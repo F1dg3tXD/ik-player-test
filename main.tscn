@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://kcsq7yb4ckqk"]
+
+[ext_resource type="Texture2D" uid="uid://dn40l66sfbodl" path="res://addons/kenney_prototype_textures/purple/texture_10.png" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="1_ig7tw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_texture = ExtResource("1_0xm2m")
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7dm0k"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_ig7tw"]
+sky_material = SubResource("ProceduralSkyMaterial_7dm0k")
+
+[sub_resource type="Environment" id="Environment_0xm2m"]
+background_mode = 2
+sky = SubResource("Sky_ig7tw")
+tonemap_mode = 4
+sdfgi_enabled = true
+
+[node name="main" type="Node3D" unique_id=1198766631]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1693308367]
+material_override = SubResource("StandardMaterial3D_h2yge")
+use_collision = true
+collision_layer = 3
+collision_mask = 3
+size = Vector3(100, 0.1, 100)
+
+[node name="env" type="Node3D" parent="." unique_id=1846598231]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="env" unique_id=1289286162]
+environment = SubResource("Environment_0xm2m")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env" unique_id=1292315982]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="player" parent="." unique_id=931792228 instance=ExtResource("1_ig7tw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.76191676, 0)
