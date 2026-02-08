@@ -28,6 +28,7 @@ var cam_pitch: float = -15.0
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
+# Stuff that didn't work
 #var dir_axis = walker.rotation.x // map to movement speed, +x rotation is forward
 #var feet_dist = walker.scale.x // smooth range from 1 to 4 for side step
 #var stride = walker.scale.z // smooth range from 1 to 7 based on movement speed
@@ -53,7 +54,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-		# Input
+	# Input
 	var input: Vector2 = Input.get_vector(
 		"move_left",
 		"move_right",
@@ -61,7 +62,7 @@ func _physics_process(delta: float) -> void:
 		"move_up"
 	)
 
-	# Camera-relative movement (yaw only)
+	# Camera-relative movement
 	var pivot_basis: Basis = _camera_pivot.global_transform.basis
 
 	var cam_forward: Vector3 = -pivot_basis.z
