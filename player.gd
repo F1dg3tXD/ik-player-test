@@ -25,6 +25,9 @@ var cam_pitch: float = -15.0
 @onready var _camera := %Camera3D as Camera3D
 @onready var _camera_pivot := %CameraPivot as Node3D
 
+@export var stick_sensitivity := 2.5
+@export var stick_deadzone := 0.15
+
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
@@ -61,6 +64,25 @@ func _physics_process(delta: float) -> void:
 		"move_down",
 		"move_up"
 	)
+	
+	# Camera controls on Stick
+	var look: Vector2 = Input.get_vector(
+		"look_left",
+		"look_right",
+		"look_up",
+		"look_down",
+		stick_deadzone
+	)
+
+	if look != Vector2.ZERO:
+		_camera_pivot.rotation.x -= look.y * stick_sensitivity * delta
+		_camera_pivot.rotation.x = clampf(
+			_camera_pivot.rotation.x,
+			-tilt_limit,
+			tilt_limit
+		)
+
+		_camera_pivot.rotation.y -= look.x * stick_sensitivity * delta
 
 	# Camera-relative movement
 	var pivot_basis: Basis = _camera_pivot.global_transform.basis
