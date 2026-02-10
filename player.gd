@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-@export var SPEED := 3.0
+@export var SPEED := 5.0
 @export var ACCEL := 10.0
 @export var DECEL := 12.0
 @export var JUMP_VELOCITY := 4.5
@@ -22,7 +22,7 @@ var horizontal_vel := Vector3.ZERO
 var cam_yaw: float = 0.0
 var cam_pitch: float = -15.0
 
-@onready var _camera := %Camera3D as Camera3D
+#@onready var _camera := %Camera3D as Camera3D
 @onready var _camera_pivot := %CameraPivot as Node3D
 
 @export var stick_sensitivity := 2.5
@@ -134,7 +134,7 @@ func update_walker(delta: float) -> void:
 	var forward_norm: float = clamp(abs(forward_speed) / SPEED, 0.0, 1.0)
 	var strafe_norm: float = clamp(abs(strafe_speed) / SPEED, 0.0, 1.0)
 
-	var moving: float = abs(forward_speed) > 0.01 or abs(strafe_speed) > 0.01
+	var _moving: float = abs(forward_speed) > 0.01 or abs(strafe_speed) > 0.01
 
 	# --- CONTINUOUS ROLL (FORWARD ONLY) ---
 	if abs(forward_speed) > 0.01:

@@ -29,6 +29,10 @@ window/size/viewport_height=720
 
 enabled=PackedStringArray("res://addons/console/plugin.cfg")
 
+[global_group]
+
+Debug="Debug Visuals and Shapes"
+
 [input]
 
 move_up={

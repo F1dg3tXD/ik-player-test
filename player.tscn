@@ -3,9 +3,37 @@
 [ext_resource type="PackedScene" uid="uid://b00s8hwiwxmfm" path="res://player_mdl.tscn" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://bkhcmto3sxbkw" path="res://player.gd" id="1_onrkg"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i3pqv"]
+transparency = 1
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sweqy"]
+transparency = 1
+albedo_color = Color(0, 0.49803922, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2hs0m"]
+transparency = 1
+albedo_color = Color(1, 0, 0, 0.49803922)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1jxqw"]
+transparency = 1
+albedo_color = Color(0, 0.49803922, 1, 0.49803922)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_onrkg"]
+transparency = 1
+albedo_color = Color(1, 1, 0, 0.5019608)
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
 radius = 0.3828125
 height = 1.8364258
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i3pqv"]
+radius = 0.383
+height = 1.836
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hqtel"]
+transparency = 1
+albedo_color = Color(0, 0.4627451, 1, 0.12156863)
 
 [node name="player" type="CharacterBody3D" unique_id=931792228]
 collision_layer = 2
@@ -14,9 +42,41 @@ script = ExtResource("1_onrkg")
 
 [node name="player_mdl" parent="." unique_id=141917622 instance=ExtResource("1_4flbx")]
 
+[node name="CSGBox3D" type="CSGBox3D" parent="player_mdl/roller/IKPole_R" parent_id_path=PackedInt32Array(141917622, 1178220090) index="0" unique_id=867082068 groups=["Debug"]]
+visible = false
+size = Vector3(10, 10, 10)
+material = SubResource("StandardMaterial3D_i3pqv")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="player_mdl/roller/IKPole_L" parent_id_path=PackedInt32Array(141917622, 963528358) index="0" unique_id=1598507986 groups=["Debug"]]
+transform = Transform3D(-0.20093763, 0.74445325, -0.6367209, 0.97774625, 0.19242445, -0.08357672, 0.06030169, -0.6393453, -0.7665515, 0, 0, 0)
+visible = false
+size = Vector3(10, 10, 10)
+material = SubResource("StandardMaterial3D_sweqy")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="player_mdl/roller/walker/IKTarget_R" parent_id_path=PackedInt32Array(141917622, 1794382976) index="0" unique_id=315622724 groups=["Debug"]]
+visible = false
+size = Vector3(15, 15, 15)
+material = SubResource("StandardMaterial3D_2hs0m")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="player_mdl/roller/walker/IKTarget_L" parent_id_path=PackedInt32Array(141917622, 1350634449) index="0" unique_id=1886229705 groups=["Debug"]]
+visible = false
+size = Vector3(15, 15, 15)
+material = SubResource("StandardMaterial3D_1jxqw")
+
+[node name="walkerDebug" type="CSGSphere3D" parent="player_mdl/roller/walker" parent_id_path=PackedInt32Array(141917622, 725400489) index="4" unique_id=1303222925 groups=["Debug"]]
+visible = false
+radius = 0.1
+rings = 12
+material = SubResource("StandardMaterial3D_onrkg")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1922632876]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9182129, 0)
 shape = SubResource("CapsuleShape3D_onrkg")
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="CollisionShape3D" unique_id=126305645 groups=["Debug"]]
+visible = false
+mesh = SubResource("CapsuleMesh_i3pqv")
+material = SubResource("StandardMaterial3D_hqtel")
 
 [node name="CameraPivot" type="Node3D" parent="." unique_id=505934924]
 unique_name_in_owner = true
