@@ -2,11 +2,19 @@
 
 [ext_resource type="Texture2D" uid="uid://dn40l66sfbodl" path="res://addons/kenney_prototype_textures/purple/texture_10.png" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://d18oyfo5mo4b0" path="res://NPC/weepingAngel.tscn" id="3_h2yge"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
 albedo_texture = ExtResource("1_0xm2m")
 uv1_scale = Vector3(0.25, 0.25, 0.25)
 uv1_triplanar = true
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_h2yge"]
+vertices = PackedVector3Array(-49.5, 0.45, -49.5, -49.5, 0.45, 49.5, 49.5, 0.45, 49.5, 49.5, 0.45, -49.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+geometry_collision_mask = 4294967041
+geometry_source_geometry_mode = 2
+geometry_source_group_name = &"World"
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7dm0k"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -23,12 +31,15 @@ sdfgi_enabled = true
 
 [node name="main" type="Node3D" unique_id=1198766631]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1693308367]
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1693308367 groups=["World"]]
 material_override = SubResource("StandardMaterial3D_h2yge")
 use_collision = true
 collision_layer = 3
 collision_mask = 3
 size = Vector3(100, 0.1, 100)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="CSGBox3D" unique_id=1058386596]
+navigation_mesh = SubResource("NavigationMesh_h2yge")
 
 [node name="env" type="Node3D" parent="." unique_id=1846598231]
 
@@ -41,3 +52,34 @@ shadow_enabled = true
 
 [node name="player" parent="." unique_id=931792228 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.76191676, 0)
+
+[node name="NPC" parent="." unique_id=1851256383 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.767655, 1.0228844, 0.29733515)
+PLAYER_PATH = NodePath("../player")
+MOVE_DELAY = 0.1
+
+[node name="NPC2" parent="." unique_id=1707849697 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.767655, 1.0228844, 2.2973351)
+PLAYER_PATH = NodePath("../player")
+MOVE_DELAY = 0.1
+
+[node name="NPC3" parent="." unique_id=1651524029 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.767655, 1.0228844, -1.7026649)
+PLAYER_PATH = NodePath("../player")
+MOVE_DELAY = 0.1
+
+[node name="NPC4" parent="." unique_id=1497060910 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.767655, 1.0228844, -1.7026649)
+PLAYER_PATH = NodePath("../player")
+MOVE_DELAY = 0.1
+
+[node name="NPC5" parent="." unique_id=861434933 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.767655, 1.0228844, 0.29733515)
+PLAYER_PATH = NodePath("../player")
+MOVE_DELAY = 0.1
+
+[node name="NPC6" parent="." unique_id=1513349557 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.767655, 1.0228844, 2.2973351)
+PLAYER_PATH = NodePath("../player")
+VISIBILITY_RADIUS = 4.5
+MOVE_DELAY = 0.1

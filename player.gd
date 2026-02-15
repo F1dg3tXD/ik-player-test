@@ -19,6 +19,9 @@ var horizontal_vel := Vector3.ZERO
 @export var TURN_SPEED := 8.0
 @export var PITCH_LIMIT := 80.0
 
+var is_flying: bool = false
+@export var FLY_SPEED := 8.0
+
 var cam_yaw: float = 0.0
 var cam_pitch: float = -15.0
 
@@ -49,23 +52,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		_camera_pivot.rotation.y += -event.screen_relative.x * mouse_sensitivity
 
 func _physics_process(delta: float) -> void:
-	# Gravity
-	if not is_on_floor():
-		velocity += get_gravity() * delta
 
-	# Jump
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	# -------------------------------------------------
+	# INPUT
+	# -------------------------------------------------
 
-	# Input
 	var input: Vector2 = Input.get_vector(
 		"move_left",
 		"move_right",
 		"move_down",
 		"move_up"
 	)
-	
-	# Camera controls on Stick
+
 	var look: Vector2 = Input.get_vector(
 		"look_left",
 		"look_right",
@@ -81,17 +79,21 @@ func _physics_process(delta: float) -> void:
 			-tilt_limit,
 			tilt_limit
 		)
-
 		_camera_pivot.rotation.y -= look.x * stick_sensitivity * delta
 
-	# Camera-relative movement
-	var pivot_basis: Basis = _camera_pivot.global_transform.basis
 
+	# -------------------------------------------------
+	# CAMERA RELATIVE MOVEMENT
+	# -------------------------------------------------
+
+	var pivot_basis: Basis = _camera_pivot.global_transform.basis
 	var cam_forward: Vector3 = -pivot_basis.z
 	var cam_right: Vector3 = pivot_basis.x
 
-	cam_forward.y = 0.0
-	cam_right.y = 0.0
+	if not is_flying:
+		cam_forward.y = 0.0
+		cam_right.y = 0.0
+
 	cam_forward = cam_forward.normalized()
 	cam_right = cam_right.normalized()
 
@@ -99,7 +101,7 @@ func _physics_process(delta: float) -> void:
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
-	# Smooth acceleration
+	# Horizontal accel
 	if move_dir != Vector3.ZERO:
 		horizontal_vel = horizontal_vel.move_toward(move_dir * SPEED, ACCEL * delta)
 	else:
@@ -108,7 +110,38 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal_vel.x
 	velocity.z = horizontal_vel.z
 
-	# --- VISUAL ROTATION (MODEL ONLY) ---
+
+	# -------------------------------------------------
+	# VERTICAL LOGIC (Clean Separation)
+	# -------------------------------------------------
+
+	if is_flying:
+		var vertical_input := 0.0
+
+		if Input.is_action_pressed("jump"):
+			vertical_input += 1.0
+		if Input.is_action_pressed("crouch"):
+			vertical_input -= 1.0
+
+		velocity.y = move_toward(
+			velocity.y,
+			vertical_input * FLY_SPEED,
+			ACCEL * delta
+		)
+
+	else:
+		# Ground gravity
+		if not is_on_floor():
+			velocity.y += get_gravity().y * delta
+		else:
+			if velocity.y < 0:
+				velocity.y = 0
+
+		# Jump
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			velocity.y = JUMP_VELOCITY
+
+# --- VISUAL ROTATION (MODEL ONLY) ---
 	if move_dir != Vector3.ZERO:
 		var target_rot: float = atan2(move_dir.x, move_dir.z)
 
@@ -120,10 +153,14 @@ func _physics_process(delta: float) -> void:
 			target_rot,
 			delta * TURN_SPEED * face_strength
 		)
+	
+	# -------------------------------------------------
+	# MOVE
+	# -------------------------------------------------
 
 	move_and_slide()
-
 	update_walker(delta)
+
 	
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
@@ -159,4 +196,13 @@ func update_walker(delta: float) -> void:
 	var strafe_dir: float = clamp(strafe_speed / SPEED, -1.0, 1.0)
 	var target_yaw: float = deg_to_rad(0.0) * strafe_dir
 	walker.rotation.y = lerp(walker.rotation.y, target_yaw, delta * 8.0)
+
+func set_fly_mode(enabled: bool) -> void:
+	is_flying = enabled
 	
+	if is_flying:
+		motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
+	else:
+		motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
+	
+	velocity = Vector3.ZERO

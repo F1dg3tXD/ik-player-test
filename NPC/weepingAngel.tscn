@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://d18oyfo5mo4b0"]
+
+[ext_resource type="Script" uid="uid://c64r3soff1x8r" path="res://NPC/weeping_angel.gd" id="1_dg07f"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6drsj"]
+
+[node name="NPC" type="CharacterBody3D" unique_id=1851256383 groups=["WeepingAngel"]]
+script = ExtResource("1_dg07f")
+TARGET_RING_RADIUS = 0.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1738933637]
+shape = SubResource("CapsuleShape3D_6drsj")
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=1735982310]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1, 0)
+cone = true
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=776433916]
+avoidance_enabled = true
+debug_enabled = true
+debug_path_custom_color = Color(1, 0, 0, 1)
