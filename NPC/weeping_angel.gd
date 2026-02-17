@@ -97,7 +97,7 @@ func any_angel_visible() -> bool:
 		if angel.is_visible_to_player():
 			return true
 	return false
-	
+
 func apply_gravity(delta):
 	if not is_on_floor():
 		velocity.y += get_gravity().y * delta

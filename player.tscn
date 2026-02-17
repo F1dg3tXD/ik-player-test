@@ -37,7 +37,7 @@ albedo_color = Color(0, 0.4627451, 1, 0.12156863)
 
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
-collision_mask = 2
+collision_mask = 3
 script = ExtResource("1_onrkg")
 
 [node name="player_mdl" parent="." unique_id=141917622 instance=ExtResource("1_4flbx")]
