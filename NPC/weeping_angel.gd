@@ -11,16 +11,31 @@ extends CharacterBody3D
 @export var SEPARATION_RADIUS := 2.0
 @export var SEPARATION_STRENGTH := 3.0
 @export var TARGET_RING_RADIUS := 2.5
+@export var ATTACK_RANGE := 3.2
+@export var OCCLUSION_MASK := 1 << 2
+@export var POSE_SWITCH_DELAY := 0.2
 
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
+
+@onready var angel_attack: MeshInstance3D = $weepingAngelMdl/weepingAngel/Skeleton3D/AngelAttack
+@onready var angel_idle: MeshInstance3D = $weepingAngelMdl/weepingAngel/Skeleton3D/Angelidle
+@onready var angel_point: MeshInstance3D = $weepingAngelMdl/weepingAngel/Skeleton3D/AngelPoint
+@onready var kill_trigger: Area3D = $KillTrigger
 
 var player : CharacterBody3D
 var player_camera : Camera3D
 var unseen_timer := 0.0
+var unseen_pose_timer := 0.0
 
 var nav_map : RID
 var nav_ready := false
 var nav_iteration_id := 0
+
+var current_state : AngelState = AngelState.IDLE
+var current_role : AngelRole = AngelRole.PRESSURE
+
+enum AngelState {IDLE, STALK, ATTACK}
+enum AngelRole {PRESSURE, FLANK, AMBUSH}
 
 func _ready():
 	player = get_tree().get_first_node_in_group("Player")
@@ -29,25 +44,105 @@ func _ready():
 	nav_map = nav_agent.get_navigation_map()
 	nav_iteration_id = NavigationServer3D.map_get_iteration_id(nav_map)
 	NavigationServer3D.map_changed.connect(_on_nav_map_changed)
+	POSE_SWITCH_DELAY += randf_range(-0.05, 0.05)
+	current_role = randi() % 3
+	kill_trigger.body_entered.connect(_on_kill_trigger_entered)
+	
+func update_visual_state():
+	angel_idle.visible = false
+	angel_point.visible = false
+	angel_attack.visible = false
+	match current_state:
+		AngelState.IDLE:
+			angel_idle.visible = true
+		AngelState.STALK:
+			angel_point.visible = true
+		AngelState.ATTACK:
+			angel_attack.visible = true
+
+func set_state(new_state: AngelState):
+	if current_state == new_state:
+		return
+	current_state = new_state
+	update_visual_state()
+	
+func update_state_logic(can_move: bool, delta: float):
+	if player == null:
+		return
+	var dist = global_position.distance_to(player.global_position)
+	var player_can_see_me = is_visible_to_player()
+	if player_can_see_me:
+		unseen_pose_timer = 0.0
+		return
+	unseen_pose_timer += delta
+	if unseen_pose_timer < POSE_SWITCH_DELAY:
+		return
+	var attackers := 0
+	for angel in get_tree().get_nodes_in_group("WeepingAngel"):
+		if angel != self and angel.current_state == AngelState.ATTACK:
+			attackers += 1
+	var max_attackers := 1
+	var desired_state : AngelState = current_state
+	# --- Maintain attack (hysteresis) ---
+	if current_state == AngelState.ATTACK:
+		if dist <= ATTACK_RANGE + 0.3:
+			desired_state = AngelState.ATTACK
+		else:
+			desired_state = AngelState.STALK
+	# --- Try to enter attack ---
+	elif dist <= ATTACK_RANGE:
+		if attackers < max_attackers:
+			desired_state = AngelState.ATTACK
+		else:
+			desired_state = AngelState.STALK
+	# --- Normal behavior ---
+	elif can_move:
+		desired_state = AngelState.STALK
+	else:
+		desired_state = AngelState.IDLE
+	set_state(desired_state)
+	
+func _on_kill_trigger_entered(body):
+	if body.is_in_group("Player") and current_state == AngelState.ATTACK:
+		trigger_jumpscare(body)
+		
+func trigger_jumpscare(player):
+	set_physics_process(false)
+	player.set_physics_process(false)
+	set_state(AngelState.ATTACK)
+	
+	# Snap to face player
+	look_at(player.global_position, Vector3.UP)
+	
+	# Play animation here
+
 
 func is_visible_to_player() -> bool:
 	if player_camera == null:
 		return false
-	# 1. Completely outside frustum?
-	if not player_camera.is_position_in_frustum(global_transform.origin):
-		return false
-	# 2. Raycast visibility check
 	var space_state = get_world_3d().direct_space_state
 	var cam_pos = player_camera.global_transform.origin
-	var target_pos = global_transform.origin
-	var query = PhysicsRayQueryParameters3D.create(cam_pos, target_pos)
-	# Ignore self AND player because the HL2 source code taught me well.
-	query.exclude = [self, player]
-	var result = space_state.intersect_ray(query)
-	# If something blocks it, it's hidden
-	if result:
-		return false
-	return true
+	var offsets = [
+		Vector3(0, VISIBILITY_RADIUS, 0),
+		Vector3(0, -VISIBILITY_RADIUS, 0),
+		Vector3(VISIBILITY_RADIUS, 0, 0),
+		Vector3(-VISIBILITY_RADIUS, 0, 0),
+		Vector3(0, 0, VISIBILITY_RADIUS),
+		Vector3(0, 0, -VISIBILITY_RADIUS)
+	]
+	for offset in offsets:
+		var sample_point = global_transform.origin + offset
+		# Skip if outside frustum
+		if not player_camera.is_position_in_frustum(sample_point):
+			continue
+		var query = PhysicsRayQueryParameters3D.create(cam_pos, sample_point)
+		query.collision_mask = OCCLUSION_MASK
+		query.exclude = [self, player]
+		var result = space_state.intersect_ray(query)
+		# If nothing blocks this sample → visible
+		if result.is_empty():
+			return true
+	return false
 
 func _on_nav_map_changed(changed_map):
 	if changed_map == nav_map:
@@ -134,7 +229,7 @@ func compute_separation() -> Vector3:
 
 func _physics_process(delta):
 	if player == null:
-		pass
+		return
 	apply_gravity(delta)
 	handle_teleport()
 	var can_move = should_move(delta)
@@ -142,32 +237,33 @@ func _physics_process(delta):
 		move_toward_player(delta)
 	else:
 		stop_horizontal()
+	# Update visual state AFTER movement decision
+	update_state_logic(can_move, delta)
 	move_and_slide()
 	clamp_to_navmesh()
 
 func should_move(delta) -> bool:
-	# Freeze if ANY angel visible
-	if any_angel_visible():
-		unseen_timer = 0.0
-		return false
-	# Freeze if this angel visible
 	if is_visible_to_player():
 		unseen_timer = 0.0
 		return false
-	# Only move if fully outside view
-	if is_fully_outside_view():
-		unseen_timer += delta
-	else:
-		unseen_timer = 0.0
+	unseen_timer += delta
 	return unseen_timer > MOVE_DELAY
-	
+
 func stop_horizontal():
 	velocity.x = 0
 	velocity.z = 0
 
 func move_toward_player(delta):
 	var to_player = (global_position - player.global_position).normalized()
-	var offset_target = player.global_position + to_player * TARGET_RING_RADIUS
+	var offset_target : Vector3
+	match current_role:
+		AngelRole.PRESSURE:
+			offset_target = player.global_position + to_player * TARGET_RING_RADIUS
+		AngelRole.FLANK:
+			var side = to_player.cross(Vector3.UP).normalized()
+			offset_target = player.global_position + (to_player * TARGET_RING_RADIUS) + side * 2.0
+		AngelRole.AMBUSH:
+			offset_target = player.global_position - to_player * (TARGET_RING_RADIUS + 2.0)
 	nav_agent.target_position = offset_target
 	var next_pos = nav_agent.get_next_path_position()
 	var direction = (next_pos - global_position)

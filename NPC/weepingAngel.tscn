@@ -1,21 +1,46 @@
 [gd_scene format=3 uid="uid://d18oyfo5mo4b0"]
 
 [ext_resource type="Script" uid="uid://c64r3soff1x8r" path="res://NPC/weeping_angel.gd" id="1_dg07f"]
+[ext_resource type="PackedScene" uid="uid://bi31m4580ptwb" path="res://NPC/weeping_angel_mdl.tscn" id="2_j6gu7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6drsj"]
+radius = 0.46484375
+height = 2.2434082
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_j6gu7"]
+radius = 0.69433594
+height = 2.2299805
 
 [node name="NPC" type="CharacterBody3D" unique_id=1851256383 groups=["WeepingAngel"]]
+collision_layer = 4
+collision_mask = 5
 script = ExtResource("1_dg07f")
 TARGET_RING_RADIUS = 0.5
+OCCLUSION_MASK = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1738933637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1217041, 0)
 shape = SubResource("CapsuleShape3D_6drsj")
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=1735982310]
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=1735982310 groups=["Debug"]]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1, 0)
+visible = false
 cone = true
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=776433916]
 avoidance_enabled = true
-debug_enabled = true
 debug_path_custom_color = Color(1, 0, 0, 1)
+
+[node name="weepingAngelMdl" parent="." unique_id=1527454363 instance=ExtResource("2_j6gu7")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, -1, 0)
+
+[node name="Angelidle" parent="weepingAngelMdl/weepingAngel/Skeleton3D" parent_id_path=PackedInt32Array(1527454363, 1014167299) index="1" unique_id=1461843831]
+visible = true
+
+[node name="KillTrigger" type="Area3D" parent="." unique_id=1709363611]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillTrigger" unique_id=1498661873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.114990234, 0)
+shape = SubResource("CapsuleShape3D_j6gu7")
+
+[editable path="weepingAngelMdl"]

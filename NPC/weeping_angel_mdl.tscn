@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bi31m4580ptwb"]
+
+[ext_resource type="PackedScene" uid="uid://b56ttf6a3js6q" path="res://models/weepingAngel.glb" id="1_kwtyh"]
+
+[node name="weepingAngelMdl" unique_id=1527454363 instance=ExtResource("1_kwtyh")]
+
+[node name="AngelAttack" parent="weepingAngel/Skeleton3D" parent_id_path=PackedInt32Array(1014167299) index="0" unique_id=1516869120]
+visible = false
+
+[node name="Angelidle" parent="weepingAngel/Skeleton3D" parent_id_path=PackedInt32Array(1014167299) index="1" unique_id=1461843831]
+visible = false
+
+[node name="AngelPoint" parent="weepingAngel/Skeleton3D" parent_id_path=PackedInt32Array(1014167299) index="2" unique_id=1045359250]
+visible = false
