@@ -15,7 +15,7 @@ config/description="Workers Engagement Extraction Patrol"
 run/main_scene="uid://kcsq7yb4ckqk"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0.14117648, 0.14117648, 0.14117648, 0)
-boot_splash/image="uid://c38aopumt1v1f"
+boot_splash/image="uid://pa3hnlx3kf3d"
 config/icon="uid://siymg4sb3lgj"
 
 [autoload]

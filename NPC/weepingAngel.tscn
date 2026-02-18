@@ -7,9 +7,29 @@
 radius = 0.46484375
 height = 2.2434082
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_21jsk"]
+radius = 0.694
+height = 2.23
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_21jsk"]
+transparency = 1
+albedo_color = Color(1, 0, 0, 0.5294118)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cdep7"]
+transparency = 1
+albedo_color = Color(0, 1, 1, 0.48235294)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wbjy1"]
+transparency = 1
+albedo_color = Color(1, 1, 0, 0.5176471)
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_j6gu7"]
 radius = 0.69433594
 height = 2.2299805
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j6gu7"]
+transparency = 1
+albedo_color = Color(0, 1, 0, 0.4392157)
 
 [node name="NPC" type="CharacterBody3D" unique_id=1851256383 groups=["WeepingAngel"]]
 collision_layer = 4
@@ -22,11 +42,6 @@ OCCLUSION_MASK = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1217041, 0)
 shape = SubResource("CapsuleShape3D_6drsj")
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=1735982310 groups=["Debug"]]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1, 0)
-visible = false
-cone = true
-
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=776433916]
 avoidance_enabled = true
 debug_path_custom_color = Color(1, 0, 0, 1)
@@ -34,13 +49,41 @@ debug_path_custom_color = Color(1, 0, 0, 1)
 [node name="weepingAngelMdl" parent="." unique_id=1527454363 instance=ExtResource("2_j6gu7")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, -1, 0)
 
+[node name="CSGMesh3D" type="CSGMesh3D" parent="weepingAngelMdl/weepingAngel/Skeleton3D/AngelAttack" parent_id_path=PackedInt32Array(1527454363, 1516869120) index="0" unique_id=518995834 groups=["Debug"]]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 1.1265124, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_21jsk")
+material = SubResource("StandardMaterial3D_21jsk")
+
 [node name="Angelidle" parent="weepingAngelMdl/weepingAngel/Skeleton3D" parent_id_path=PackedInt32Array(1527454363, 1014167299) index="1" unique_id=1461843831]
 visible = true
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="weepingAngelMdl/weepingAngel/Skeleton3D/Angelidle" index="0" unique_id=1818100495 groups=["Debug"]]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 1.1265124, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_21jsk")
+material = SubResource("StandardMaterial3D_cdep7")
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="weepingAngelMdl/weepingAngel/Skeleton3D/AngelPoint" parent_id_path=PackedInt32Array(1527454363, 1045359250) index="0" unique_id=1113625325 groups=["Debug"]]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 1.1265124, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_21jsk")
+material = SubResource("StandardMaterial3D_wbjy1")
 
 [node name="KillTrigger" type="Area3D" parent="." unique_id=1709363611]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KillTrigger" unique_id=1498661873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.114990234, 0)
 shape = SubResource("CapsuleShape3D_j6gu7")
+
+[node name="Debug" type="Node3D" parent="." unique_id=1753227849 groups=["Debug"]]
+visible = false
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Debug" unique_id=1735982310]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.5012029, 0.37924194)
+radius = 0.18896484
+height = 0.33050537
+cone = true
+material = SubResource("StandardMaterial3D_j6gu7")
 
 [editable path="weepingAngelMdl"]
