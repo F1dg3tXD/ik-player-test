@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgf0o615ca00u"
 path.s3tc="res://.godot/imported/weepingAngel_angelwings_nrm.png-323b5850ed9cd2a293d10b34e05f168e.s3tc.ctex"
+path.etc2="res://.godot/imported/weepingAngel_angelwings_nrm.png-323b5850ed9cd2a293d10b34e05f168e.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://models/weepingAngel_angelwings_nrm.png"
-dest_files=["res://.godot/imported/weepingAngel_angelwings_nrm.png-323b5850ed9cd2a293d10b34e05f168e.s3tc.ctex"]
+dest_files=["res://.godot/imported/weepingAngel_angelwings_nrm.png-323b5850ed9cd2a293d10b34e05f168e.s3tc.ctex", "res://.godot/imported/weepingAngel_angelwings_nrm.png-323b5850ed9cd2a293d10b34e05f168e.etc2.ctex"]
 
 [params]
 

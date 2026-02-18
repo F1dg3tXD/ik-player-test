@@ -19,3 +19,4 @@ export_presets.cfg
 .DS_Store
 /src
 /.vscode
+*.import
