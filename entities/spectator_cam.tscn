@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bfdvemsafgjnx"]
+
+[ext_resource type="Script" uid="uid://1w2s1q5pxk01" path="res://entities/spectator_cam.gd" id="1_tn8n1"]
+
+[node name="SpectatorCam" type="Node3D" unique_id=1061236020]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, 0, 0)
+script = ExtResource("1_tn8n1")
+
+[node name="camera holder" type="SpringArm3D" parent="." unique_id=1590159197]
+spring_length = 3.0
+
+[node name="Camera3D" type="Camera3D" parent="camera holder" unique_id=1506304917]
+unique_name_in_owner = true

@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://ct611hjwlh6tt"]
+
+[ext_resource type="Script" uid="uid://csye018x48vg4" path="res://addons/SimpleDungeons/DungeonGenerator3D.gd" id="1_u0dwv"]
+[ext_resource type="PackedScene" uid="uid://bhpnvm7ntyup3" path="res://maps/spawn_room.tscn" id="2_ye226"]
+[ext_resource type="PackedScene" uid="uid://bf2x1vi7geqpp" path="res://maps/test_room.tscn" id="3_ye226"]
+[ext_resource type="PackedScene" uid="uid://cplmb48hh865" path="res://maps/corridor.tscn" id="3_yxivg"]
+
+[node name="maze" type="Node3D" unique_id=839545564]
+script = ExtResource("1_u0dwv")
+room_scenes = Array[PackedScene]([ExtResource("2_ye226"), ExtResource("3_ye226")])
+corridor_room_scene = ExtResource("3_yxivg")
+dungeon_size = Vector3i(5, 1, 5)
+metadata/_custom_type_script = "uid://csye018x48vg4"

@@ -2,7 +2,7 @@ extends Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	Console.pause_enabled = true
+	Console.pause_enabled = false
 	Console.console_opened.connect(on_console_opened)
 	Console.console_closed.connect(on_console_closed)
 	Console.add_command("debug", on_debug, 1, 1, "debug 0 = off | debug 1 = debug nodes | debug 2 = nav paths + avoidance")

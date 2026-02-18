@@ -4,7 +4,7 @@
 
 [node name="player_mdl" unique_id=141917622 instance=ExtResource("1_ggndm")]
 
-[node name="Skeleton3D" parent="Armature" parent_id_path=PackedInt32Array(1707277225) index="0" unique_id=301745978]
+[node name="Skeleton3D" parent="Armature" parent_id_path=PackedInt32Array(625437069) index="0" unique_id=1172839319]
 bones/0/position = Vector3(6.394337e-06, 1.5542562, -104.27047)
 bones/6/rotation = Quaternion(-0.4844306, 0.57096386, -0.5261635, -0.4030873)
 bones/7/position = Vector3(3.7803807e-07, 10.8381815, 1.6289932e-05)
@@ -94,6 +94,16 @@ settings/0/end_bone = 46
 settings/0/use_virtual_end = false
 settings/0/extend_end_bone = false
 
+[node name="HeadLook" type="LookAtModifier3D" parent="Armature/Skeleton3D" index="4" unique_id=2057116475]
+target_node = NodePath("../../../SpineIK/HeadTarget")
+bone_name = "Head"
+bone = 5
+
+[node name="ChestLook" type="LookAtModifier3D" parent="Armature/Skeleton3D" index="5" unique_id=1976242808]
+target_node = NodePath("../../../SpineIK/SpineTarget")
+bone_name = "Spine"
+bone = 1
+
 [node name="roller" type="Node3D" parent="." index="2" unique_id=1718411187]
 
 [node name="IKPole_R" type="Marker3D" parent="roller" index="0" unique_id=1178220090]
@@ -118,3 +128,12 @@ remote_path = NodePath("..")
 [node name="RemoteTransform3D_R" type="RemoteTransform3D" parent="roller/walker" index="3" unique_id=1523546746]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, -0.1)
 remote_path = NodePath("..")
+
+[node name="SpineIK" type="Node3D" parent="." index="3" unique_id=639342629]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4478381, 0.6574899)
+
+[node name="HeadTarget" type="Marker3D" parent="SpineIK" index="0" unique_id=771112146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16833627, 0.001106143)
+
+[node name="SpineTarget" type="Marker3D" parent="SpineIK" index="1" unique_id=561460877]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20968366, 0.029347837)

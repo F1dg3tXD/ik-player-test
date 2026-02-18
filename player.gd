@@ -12,6 +12,8 @@ var roll_angle: float = 0.0
 
 @onready var walker: Marker3D = $player_mdl/roller/walker
 @onready var player_mdl: Node3D = $player_mdl
+@onready var beta_joints: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_Joints
+@onready var beta_surface: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_Surface
 
 var horizontal_vel := Vector3.ZERO
 
@@ -25,8 +27,12 @@ var is_flying: bool = false
 var cam_yaw: float = 0.0
 var cam_pitch: float = -15.0
 
-#@onready var _camera := %Camera3D as Camera3D
-@onready var _camera_pivot := %CameraPivot as Node3D
+# Thirdperson camera will be reused for spectator camera
+
+# Main FPS Camera Stuff
+@onready var camera_3d: Camera3D = %Camera3D
+@onready var neck: Node3D = $neck
+@onready var head: Node3D = $neck/head
 
 @export var stick_sensitivity := 2.5
 @export var stick_deadzone := 0.15
@@ -36,7 +42,7 @@ var cam_pitch: float = -15.0
 
 #Steam Stuff
 @onready var display_name: Label = $SteamName/displayName
-@onready var steam_avatar: TextureRect = $SteamIcon/steamAvatar
+#@onready var steam_avatar: TextureRect = $SteamIcon/steamAvatar
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
 
 var personaName := Steam.getPersonaName()
@@ -49,6 +55,14 @@ func _ready() -> void:
 	Steam.getPlayerAvatar(Steam.AVATAR_LARGE)
 	Steam.avatar_loaded.connect(_on_loaded_avatar)
 	display_name.text = personaName
+	
+	if is_multiplayer_authority():
+		player_mdl.visible = true
+		beta_joints.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		beta_surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		camera_3d.current = true
+	else:
+		camera_3d.current = false
 	
 func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByteArray) -> void:
 	print("Avatar for user: %s" % user_id)
@@ -64,48 +78,51 @@ func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByte
 	var avatar_texture: ImageTexture = ImageTexture.create_from_image(avatar_image)
 	# Set the texture to a Sprite, TextureRect, etc.
 	avatar_sprite.set_texture(avatar_texture)
-	steam_avatar.set_texture(avatar_texture)
+	#steam_avatar.set_texture(avatar_texture)
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Mouselook implemented using `screen_relative` for resolution-independent sensitivity.
+	if not is_multiplayer_authority():
+		return
 	if event is InputEventMouseMotion:
-		_camera_pivot.rotation.x -= event.screen_relative.y * mouse_sensitivity
-		# Prevent the camera from rotating too far up or down.
-		_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, -tilt_limit, tilt_limit)
-		_camera_pivot.rotation.y += -event.screen_relative.x * mouse_sensitivity
+		# Yaw rotates the body
+		rotation.y -= event.relative.x * mouse_sensitivity
+		# Pitch rotates the head
+		head.rotation.x += event.relative.y * mouse_sensitivity
+		head.rotation.x = clamp(head.rotation.x, -tilt_limit, tilt_limit)
 
 func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority():
+		return
 
 	# -------------------------------------------------
 	# INPUT
 	# -------------------------------------------------
 
-	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_down", "move_up")
+	var input: Vector2 = Input.get_vector("move_right", "move_left", "move_up", "move_down")
 
 	var look: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down", stick_deadzone)
 
-	if look != Vector2.ZERO:
-		_camera_pivot.rotation.x -= look.y * stick_sensitivity * delta
-		_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, -tilt_limit, tilt_limit)
-		_camera_pivot.rotation.y -= look.x * stick_sensitivity * delta
-
+	if look != Vector2.ZERO and is_multiplayer_authority():
+		rotation.y -= look.x * stick_sensitivity * delta
+		head.rotation.x += look.y * stick_sensitivity * delta
+		head.rotation.x = clamp(head.rotation.x, -tilt_limit, tilt_limit)
 
 	# -------------------------------------------------
 	# CAMERA RELATIVE MOVEMENT
 	# -------------------------------------------------
 
-	var pivot_basis: Basis = _camera_pivot.global_transform.basis
-	var cam_forward: Vector3 = -pivot_basis.z
-	var cam_right: Vector3 = pivot_basis.x
+	var forward = -transform.basis.z
+	var right = transform.basis.x
 
 	if not is_flying:
-		cam_forward.y = 0.0
-		cam_right.y = 0.0
+		forward.y = 0
+		right.y = 0
 
-	cam_forward = cam_forward.normalized()
-	cam_right = cam_right.normalized()
+	forward = forward.normalized()
+	right = right.normalized()
 
-	var move_dir: Vector3 = cam_right * input.x + cam_forward * input.y
+	var move_dir = right * input.x + forward * input.y
+
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
@@ -150,13 +167,13 @@ func _physics_process(delta: float) -> void:
 			velocity.y = JUMP_VELOCITY
 
 # --- VISUAL ROTATION (MODEL ONLY) ---
-	if move_dir != Vector3.ZERO:
-		var target_rot: float = atan2(move_dir.x, move_dir.z)
-
-		# Forward input biases turning (prevents forced rotation while strafing)
-		var face_strength: float = abs(input.y)
-
-		player_mdl.rotation.y = lerp_angle(player_mdl.rotation.y, target_rot, delta * TURN_SPEED * face_strength)
+	#if move_dir != Vector3.ZERO:
+		#var target_rot: float = atan2(move_dir.x, move_dir.z)
+#
+		## Forward input biases turning (prevents forced rotation while strafing)
+		#var face_strength: float = abs(input.y)
+#
+		#player_mdl.rotation.y = lerp_angle(player_mdl.rotation.y, target_rot, delta * TURN_SPEED * face_strength)
 	
 	# -------------------------------------------------
 	# MOVE
@@ -210,3 +227,7 @@ func set_fly_mode(enabled: bool) -> void:
 		motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
 	
 	velocity = Vector3.ZERO
+	
+@rpc("authority", "call_local")
+func apply_color(color: Color):
+	$MeshInstance3D.material_override.albedo_color = color
