@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 Console="*uid://ouiu5xh1cs8n"
 Terminal="*uid://b57oidlvdiwvv"
 
+[debug]
+
+file_logging/enable_file_logging=true
+
 [display]
 
 window/size/viewport_width=1280
@@ -113,3 +117,10 @@ crouch={
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[steam]
+
+multiplayer_peer/max_channels=4
+initialization/app_id=420
+initialization/embed_callbacks=true
+initialization/initialize_on_startup=true

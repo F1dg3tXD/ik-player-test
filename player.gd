@@ -34,14 +34,37 @@ var cam_pitch: float = -15.0
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
-# Stuff that didn't work
-#var dir_axis = walker.rotation.x // map to movement speed, +x rotation is forward
-#var feet_dist = walker.scale.x // smooth range from 1 to 4 for side step
-#var stride = walker.scale.z // smooth range from 1 to 7 based on movement speed
-#var strafe_dir = walker.rotation.y // rotate y between 0 and -90 if strafing, where -x rotation is left and +x rotation is right. 
+#Steam Stuff
+@onready var display_name: Label = $SteamName/displayName
+@onready var steam_avatar: TextureRect = $SteamIcon/steamAvatar
+@onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
+
+var personaName := Steam.getPersonaName()
+
+# For later multiplayer
+#Steam.getPlayerAvatar(remote_steam_id, Steam.AVATAR_MEDIUM)
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Steam.getPlayerAvatar(Steam.AVATAR_LARGE)
+	Steam.avatar_loaded.connect(_on_loaded_avatar)
+	display_name.text = personaName
+	
+func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByteArray) -> void:
+	print("Avatar for user: %s" % user_id)
+	print("Size: %s" % avatar_size)
+	# Check if user exists
+	if user_id != Steam.getSteamID():
+		return
+	# Create the image and texture for loading
+	var avatar_image: Image = Image.create_from_data(avatar_size, avatar_size, false, Image.FORMAT_RGBA8, avatar_buffer)
+	# Optionally resize the image if it is too large
+	avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
+	# Apply the image to a texture
+	var avatar_texture: ImageTexture = ImageTexture.create_from_image(avatar_image)
+	# Set the texture to a Sprite, TextureRect, etc.
+	avatar_sprite.set_texture(avatar_texture)
+	steam_avatar.set_texture(avatar_texture)
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Mouselook implemented using `screen_relative` for resolution-independent sensitivity.
@@ -57,28 +80,13 @@ func _physics_process(delta: float) -> void:
 	# INPUT
 	# -------------------------------------------------
 
-	var input: Vector2 = Input.get_vector(
-		"move_left",
-		"move_right",
-		"move_down",
-		"move_up"
-	)
+	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_down", "move_up")
 
-	var look: Vector2 = Input.get_vector(
-		"look_left",
-		"look_right",
-		"look_up",
-		"look_down",
-		stick_deadzone
-	)
+	var look: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down", stick_deadzone)
 
 	if look != Vector2.ZERO:
 		_camera_pivot.rotation.x -= look.y * stick_sensitivity * delta
-		_camera_pivot.rotation.x = clampf(
-			_camera_pivot.rotation.x,
-			-tilt_limit,
-			tilt_limit
-		)
+		_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, -tilt_limit, tilt_limit)
 		_camera_pivot.rotation.y -= look.x * stick_sensitivity * delta
 
 
@@ -148,11 +156,7 @@ func _physics_process(delta: float) -> void:
 		# Forward input biases turning (prevents forced rotation while strafing)
 		var face_strength: float = abs(input.y)
 
-		player_mdl.rotation.y = lerp_angle(
-			player_mdl.rotation.y,
-			target_rot,
-			delta * TURN_SPEED * face_strength
-		)
+		player_mdl.rotation.y = lerp_angle(player_mdl.rotation.y, target_rot, delta * TURN_SPEED * face_strength)
 	
 	# -------------------------------------------------
 	# MOVE

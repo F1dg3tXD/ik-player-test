@@ -3,6 +3,13 @@
 [ext_resource type="PackedScene" uid="uid://b00s8hwiwxmfm" path="res://player_mdl.tscn" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://bkhcmto3sxbkw" path="res://player.gd" id="1_onrkg"]
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_i3pqv"]
+viewport_path = NodePath("SteamIcon")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dw050"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_i3pqv")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i3pqv"]
 transparency = 1
 albedo_color = Color(1, 0, 0, 1)
@@ -35,12 +42,25 @@ height = 1.836
 transparency = 1
 albedo_color = Color(0, 0.4627451, 1, 0.12156863)
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_onrkg"]
+viewport_path = NodePath("SteamName")
+
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_onrkg")
 
 [node name="player_mdl" parent="." unique_id=141917622 instance=ExtResource("1_4flbx")]
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="player_mdl/Armature/Skeleton3D" parent_id_path=PackedInt32Array(141917622, 301745978) index="4" unique_id=771474810]
+transform = Transform3D(1, 6.248532e-08, -4.0224197e-08, 4.010733e-08, 0.0018693358, 0.9999983, 6.2560474e-08, -0.99999803, 0.0018692389, 3.1935379e-06, -4.3909283, -159.99924)
+bone_name = "Head"
+bone_idx = 5
+
+[node name="profileImg" type="CSGBox3D" parent="player_mdl/Armature/Skeleton3D/BoneAttachment3D" unique_id=1040001757]
+transform = Transform3D(100, 4.5474735e-13, 2.2586377e-12, 5.4178884e-14, -7.4505806e-08, 99.99996, 0, -100, -1.4901161e-08, -3.0825186e-07, 8.248093, 5.149426)
+size = Vector3(0.3, 0.3, 0.28085938)
+material = SubResource("StandardMaterial3D_dw050")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="player_mdl/roller/IKPole_R" parent_id_path=PackedInt32Array(141917622, 1178220090) index="0" unique_id=867082068 groups=["Debug"]]
 visible = false
@@ -87,5 +107,43 @@ spring_length = 3.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot/camera holder" unique_id=1821629408]
 unique_name_in_owner = true
+
+[node name="SteamName" type="SubViewport" parent="." unique_id=1236479918]
+transparent_bg = true
+gui_disable_input = true
+size = Vector2i(500, 50)
+
+[node name="displayName" type="Label" parent="SteamName" unique_id=624669869]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "$USER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SteamIcon" type="SubViewport" parent="." unique_id=82591932]
+transparent_bg = true
+gui_disable_input = true
+size = Vector2i(128, 128)
+
+[node name="steamAvatar" type="TextureRect" parent="SteamIcon" unique_id=1379780327]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="avatarSprite" type="Sprite2D" parent="SteamIcon" unique_id=1272131050]
+position = Vector2(64, 64)
+rotation = -1.5707964
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=2051097246]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.084975, 0)
+billboard = 1
+texture = SubResource("ViewportTexture_onrkg")
 
 [editable path="player_mdl"]
