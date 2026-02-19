@@ -22,6 +22,7 @@ config/icon="uid://siymg4sb3lgj"
 
 Console="*uid://ouiu5xh1cs8n"
 Terminal="*uid://b57oidlvdiwvv"
+NetworkManager="*uid://dlglunsmvpajx"
 
 [debug]
 

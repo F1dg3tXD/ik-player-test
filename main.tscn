@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://kcsq7yb4ckqk"]
 
-[ext_resource type="Script" uid="uid://dbv8npisj7ehe" path="res://main.gd" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://dpd40gidibq5q" path="res://scrips/tests/enet_menu.gd" id="1_h2yge"]
 [ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="3_1bvp3"]
 [ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="3_h2yge"]
 
@@ -12,8 +11,7 @@ outline_size = 30
 outline_color = Color(1, 0, 0, 1)
 
 [node name="Menu" type="Node2D" unique_id=298708851]
-script = ExtResource("1_0xm2m")
-player_scene = ExtResource("1_ig7tw")
+script = ExtResource("1_h2yge")
 
 [node name="main" type="Control" parent="." unique_id=108881086]
 layout_mode = 3

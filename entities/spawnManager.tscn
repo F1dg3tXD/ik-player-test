@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://blwdixrupw41w"]
-
-[ext_resource type="Script" uid="uid://bmg3dhinjg2be" path="res://entities/spawn_manager.gd" id="1_sj8xy"]
-[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="2_tyxky"]
-
-[node name="spawnManager" type="Node3D" unique_id=998261882]
-script = ExtResource("1_sj8xy")
-player_scene = ExtResource("2_tyxky")

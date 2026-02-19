@@ -2,8 +2,11 @@
 
 [ext_resource type="Script" uid="uid://cwcs32mi20btt" path="res://addons/SimpleDungeons/DungeonRoom3D.gd" id="1_4q6cr"]
 [ext_resource type="PackedScene" uid="uid://d1ydcniaskip3" path="res://entities/van.tscn" id="2_el33t"]
-[ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnManager.tscn" id="3_5dgav"]
-[ext_resource type="PackedScene" uid="uid://kjcw2iun6d6a" path="res://models/spawnRoom_mesh.glb" id="4_apvvq"]
+[ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="3_5dgav"]
+[ext_resource type="PackedScene" uid="uid://coy2qmhw3rw4v" path="res://models/spawnRoom_mesh.glb" id="4_apvvq"]
+[ext_resource type="PackedScene" uid="uid://30ps5b6kgidk" path="res://globals/game_manager.tscn" id="5_pooin"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_apvvq"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_apvvq"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -33,19 +36,25 @@ visible = false
 use_collision = true
 size = Vector3(30, 0.5, 30)
 
-[node name="spawnManager" parent="." unique_id=998261882 instance=ExtResource("3_5dgav")]
+[node name="GameManager" parent="." unique_id=313029006 instance=ExtResource("5_pooin")]
+spawn_points_path = NodePath("../spawnPoints")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="GameManager" unique_id=1530093420]
+replication_config = SubResource("SceneReplicationConfig_apvvq")
+
+[node name="spawnPoints" parent="." unique_id=998261882 instance=ExtResource("3_5dgav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20922852, 0)
 
-[node name="spawn" type="Node3D" parent="spawnManager" unique_id=784111094 groups=["SpawnPoint"]]
+[node name="spawn2" type="Marker3D" parent="spawnPoints" unique_id=847261045 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -1.7354393, -2)
 
-[node name="spawn3" type="Node3D" parent="spawnManager" unique_id=1996253255 groups=["SpawnPoint"]]
+[node name="spawn3" type="Marker3D" parent="spawnPoints" unique_id=256835023 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -1.7354393, -2)
 
-[node name="spawn4" type="Node3D" parent="spawnManager" unique_id=1970945041 groups=["SpawnPoint"]]
+[node name="spawn4" type="Marker3D" parent="spawnPoints" unique_id=915371870 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -1.7354393, 3)
 
-[node name="spawn6" type="Node3D" parent="spawnManager" unique_id=1738256549 groups=["SpawnPoint"]]
+[node name="spawn6" type="Marker3D" parent="spawnPoints" unique_id=788846050 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17847806, -3.2119029, -6.5889654)
 
 [node name="env" type="Node3D" parent="." unique_id=1690037503]
@@ -76,5 +85,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -14)
 [node name="DOOR?_3" type="Node3D" parent="." unique_id=2136942214]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -14)
 
-[editable path="spawnManager"]
+[editable path="spawnPoints"]
 [editable path="spawnRoom"]
