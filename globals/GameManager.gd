@@ -36,7 +36,7 @@ func _spawn_player(id: int):
 	add_child(player)
 
 	# Assign spawn position deterministically
-	var index = spawn_points.size() > 0 ? id % spawn_points.size() : 0
+	var index = id % spawn_points.size() if spawn_points.size() > 0 else 0
 	player.global_transform = spawn_points[index].global_transform
 
 func _remove_player(id: int):

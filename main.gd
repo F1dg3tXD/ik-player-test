@@ -13,13 +13,16 @@ var is_joining : bool = false
 func host_lobby():
 	Steam.createLobby(Steam.LobbyType.LOBBY_TYPE_PUBLIC, 16)
 	
-func join_lobby(lobby_id: int):
+func join_lobby(target_lobby_id: int):
 	is_joining = true
-	Steam.joinLobby(lobby_id)
+	Steam.joinLobby(target_lobby_id)
+
 	
-func _on_lobby_joined(lobby_id : int, permissions : int, locked: bool, response: int):
+func _on_lobby_joined(new_lobby_id : int, permissions : int, locked: bool, response: int):
 	if !is_joining:
 		return
+	
+	lobby_id = new_lobby_id
 	
 	self.lobby_id = lobby_id
 	peer = SteamMultiplayerPeer.new()
@@ -35,9 +38,9 @@ func _on_connected_to_server():
 	print("Connected to host.")
 
 	
-func _on_lobby_created(result: int, lobby_id: int):
+func _on_lobby_created(result: int, new_lobby_id: int):
 	if result == Steam.Result.RESULT_OK:
-		self.lobby_id = lobby_id
+		lobby_id = new_lobby_id
 		
 		peer = SteamMultiplayerPeer.new()
 		peer.server_relay = true
@@ -56,6 +59,7 @@ func _ready() -> void:
 	Steam.lobby_joined.connect(_on_lobby_joined)
 
 func _on_btn_host_pressed() -> void:
+	print("Host button pressed")
 	host_lobby()
 
 func _on_id_prompt_text_changed(new_text):
