@@ -18,7 +18,7 @@ func join_lobby(target_lobby_id: int):
 	Steam.joinLobby(target_lobby_id)
 
 	
-func _on_lobby_joined(new_lobby_id : int, permissions : int, locked: bool, response: int):
+func _on_lobby_joined(new_lobby_id : int, _permissions : int, _locked: bool, _response: int):
 	if !is_joining:
 		return
 	
@@ -39,7 +39,9 @@ func _on_connected_to_server():
 
 	
 func _on_lobby_created(result: int, new_lobby_id: int):
+	print("Lobby created callback fired. Result:", result)
 	if result == Steam.Result.RESULT_OK:
+		print("Lobby creation successful")
 		lobby_id = new_lobby_id
 		
 		peer = SteamMultiplayerPeer.new()
@@ -53,10 +55,13 @@ func _on_lobby_created(result: int, new_lobby_id: int):
 		load_game_scene.rpc()
 
 func _ready() -> void:
-	print("Steam Initialized: ", Steam.steamInit(480, true))
+	print("Steam running:", Steam.isSteamRunning())
 	Steam.initRelayNetworkAccess()
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joined)
+
+func _process(_delta):
+	Steam.run_callbacks()
 
 func _on_btn_host_pressed() -> void:
 	print("Host button pressed")

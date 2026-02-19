@@ -35,7 +35,6 @@ layout_mode = 2
 text = "Host"
 
 [node name="BTN_Join" type="Button" parent="main/VBoxContainer" unique_id=1761767766]
-visible = false
 layout_mode = 2
 text = "Join"
 
