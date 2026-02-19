@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cwcs32mi20btt" path="res://addons/SimpleDungeons/DungeonRoom3D.gd" id="1_4q6cr"]
 [ext_resource type="PackedScene" uid="uid://d1ydcniaskip3" path="res://entities/van.tscn" id="2_el33t"]
 [ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="3_5dgav"]
-[ext_resource type="PackedScene" uid="uid://coy2qmhw3rw4v" path="res://models/spawnRoom_mesh.glb" id="4_apvvq"]
+[ext_resource type="PackedScene" uid="uid://kjcw2iun6d6a" path="res://models/spawnRoom_mesh.glb" id="4_apvvq"]
 [ext_resource type="PackedScene" uid="uid://30ps5b6kgidk" path="res://globals/game_manager.tscn" id="5_pooin"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_apvvq"]

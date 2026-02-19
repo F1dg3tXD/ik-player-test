@@ -24,6 +24,10 @@ Console="*uid://ouiu5xh1cs8n"
 Terminal="*uid://b57oidlvdiwvv"
 NetworkManager="*uid://dlglunsmvpajx"
 
+[console]
+
+theme="uid://bs82yxmgegsx5"
+
 [debug]
 
 file_logging/enable_file_logging=true
@@ -130,11 +134,16 @@ inventory={
 
 3d/physics_engine="Jolt Physics"
 
+[plugins]
+
+ai_assistant_hub/llm_api="ollama_api"
+ai_assistant_hub/preferences/thinking_target=0
+ai_assistant_hub/preferences/skip_greeting=false
+ai_assistant_hub/preferences/always_scroll_to_bottom=false
+
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
 

@@ -693,6 +693,12 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath(".:rotation")
 properties/1/spawn = true
 properties/1/replication_mode = 1
+properties/2/path = NodePath("neck/head:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("player_mdl/roller:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
@@ -1118,12 +1124,6 @@ transform = Transform3D(100, 4.5474735e-13, 2.2586377e-12, 5.4178884e-14, -7.450
 size = Vector3(0.3, 0.3, 0.28085938)
 material = SubResource("StandardMaterial3D_dw050")
 
-[node name="HeadTarget" type="Marker3D" parent="player_mdl/Armature/Skeleton3D/BoneAttachment3D" unique_id=1332418034]
-transform = Transform3D(100, -7.3811957e-06, -2.8810791e-06, 7.3429314e-06, 99.99148, -1.3068595, 2.9772941e-06, 1.3068521, 99.99146, -5.6903336e-06, 1.3280029, 69.24116)
-
-[node name="SpineTarget" type="Marker3D" parent="player_mdl/Armature/Skeleton3D/BoneAttachment3D" unique_id=2000576735]
-transform = Transform3D(100, -7.3811957e-06, -2.8810791e-06, 7.3429314e-06, 99.99148, -1.3068595, 2.9772941e-06, 1.3068521, 99.99146, -2.8176346e-06, -37.587845, 68.732544)
-
 [node name="HeadLook" type="LookAtModifier3D" parent="player_mdl/Armature/Skeleton3D" unique_id=2057116475]
 target_node = NodePath("../../../SpineIK/HeadRemote")
 bone_name = "Head"
@@ -1148,11 +1148,11 @@ transform = Transform3D(1, 0, 6.3573026e-08, 0, 1, 0, -6.3573026e-08, 0, 1, 4.17
 
 [node name="HeadRemote" type="RemoteTransform3D" parent="player_mdl/SpineIK" unique_id=2051721698]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17562795, 0)
-remote_path = NodePath("../../Armature/Skeleton3D/BoneAttachment3D/HeadTarget")
+remote_path = NodePath("../../../neck/head/LookTarget/HeadTarget")
 
 [node name="SpineRemote" type="RemoteTransform3D" parent="player_mdl/SpineIK" unique_id=1127774211]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2135638, 0)
-remote_path = NodePath("../../Armature/Skeleton3D/BoneAttachment3D/SpineTarget")
+remote_path = NodePath("../../../neck/head/LookTarget/SpineTarget")
 
 [node name="roller" type="Node3D" parent="player_mdl" unique_id=1718411187]
 
@@ -1254,6 +1254,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17386842, 0)
 [node name="Camera3D" type="Camera3D" parent="neck/head" unique_id=2053508083]
 unique_name_in_owner = true
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="LookTarget" type="Node3D" parent="neck/head" unique_id=2077054665]
+transform = Transform3D(1, -9.334053e-08, 7.259832e-08, -7.3812124e-08, -0.013068594, 0.9999141, -9.2383814e-08, -0.99991465, -0.013068514, 4.0819735e-08, -0.018010497, 0.015722938)
+
+[node name="HeadTarget" type="Marker3D" parent="neck/head/LookTarget" unique_id=1332418034]
+transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.01306852, -0.9999146, 7.342934e-08, 0.9999151, -0.013068601, -5.3820813e-08, -0.6409173, -0.069200754)
+
+[node name="SpineTarget" type="Marker3D" parent="neck/head/LookTarget" unique_id=2000576735]
+transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.01306852, -0.9999146, 7.342934e-08, 0.9999151, -0.013068601, -2.5093811e-08, -0.6358312, -0.45835948)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2018578722]
 replication_config = SubResource("SceneReplicationConfig_4flbx")
