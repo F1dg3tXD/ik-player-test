@@ -42,7 +42,6 @@ var cam_pitch: float = -15.0
 
 #Steam Stuff
 @onready var display_name: Label = $SteamName/displayName
-#@onready var steam_avatar: TextureRect = $SteamIcon/steamAvatar
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
 
 var personaName := Steam.getPersonaName()
@@ -166,23 +165,9 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = JUMP_VELOCITY
 
-# --- VISUAL ROTATION (MODEL ONLY) ---
-	#if move_dir != Vector3.ZERO:
-		#var target_rot: float = atan2(move_dir.x, move_dir.z)
-#
-		## Forward input biases turning (prevents forced rotation while strafing)
-		#var face_strength: float = abs(input.y)
-#
-		#player_mdl.rotation.y = lerp_angle(player_mdl.rotation.y, target_rot, delta * TURN_SPEED * face_strength)
-	
-	# -------------------------------------------------
-	# MOVE
-	# -------------------------------------------------
-
 	move_and_slide()
 	update_walker(delta)
 
-	
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
 

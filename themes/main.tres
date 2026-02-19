@@ -1,0 +1,25 @@
+[gd_resource type="Theme" format=3 uid="uid://bs82yxmgegsx5"]
+
+[ext_resource type="FontFile" uid="uid://ec5hfory2rbn" path="res://fonts/RockwellNova.ttf" id="1_78ekx"]
+[ext_resource type="FontFile" uid="uid://brcbika3lm10u" path="res://fonts/RockwellNovaCond.ttf" id="2_wc0q8"]
+[ext_resource type="FontFile" uid="uid://dpsqa3du03kxa" path="res://fonts/RockwellNova-Bold.ttf" id="3_7d6gw"]
+
+[resource]
+Button/colors/font_disabled_color = Color(0.8745098, 0.003921569, 0, 0.5019608)
+Button/colors/font_hover_color = Color(0.9490196, 0, 0, 1)
+Button/colors/font_hover_pressed_color = Color(1, 0.44705883, 0, 1)
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(1, 1, 0, 1)
+Button/constants/h_separation = 16
+Button/constants/outline_size = 6
+Button/fonts/font = ExtResource("1_78ekx")
+CheckBox/colors/checkbox_checked_color = Color(1, 0, 0, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.45882353)
+Label/constants/outline_size = 6
+Label/fonts/font = ExtResource("2_wc0q8")
+ProgressBar/colors/font_color = Color(0.95, 0.95, 0.95, 1)
+ProgressBar/colors/font_outline_color = Color(1, 0, 0, 1)
+ProgressBar/constants/outline_size = 6
+ProgressBar/font_sizes/font_size = 20
+ProgressBar/fonts/font = ExtResource("3_7d6gw")

@@ -2,10 +2,6 @@ extends Node3D
 
 @export var player_scene: PackedScene
 
-#var player = player_scene.instantiate()
-#player.set_multiplayer_authority(peer_id)
-#add_child(player)
-
 var spawn_points: Array[Node3D] = []
 var used_spawns: Dictionary = {} # peer_id -> spawn_point
 
