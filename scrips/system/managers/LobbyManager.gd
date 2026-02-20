@@ -63,6 +63,7 @@ func _ready():
 	map_spawner.spawn_function = map_manager.spawn_map
 	setup_filters()
 	setup_steam_lobbies()
+	Steam.lobby_joined.connect(_on_steam_lobby_joined)
 
 func setup_filters():
 	name_filter_edit.text_changed.connect(_on_name_filter_changed)
@@ -213,7 +214,7 @@ func setup_local_lobbies():
 
 func setup_steam_lobbies():
 	network_manager.set_peer_mode(network_manager.PeerMode.STEAM)
-	network_manager.get_peer().lobby_created.connect(_on_steam_lobby_created)
+	Steam.lobby_created.connect(_on_steam_lobby_created)
 	Steam.lobby_match_list.connect(_on_steam_lobby_match_list)
 	refresh_steam_lobby_list()
 	
@@ -244,7 +245,7 @@ func create_steam_lobby():
 		lobby_type = LOBBY_TYPES.PRIVATE
 	
 	# Create the lobby
-	network_manager.get_peer().create_lobby(lobby_type)
+	Steam.createLobby(lobby_type, host_max_players.value)
 	network_manager.update_multiplayer_peer()
 	map_spawner.spawn(map_manager.lobby_scene_path)
 	on_steam_lobby_created.emit()
@@ -260,7 +261,7 @@ func join_local_lobby():
 
 func join_steam_lobby(id):
 	if await validate_lobby_join(id):
-		network_manager.get_peer().connect_lobby(id)
+		Steam.joinLobby(id)
 		network_manager.update_multiplayer_peer()
 		steam_lobby_id = id
 	else:
@@ -377,6 +378,14 @@ func should_display_lobby(lobby_name: String, max_players: String, has_password:
 	
 	return true
 	
+func _on_steam_lobby_joined(lobby_id, permissions, locked, response):
+	if response == Steam.CHAT_ROOM_ENTER_RESPONSE_SUCCESS:
+		steam_lobby_id = lobby_id
+		network_manager.update_multiplayer_peer()
+		map_spawner.spawn(map_manager.lobby_scene_path)
+	else:
+		print("Failed to join lobby:", response)
+
 func _on_steam_lobby_match_list(lobbies):
 	for lobby in lobbies:
 		var lobby_name = Steam.getLobbyData(lobby, "name")

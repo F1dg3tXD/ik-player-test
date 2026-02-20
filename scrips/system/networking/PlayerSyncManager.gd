@@ -1,5 +1,5 @@
 extends Node
-@onready var camera = $"../Head/Camera3D"
+@onready var camera = $"../neck/head/Camera3D"
 
 ## INFO: Here is all the other things that need to be synced, other then movement
 
