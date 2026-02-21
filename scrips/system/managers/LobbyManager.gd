@@ -309,6 +309,11 @@ func _on_steam_lobby_created(connected, id):
 		# Make the lobby joinable
 		Steam.setLobbyJoinable(steam_lobby_id, true)
 		
+		var peer = network_manager.get_peer()
+		peer.create_host(id)  # ← HOST CREATES SOCKET HERE
+
+		network_manager.update_multiplayer_peer()
+		
 		print(steam_lobby_id, " Running")
 
 		
@@ -386,17 +391,12 @@ func should_display_lobby(lobby_name: String, max_players: String, has_password:
 func _on_steam_lobby_joined(lobby_id, permissions, locked, response):
 	if response == Steam.CHAT_ROOM_ENTER_RESPONSE_SUCCESS:
 		steam_lobby_id = lobby_id
-		
-		var peer = network_manager.get_peer()
-		
-		# Determine if we are host
-		if Steam.getLobbyOwner(lobby_id) == Steam.getSteamID():
-			peer.create_host(lobby_id)
-		else:
+
+		# ONLY CLIENTS create_client()
+		if Steam.getLobbyOwner(lobby_id) != Steam.getSteamID():
+			var peer = network_manager.get_peer()
 			peer.create_client(lobby_id)
-		
-		network_manager.update_multiplayer_peer()
-		map_spawner.spawn(map_manager.lobby_scene_path)
+			network_manager.update_multiplayer_peer()
 	else:
 		print("Failed to join lobby:", response)
 
