@@ -386,6 +386,15 @@ func should_display_lobby(lobby_name: String, max_players: String, has_password:
 func _on_steam_lobby_joined(lobby_id, permissions, locked, response):
 	if response == Steam.CHAT_ROOM_ENTER_RESPONSE_SUCCESS:
 		steam_lobby_id = lobby_id
+		
+		var peer = network_manager.get_peer()
+		
+		# Determine if we are host
+		if Steam.getLobbyOwner(lobby_id) == Steam.getSteamID():
+			peer.create_host(lobby_id)
+		else:
+			peer.create_client(lobby_id)
+		
 		network_manager.update_multiplayer_peer()
 		map_spawner.spawn(map_manager.lobby_scene_path)
 	else:
