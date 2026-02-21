@@ -5,10 +5,12 @@ extends Node
 
 func _ready():
 	initialize_steam() 
+	Steam.steamInitEx()
 
 func initialize_steam() -> void:
 	OS.set_environment("SteamAppId", app_id)
 	OS.set_environment("SteamGameId", app_id)
+	Steam.allowP2PPacketRelay(true)
 	var initialize_response: Dictionary = Steam.steamInitEx()
 	
 	if initialize_response["status"] == 0:
