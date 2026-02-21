@@ -7,7 +7,14 @@
 [ext_resource type="Script" uid="uid://7hkh8kt7ikqf" path="res://scrips/system/managers/MapManager.gd" id="5_qqweo"]
 [ext_resource type="PackedScene" uid="uid://b7pp3skomvnhc" path="res://Scenes/level.tscn" id="6_1scc6"]
 [ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="7_gin60"]
+[ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="8_5v1tr"]
 [ext_resource type="Script" uid="uid://b2d7hjs0b56d2" path="res://Scenes/check_box.gd" id="8_pctin"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0fj1v"]
+font = ExtResource("8_5v1tr")
+font_size = 160
+outline_size = 30
+outline_color = Color(1, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_nfy72"]
 font_size = 25
@@ -76,7 +83,6 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="MainMenu" type="Control" parent="CanvasLayer/Control" unique_id=1161482794]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -91,9 +97,9 @@ anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -162.0
-offset_top = 145.0
+offset_top = 260.0
 offset_right = 161.0
-offset_bottom = -51.0
+offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -108,6 +114,19 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 text = "Multiplayer"
+
+[node name="Title" type="Label" parent="CanvasLayer/Control/MainMenu" unique_id=1342983789]
+layout_mode = 0
+offset_right = 1279.0
+offset_bottom = 218.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.18431373)
+theme_override_colors/font_outline_color = Color(1, 0, 0, 1)
+theme_override_constants/outline_size = 22
+text = "W.E.E.P"
+label_settings = SubResource("LabelSettings_0fj1v")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="MultiplayerSelectMenu" type="Control" parent="CanvasLayer/Control" unique_id=74371829]
 visible = false
@@ -125,9 +144,9 @@ anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -162.0
-offset_top = 145.0
+offset_top = 281.0
 offset_right = 161.0
-offset_bottom = -51.0
+offset_bottom = -87.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -154,6 +173,7 @@ mouse_default_cursor_shape = 2
 text = "Back To Main Menu"
 
 [node name="LocalMultiplayerMenu" type="Control" parent="CanvasLayer/Control" unique_id=488514309]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -164,9 +184,9 @@ grow_vertical = 2
 [node name="CreateLocalLobbyPanel" type="Panel" parent="CanvasLayer/Control/LocalMultiplayerMenu" unique_id=2092510798]
 layout_mode = 0
 offset_left = 478.0
-offset_top = 106.0
+offset_top = 207.0
 offset_right = 801.0
-offset_bottom = 265.0
+offset_bottom = 366.0
 
 [node name="Label" type="Label" parent="CanvasLayer/Control/LocalMultiplayerMenu/CreateLocalLobbyPanel" unique_id=1864522067]
 layout_mode = 1
@@ -203,9 +223,9 @@ anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -162.0
-offset_top = 271.0
+offset_top = 379.0
 offset_right = 161.0
-offset_bottom = -181.0
+offset_bottom = -73.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10

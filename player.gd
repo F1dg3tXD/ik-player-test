@@ -40,20 +40,22 @@ var cam_pitch: float = -15.0
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
-##Steam Stuff
-#@onready var display_name: Label = $SteamName/displayName
-#@onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
-#
-#var personaName := Steam.getPersonaName()
+#Steam Stuff
+@onready var display_name: Label = $SteamName/displayName
+@onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
+
+var personaName := Steam.getPersonaName()
 
 # For later multiplayer
 #Steam.getPlayerAvatar(remote_steam_id, Steam.AVATAR_MEDIUM)
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	#Steam.getPlayerAvatar(Steam.AVATAR_LARGE)
-	#Steam.avatar_loaded.connect(_on_loaded_avatar)
-	#display_name.text = personaName
+	if is_multiplayer_authority():
+		await get_tree().process_frame
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Steam.getPlayerAvatar(Steam.AVATAR_LARGE)
+	Steam.avatar_loaded.connect(_on_loaded_avatar)
+	display_name.text = personaName
 	
 	if is_multiplayer_authority():
 		player_mdl.visible = true
@@ -76,8 +78,7 @@ func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByte
 	# Apply the image to a texture
 	var avatar_texture: ImageTexture = ImageTexture.create_from_image(avatar_image)
 	# Set the texture to a Sprite, TextureRect, etc.
-	#avatar_sprite.set_texture(avatar_texture)
-	#steam_avatar.set_texture(avatar_texture)
+	avatar_sprite.set_texture(avatar_texture)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():

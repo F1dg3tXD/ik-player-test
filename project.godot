@@ -12,7 +12,7 @@ config_version=5
 
 config/name="W.E.E.P"
 config/description="Workers Engagement Extraction Patrol"
-run/main_scene="uid://kcsq7yb4ckqk"
+run/main_scene="uid://cv44tvj0o5jcf"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0.14117648, 0.14117648, 0.14117648, 0)
 boot_splash/image="uid://pa3hnlx3kf3d"

@@ -54,6 +54,9 @@ const LOBBY_TYPES = {
 	"PRIVATE": Steam.LOBBY_TYPE_PRIVATE
 }
 
+const LOBBY_IDENTIFIER = "WEEP_GAME"
+const LOBBY_KEY = "game"
+
 ## INFO: Signals
 signal on_singleplayer_lobby_created
 signal on_local_lobby_created
@@ -213,9 +216,13 @@ func setup_local_lobbies():
 	network_manager.get_peer().peer_disconnected.connect(_on_local_player_disconnect_lobby)
 
 func setup_steam_lobbies():
+	if not Steam.lobby_created.is_connected(_on_steam_lobby_created):
+		Steam.lobby_created.connect(_on_steam_lobby_created)
+
+	if not Steam.lobby_match_list.is_connected(_on_steam_lobby_match_list):
+		Steam.lobby_match_list.connect(_on_steam_lobby_match_list)
+
 	network_manager.set_peer_mode(network_manager.PeerMode.STEAM)
-	Steam.lobby_created.connect(_on_steam_lobby_created)
-	Steam.lobby_match_list.connect(_on_steam_lobby_match_list)
 	refresh_steam_lobby_list()
 	
 #endregion
@@ -246,9 +253,6 @@ func create_steam_lobby():
 	
 	# Create the lobby
 	Steam.createLobby(lobby_type, host_max_players.value)
-	network_manager.update_multiplayer_peer()
-	map_spawner.spawn(map_manager.lobby_scene_path)
-	on_steam_lobby_created.emit()
 	
 #endregion
 	
@@ -262,7 +266,6 @@ func join_local_lobby():
 func join_steam_lobby(id):
 	if await validate_lobby_join(id):
 		Steam.joinLobby(id)
-		network_manager.update_multiplayer_peer()
 		steam_lobby_id = id
 	else:
 		print("Invalid password or cancelled")
@@ -289,6 +292,7 @@ func _on_steam_lobby_created(connected, id):
 		steam_lobby_id = id
 		
 		# Set basic lobby data
+		Steam.setLobbyData(steam_lobby_id, LOBBY_KEY, LOBBY_IDENTIFIER)
 		update_lobby_name()  # Set initial name with player count
 		Steam.setLobbyData(steam_lobby_id, "max_players", str(host_max_players.value))
 		
@@ -360,6 +364,7 @@ func refresh_steam_lobby_list():
 			Steam.addRequestLobbyListStringFilter("has_password", "1", Steam.LOBBY_COMPARISON_EQUAL)
 		
 		# Request the filtered list
+		Steam.addRequestLobbyListStringFilter(LOBBY_KEY, LOBBY_IDENTIFIER, Steam.LOBBY_COMPARISON_EQUAL)
 		Steam.requestLobbyList()
 
 # Helper function to check if a lobby matches the current filters

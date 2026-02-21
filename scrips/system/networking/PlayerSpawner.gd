@@ -3,7 +3,8 @@ extends MultiplayerSpawner
 @export var player_scene : PackedScene
 
 @export_category("Configurations")
-@export var spawn_points : Array[Node3D]
+@export var spawn_points_path : NodePath
+var spawn_points : Array[Node3D] = []
 
 ## This is for spawning that only happens once, if a player spawns in that location, no one else can spawn there.
 @export var spawn_in_empty : bool
@@ -19,9 +20,20 @@ func _ready():
 		call_deferred("_setup_spawning")
 		
 func _setup_spawning():
+	await get_tree().process_frame
+	await get_tree().process_frame  # two frames for safety
+	
+	collect_spawn_points()
 	spawn(multiplayer.get_unique_id())
 	multiplayer.peer_connected.connect(spawn)
 	multiplayer.peer_disconnected.connect(remove_player)
+	
+func collect_spawn_points():
+	spawn_points.clear()
+	var container = get_node(spawn_points_path)
+	for child in container.get_children():
+		if child is Node3D:
+			spawn_points.append(child)
 	
 func spawn_player(data):
 	var player : CharacterBody3D = player_scene.instantiate()
@@ -37,9 +49,9 @@ func spawn_player(data):
 				spawn_point.add_child(Node3D.new())
 				break
 	
-	player.global_position = spawn_position
+	player.position = spawn_position
 	return player
-
+	
 func remove_player(data):
 	players[data].queue_free()
 	players.erase(data)

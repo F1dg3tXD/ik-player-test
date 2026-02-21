@@ -40,7 +40,7 @@ text = "Join"
 layout_mode = 2
 placeholder_text = "Lobby ID"
 
-[node name="Label" type="Label" parent="main" unique_id=663570283]
+[node name="Title" type="Label" parent="main" unique_id=663570283]
 layout_mode = 0
 offset_right = 1279.0
 offset_bottom = 218.0

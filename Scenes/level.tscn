@@ -3,57 +3,41 @@
 [ext_resource type="Script" uid="uid://dpfxbffeopj5n" path="res://scrips/system/networking/PlayerSpawner.gd" id="1_gojf1"]
 [ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="2_fehjn"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_okv1i"]
-transparency = 1
-vertex_color_use_as_albedo = true
-albedo_color = Color(0, 1, 1, 0.301961)
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k5f4k"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_6phgx"]
+sky_material = SubResource("ProceduralSkyMaterial_k5f4k")
+
+[sub_resource type="Environment" id="Environment_81xng"]
+background_mode = 2
+sky = SubResource("Sky_6phgx")
+tonemap_mode = 2
 
 [node name="Level" type="Node3D" unique_id=262086821]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=392951357]
-transform = Transform3D(1, 0, 0, 0, 0.628194, 0.778057, 0, -0.778057, 0.628194, 0, 0, 0)
-
-[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=964391933 node_paths=PackedStringArray("spawn_points")]
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="." unique_id=964391933]
 spawn_path = NodePath("../Players")
 script = ExtResource("1_gojf1")
 player_scene = ExtResource("2_fehjn")
-spawn_points = [NodePath("../Players/SpawnPoint01"), NodePath("../Players/SpawnPoint02"), NodePath("../Players/SpawnPoint03"), NodePath("../Players/SpawnPoint04")]
+spawn_points_path = NodePath("../Players")
 spawn_in_empty = true
 
 [node name="Players" type="Node3D" parent="." unique_id=1820506287]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.106197, 0)
 
-[node name="SpawnPoint01" type="Node3D" parent="Players" unique_id=2080933931]
+[node name="SpawnPoint01" type="Node3D" parent="Players" unique_id=2080933931 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.46775, 1.53141, -2.10603)
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Players/SpawnPoint01" unique_id=126610106]
-transform = Transform3D(1, 0, 0, 0, 2.6484, 0, 0, 0, 1, 0, 0.204663, 0)
-layers = 32
-material = SubResource("StandardMaterial3D_okv1i")
-
-[node name="SpawnPoint02" type="Node3D" parent="Players" unique_id=2046781560]
+[node name="SpawnPoint02" type="Node3D" parent="Players" unique_id=2046781560 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.46775, 1.53141, 1.89397)
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Players/SpawnPoint02" unique_id=768830360]
-transform = Transform3D(1, 0, 0, 0, 2.6484, 0, 0, 0, 1, 0, 0.204663, 0)
-layers = 32
-material = SubResource("StandardMaterial3D_okv1i")
-
-[node name="SpawnPoint03" type="Node3D" parent="Players" unique_id=1065563091]
+[node name="SpawnPoint03" type="Node3D" parent="Players" unique_id=1065563091 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.53225, 1.53141, 1.89397)
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Players/SpawnPoint03" unique_id=79737307]
-transform = Transform3D(1, 0, 0, 0, 2.6484, 0, 0, 0, 1, 0, 0.204663, 0)
-layers = 32
-material = SubResource("StandardMaterial3D_okv1i")
-
-[node name="SpawnPoint04" type="Node3D" parent="Players" unique_id=1503933645]
+[node name="SpawnPoint04" type="Node3D" parent="Players" unique_id=1503933645 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.53225, 1.53141, -2.10603)
-
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Players/SpawnPoint04" unique_id=318837707]
-transform = Transform3D(1, 0, 0, 0, 2.6484, 0, 0, 0, 1, 0, 0.204663, 0)
-layers = 32
-material = SubResource("StandardMaterial3D_okv1i")
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="." unique_id=987938108]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0229278, 1.11218, 0.0164433)
@@ -61,3 +45,12 @@ use_collision = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D" unique_id=2123710621]
 size = Vector3(7, 0.165527, 6.77649)
+
+[node name="Node3D" type="Node3D" parent="." unique_id=875013859]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Node3D" unique_id=1995116999]
+environment = SubResource("Environment_81xng")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D" unique_id=1603883762]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
