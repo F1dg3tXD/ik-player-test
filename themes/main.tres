@@ -6,14 +6,15 @@
 
 [resource]
 Button/colors/font_disabled_color = Color(0.8745098, 0.003921569, 0, 0.5019608)
-Button/colors/font_hover_color = Color(0.9490196, 0, 0, 1)
+Button/colors/font_hover_color = Color(1, 0.44705883, 0, 1)
 Button/colors/font_hover_pressed_color = Color(1, 0.44705883, 0, 1)
 Button/colors/font_outline_color = Color(0, 0, 0, 1)
-Button/colors/font_pressed_color = Color(1, 1, 0, 1)
+Button/colors/font_pressed_color = Color(1, 0, 0, 1)
 Button/constants/h_separation = 16
 Button/constants/outline_size = 6
 Button/fonts/font = ExtResource("1_78ekx")
 CheckBox/colors/checkbox_checked_color = Color(1, 0, 0, 1)
+CheckButton/colors/button_checked_color = Color(1, 0, 0, 1)
 Label/colors/font_outline_color = Color(0, 0, 0, 1)
 Label/colors/font_shadow_color = Color(0, 0, 0, 0.45882353)
 Label/constants/outline_size = 6

@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://30ps5b6kgidk"]
-
-[ext_resource type="Script" uid="uid://bud3em7rf53jg" path="res://globals/GameManager.gd" id="1_dmcod"]
-[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="2_77tft"]
-
-[node name="GameManager" type="Node3D" unique_id=313029006]
-script = ExtResource("1_dmcod")
-player_scene = ExtResource("2_77tft")

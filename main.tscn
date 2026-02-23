@@ -1,58 +1,50 @@
-[gd_scene format=3 uid="uid://kcsq7yb4ckqk"]
+[gd_scene format=3 uid="uid://buyiroykjibha"]
 
-[ext_resource type="Script" uid="uid://dpd40gidibq5q" path="res://scrips/tests/enet_menu.gd" id="1_h2yge"]
-[ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="3_1bvp3"]
-[ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="3_h2yge"]
+[ext_resource type="PackedScene" uid="uid://kcsq7yb4ckqk" path="res://menu.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://d1ydcniaskip3" path="res://entities/van.tscn" id="2_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://b00s8hwiwxmfm" path="res://player_mdl.tscn" id="3_h2yge"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
-font = ExtResource("3_h2yge")
-font_size = 160
-outline_size = 30
-outline_color = Color(1, 0, 0, 1)
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_h2yge"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 
-[node name="Menu" type="Node2D" unique_id=298708851]
-script = ExtResource("1_h2yge")
+[sub_resource type="Sky" id="Sky_1bvp3"]
+sky_material = SubResource("ProceduralSkyMaterial_h2yge")
 
-[node name="main" type="Control" parent="." unique_id=108881086]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1280.0
-offset_bottom = 720.0
-theme = ExtResource("3_1bvp3")
+[sub_resource type="Environment" id="Environment_lquwl"]
+background_mode = 2
+sky = SubResource("Sky_1bvp3")
+tonemap_mode = 2
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+sdfgi_enabled = true
+glow_enabled = true
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.01
 
-[node name="VBoxContainer" type="VBoxContainer" parent="main" unique_id=1880570163]
-layout_mode = 0
-offset_left = 560.0
-offset_top = 320.0
-offset_right = 720.0
-offset_bottom = 480.0
-pivot_offset = Vector2(80, 80)
+[node name="Main" type="Node3D" unique_id=2071420841]
 
-[node name="BTN_Host" type="Button" parent="main/VBoxContainer" unique_id=74806384]
-layout_mode = 2
-text = "Host"
+[node name="Menu" parent="." unique_id=298708851 instance=ExtResource("1_ig7tw")]
 
-[node name="BTN_Join" type="Button" parent="main/VBoxContainer" unique_id=1761767766]
-layout_mode = 2
-text = "Join"
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1738591911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, -11.5)
+size = Vector3(63, 0.1, 33)
 
-[node name="id_prompt" type="LineEdit" parent="main/VBoxContainer" unique_id=982690257]
-layout_mode = 2
-placeholder_text = "Lobby ID"
+[node name="Van" parent="." unique_id=510339525 instance=ExtResource("2_0xm2m")]
+transform = Transform3D(0.49999997, 0, 0.8660253, 0, 1, 0, -0.8660253, 0, 0.49999997, -2.5383537, 0, -4.378849)
 
-[node name="Title" type="Label" parent="main" unique_id=663570283]
-layout_mode = 0
-offset_right = 1279.0
-offset_bottom = 218.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.18431373)
-theme_override_colors/font_outline_color = Color(1, 0, 0, 1)
-theme_override_constants/outline_size = 22
-text = "W.E.E.P"
-label_settings = SubResource("LabelSettings_0xm2m")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="player_mdl" parent="." unique_id=141917622 instance=ExtResource("3_h2yge")]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 1.6660616, 0, 0)
 
-[connection signal="pressed" from="main/VBoxContainer/BTN_Host" to="." method="_on_btn_host_pressed"]
-[connection signal="pressed" from="main/VBoxContainer/BTN_Join" to="." method="_on_btn_join_pressed"]
-[connection signal="text_changed" from="main/VBoxContainer/id_prompt" to="." method="_on_id_prompt_text_changed"]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1244636015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
+
+[node name="env" type="Node3D" parent="." unique_id=1177341902]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="env" unique_id=728740791]
+environment = SubResource("Environment_lquwl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env" unique_id=1188523461]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true

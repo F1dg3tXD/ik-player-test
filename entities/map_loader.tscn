@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://cw0owf85ravlt"]
+
+[ext_resource type="Script" uid="uid://d0d3ax1uk3md6" path="res://scrips/MapLoader.gd" id="1_56wb7"]
+[ext_resource type="Script" uid="uid://csye018x48vg4" path="res://addons/SimpleDungeons/DungeonGenerator3D.gd" id="2_nxfb7"]
+[ext_resource type="Script" uid="uid://bsgnufuh8jgss" path="res://entities/GameManager.gd" id="3_nxfb7"]
+[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="4_e6uxn"]
+
+[node name="MapLoader" type="Node3D" unique_id=165551071]
+script = ExtResource("1_56wb7")
+
+[node name="DungeonGenerator3D" type="Node3D" parent="." unique_id=422585700]
+unique_name_in_owner = true
+script = ExtResource("2_nxfb7")
+metadata/_custom_type_script = "uid://csye018x48vg4"
+
+[node name="MapSpawner" type="MultiplayerSpawner" parent="." unique_id=168494294]
+unique_name_in_owner = true
+_spawnable_scenes = PackedStringArray("uid://b5h3gn2xc5hv7", "uid://d18oyfo5mo4b0", "")
+spawn_path = NodePath("../DungeonGenerator3D")
+
+[node name="GameManager" type="Node3D" parent="." unique_id=1066764988]
+unique_name_in_owner = true
+script = ExtResource("3_nxfb7")
+player_scene = ExtResource("4_e6uxn")

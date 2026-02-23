@@ -16,6 +16,7 @@ func _on_player_trigger_body_entered(body: Node3D) -> void:
 	
 	if body.is_in_group("Player"):
 		players_inside += 1
+		print("Player at Van")
 		update_door_state()
 
 func _on_player_trigger_body_exited(body: Node3D) -> void:
@@ -24,6 +25,7 @@ func _on_player_trigger_body_exited(body: Node3D) -> void:
 	
 	if body.is_in_group("Player"):
 		players_inside -= 1
+		print("Player left Van")
 		update_door_state()
 
 func update_door_state():

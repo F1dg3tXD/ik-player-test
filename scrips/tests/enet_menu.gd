@@ -2,9 +2,9 @@ extends Node2D
 
 var peer : ENetMultiplayerPeer
 
-@onready var btn_host: Button = $main/VBoxContainer/BTN_Host
-@onready var btn_join: Button = $main/VBoxContainer/BTN_Join
-@onready var id_prompt: LineEdit = $main/VBoxContainer/id_prompt
+@onready var btn_host: Button = $main/Menu/MultiplayerMenu/ENet/BTN_ENet_Host
+@onready var btn_join: Button = $main/Menu/MultiplayerMenu/ENet/BTN_ENet_Join
+@onready var id_prompt: LineEdit = $main/Menu/MultiplayerMenu/ENet/ENet_id_prompt
 
 const PORT := 7777
 
@@ -24,7 +24,7 @@ func _on_btn_host_pressed() -> void:
 	multiplayer.multiplayer_peer = peer
 	
 	print("Server started on port", PORT)
-	get_tree().change_scene_to_file("res://maps/spawn_room.tscn")
+	get_tree().change_scene_to_file("res://maps/Lobby.tscn")
 
 func _on_btn_join_pressed() -> void:
 	var ip = id_prompt.text.strip_edges()
@@ -48,4 +48,4 @@ func _on_id_prompt_text_changed(new_text):
 
 @rpc("authority", "call_local")
 func load_game_scene():
-	get_tree().change_scene_to_file("res://maps/spawn_room.tscn")
+	get_tree().change_scene_to_file("res://maps/Lobby.tscn")

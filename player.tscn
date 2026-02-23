@@ -738,6 +738,30 @@ properties/15/replication_mode = 1
 properties/16/path = NodePath("neck/head/LookTarget/SpineTarget:position")
 properties/16/spawn = true
 properties/16/replication_mode = 1
+properties/17/path = NodePath("player_mdl/Armature/Skeleton3D/LeftLegIK3D:position")
+properties/17/spawn = true
+properties/17/replication_mode = 1
+properties/18/path = NodePath("player_mdl/Armature/Skeleton3D/LeftLegIK3D:rotation")
+properties/18/spawn = true
+properties/18/replication_mode = 1
+properties/19/path = NodePath("player_mdl/Armature/Skeleton3D/RightLegIK3D:position")
+properties/19/spawn = true
+properties/19/replication_mode = 1
+properties/20/path = NodePath("player_mdl/Armature/Skeleton3D/RightLegIK3D:rotation")
+properties/20/spawn = true
+properties/20/replication_mode = 1
+properties/21/path = NodePath("player_mdl/Armature/Skeleton3D/HeadLook:position")
+properties/21/spawn = true
+properties/21/replication_mode = 1
+properties/22/path = NodePath("player_mdl/Armature/Skeleton3D/ChestLook:position")
+properties/22/spawn = true
+properties/22/replication_mode = 1
+properties/23/path = NodePath("player_mdl/Armature/Skeleton3D/HeadLook:rotation")
+properties/23/spawn = true
+properties/23/replication_mode = 1
+properties/24/path = NodePath("player_mdl/Armature/Skeleton3D/ChestLook:rotation")
+properties/24/spawn = true
+properties/24/replication_mode = 1
 
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
@@ -1279,7 +1303,7 @@ size = Vector2i(128, 128)
 position = Vector2(64, 64)
 rotation = -1.5707964
 
-[node name="Sprite3D" type="Sprite3D" parent="." unique_id=2051097246]
+[node name="namePlate" type="Sprite3D" parent="." unique_id=2051097246]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.084975, 0)
 billboard = 1
 texture = SubResource("ViewportTexture_onrkg")

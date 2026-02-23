@@ -12,16 +12,23 @@ config_version=5
 
 config/name="W.E.E.P"
 config/description="Workers Engagement Extraction Patrol"
-run/main_scene="uid://cv44tvj0o5jcf"
+run/main_scene="uid://buyiroykjibha"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0.14117648, 0.14117648, 0.14117648, 0)
 boot_splash/image="uid://pa3hnlx3kf3d"
 config/icon="uid://siymg4sb3lgj"
 
+[audio]
+
+buses/default_bus_layout="uid://datjiw3jjdo0s"
+
 [autoload]
 
 Console="*uid://ouiu5xh1cs8n"
 Terminal="*uid://b57oidlvdiwvv"
+NetworkManager="*uid://bbayd6bi5w5tt"
+SteamManager="*uid://cut8vti1g3bw2"
+Lobby="*uid://2yvjfoighqbo"
 
 [console]
 
@@ -35,6 +42,7 @@ file_logging/enable_file_logging=true
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/stretch/mode="canvas_items"
 
 [editor_plugins]
 

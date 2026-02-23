@@ -43,6 +43,7 @@ var cam_pitch: float = -15.0
 #Steam Stuff
 @onready var display_name: Label = $SteamName/displayName
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
+@onready var name_plate: Sprite3D = $namePlate
 
 var personaName := Steam.getPersonaName()
 
@@ -59,6 +60,7 @@ func _ready() -> void:
 	
 	if is_multiplayer_authority():
 		player_mdl.visible = true
+		name_plate.visible = false
 		beta_joints.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		beta_surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		camera_3d.current = true

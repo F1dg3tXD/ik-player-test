@@ -1,35 +1,76 @@
+# NetworkManager.gd (Autoload)
 extends Node
 
-var peer : ENetMultiplayerPeer
-const PORT := 7777
+enum PeerMode { NONE, ENET, STEAM }
 
-func host_game():
-	peer = ENetMultiplayerPeer.new()
-	var result = peer.create_server(PORT)
+var peer_mode : PeerMode = PeerMode.NONE
+var peer : Object = null
 
-	if result != OK:
-		print("Failed to create server:", result)
+func set_peer_mode(mode: PeerMode) -> void:
+	peer_mode = mode
+	match mode:
+		PeerMode.ENET:
+			peer = ENetMultiplayerPeer.new()
+		PeerMode.STEAM:
+			# SteamMultiplayerPeer class provided by GodotSteam extension / custom build
+			peer = SteamMultiplayerPeer.new()
+		PeerMode.NONE:
+			peer = null
+
+# Safe update function: only assign multiplayer_peer when peer is connected/connecting
+func update_multiplayer_peer() -> void:
+	# NOTE: `multiplayer` is the SceneTree's MultiplayerAPI instance
+	if peer == null:
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 		return
 
+	# If peer has get_connection_status, ensure it's not disconnected
+	if peer.has_method("get_connection_status"):
+		var status = peer.get_connection_status()
+		# Godot C++ constants are available; compare against DISCONNECTED
+		if int(status) == MultiplayerPeer.CONNECTION_DISCONNECTED:
+			push_warning("Peer is disconnected — not assigning multiplayer_peer yet.")
+			return
+
+	# Assign
 	multiplayer.multiplayer_peer = peer
-	print("Server started.")
-	load_game_scene.rpc()
 
-func join_game(ip: String):
-	peer = ENetMultiplayerPeer.new()
-	var result = peer.create_client(ip, PORT)
+# Helper wrappers for ENet
+func start_local_server(port: int, max_clients: int = 8) -> Error:
+	if peer_mode != PeerMode.ENET:
+		set_peer_mode(PeerMode.ENET)
+	var err = peer.create_server(port, max_clients)
+	if err != OK:
+		return err
+	update_multiplayer_peer()
+	return OK
 
-	if result != OK:
-		print("Failed to connect:", result)
-		return
+func start_local_client(addr: String, port: int) -> Error:
+	if peer_mode != PeerMode.ENET:
+		set_peer_mode(PeerMode.ENET)
+	var err = peer.create_client(addr, port)
+	if err != OK:
+		return err
+	update_multiplayer_peer()
+	return OK
 
-	multiplayer.multiplayer_peer = peer
-	multiplayer.connected_to_server.connect(_on_connected)
+# Helper wrappers for SteamMultiplayerPeer:
+func start_steam_host(relay: bool = true) -> Error:
+	if peer_mode != PeerMode.STEAM:
+		set_peer_mode(PeerMode.STEAM)
+	peer.server_relay = true
+	var err = peer.create_host()
+	if err != OK:
+		return err
+	update_multiplayer_peer()
+	return OK
 
-func _on_connected():
-	print("Connected to host.")
-	load_game_scene.rpc()
-
-@rpc("authority", "call_local")
-func load_game_scene():
-	get_tree().change_scene_to_file("res://maps/spawn_room.tscn")
+func start_steam_client(owner_steamid: int) -> Error:
+	if peer_mode != PeerMode.STEAM:
+		set_peer_mode(PeerMode.STEAM)
+	peer.server_relay = true
+	var err = peer.create_client(owner_steamid)
+	if err != OK:
+		return err
+	update_multiplayer_peer()
+	return OK

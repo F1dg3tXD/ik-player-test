@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://daoklrpvjgf8w"]
+
+[ext_resource type="Script" uid="uid://d3vsobckqqhv6" path="res://scrips/steam_lobby_browser.gd" id="1_jdb4c"]
+
+[node name="SteamLobbyBrowser" type="Control" unique_id=1229592265]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_jdb4c")
+
+[node name="Panel" type="Panel" parent="." unique_id=218886949]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 400.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=549462108]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=1467298102]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Steam Lobbies"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=539647314]
+layout_mode = 2
+
+[node name="RefreshButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1246527674]
+layout_mode = 2
+text = "Refresh"
+
+[node name="BackButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=2027200479]
+layout_mode = 2
+text = "Back
+"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/VBoxContainer" unique_id=2076699563]
+custom_minimum_size = Vector2(500, 300)
+layout_mode = 2
+
+[node name="LobbyList" type="VBoxContainer" parent="Panel/VBoxContainer/ScrollContainer" unique_id=1546228657]
+custom_minimum_size = Vector2(500, 50)
+layout_mode = 2
+
+[connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_pressed"]

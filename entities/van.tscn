@@ -42,24 +42,23 @@ transitions = ["Start", "van_doors_close", SubResource("AnimationNodeStateMachin
 size = Vector3(3.6738281, 2.784912, 3.4768066)
 
 [node name="Van" unique_id=510339525 instance=ExtResource("1_s5aam")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 script = ExtResource("2_dnsr3")
 
-[node name="Skeleton3D" parent="Van" parent_id_path=PackedInt32Array(985321443) index="0" unique_id=1138171106]
-bones/1/rotation = Quaternion(0.24690804, 0.29393739, 0.6625983, 0.643118)
-bones/2/rotation = Quaternion(-0.24690804, 0.29393739, 0.6625983, -0.643118)
+[node name="Skeleton3D" parent="Van" parent_id_path=PackedInt32Array(735196186) index="0" unique_id=872628892]
+bones/1/rotation = Quaternion(0.7066486, 0.70664865, 0.025452096, -0.025452092)
+bones/2/rotation = Quaternion(-0.7066486, 0.70664865, 0.025452096, 0.025452092)
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/Door_1" parent_id_path=PackedInt32Array(2096208470) index="0" unique_id=1571496937]
+[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/Door_1" parent_id_path=PackedInt32Array(1151590077) index="0" unique_id=1571496937]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Van/Skeleton3D/Door_1/StaticBody3D" index="0" unique_id=1153165309]
 shape = SubResource("ConvexPolygonShape3D_dnsr3")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/Door_2" parent_id_path=PackedInt32Array(772944312) index="0" unique_id=581144266]
+[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/Door_2" parent_id_path=PackedInt32Array(1266328587) index="0" unique_id=581144266]
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Van/Skeleton3D/Door_2/StaticBody3D" index="0" unique_id=678442167]
 shape = SubResource("ConvexPolygonShape3D_bags1")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/VanMesh" parent_id_path=PackedInt32Array(262073135) index="0" unique_id=207440229]
+[node name="StaticBody3D" type="StaticBody3D" parent="Van/Skeleton3D/VanMesh" parent_id_path=PackedInt32Array(1888584528) index="0" unique_id=207440229]
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="Van/Skeleton3D/VanMesh/StaticBody3D" index="0" unique_id=1403376284]
 shape = SubResource("ConcavePolygonShape3D_gx66i")

@@ -1,0 +1,364 @@
+[gd_scene format=3 uid="uid://kcsq7yb4ckqk"]
+
+[ext_resource type="Script" uid="uid://bg4wpf7vxcbl6" path="res://scrips/menu.gd" id="1_mae5d"]
+[ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="2_4hy44"]
+[ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="3_ytr4m"]
+[ext_resource type="PackedScene" uid="uid://daoklrpvjgf8w" path="res://Scenes/steam_lobby_browser.tscn" id="4_4hy44"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
+font = ExtResource("3_ytr4m")
+font_size = 160
+outline_size = 30
+outline_color = Color(1, 0, 0, 1)
+
+[node name="Menu" type="Node2D" unique_id=298708851]
+self_modulate = Color(1, 1, 1, 0)
+script = ExtResource("1_mae5d")
+
+[node name="main" type="Control" parent="." unique_id=108881086]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+theme = ExtResource("2_4hy44")
+
+[node name="Title" type="Label" parent="main" unique_id=663570283]
+layout_mode = 0
+offset_right = 1279.0
+offset_bottom = 218.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.18431373)
+theme_override_colors/font_outline_color = Color(1, 0, 0, 1)
+theme_override_constants/outline_size = 22
+text = "W.E.E.P"
+label_settings = SubResource("LabelSettings_0xm2m")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Menu" type="Control" parent="main" unique_id=1118780734]
+custom_minimum_size = Vector2(300, 400)
+anchors_preset = 0
+offset_left = 489.0
+offset_top = 252.0
+offset_right = 789.0
+offset_bottom = 652.00037
+pivot_offset = Vector2(150, 200)
+
+[node name="Main" type="VBoxContainer" parent="main/Menu" unique_id=633187136]
+layout_mode = 0
+offset_left = -475.0
+offset_right = -147.0
+offset_bottom = 312.0
+theme = ExtResource("2_4hy44")
+
+[node name="SinglePlayer" type="Button" parent="main/Menu/Main" unique_id=923507596]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Singleplayer"
+
+[node name="MultiPlayer" type="Button" parent="main/Menu/Main" unique_id=80676056]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Multiplayer"
+
+[node name="Options" type="Button" parent="main/Menu/Main" unique_id=1672860225]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Options"
+
+[node name="Exit" type="Button" parent="main/Menu/Main" unique_id=439995800]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Exit
+"
+
+[node name="MultiPlayerMenuHead" type="Control" parent="main/Menu" unique_id=280195614]
+visible = false
+anchors_preset = 0
+offset_left = -475.0
+offset_top = 316.0
+offset_right = -147.0
+offset_bottom = 316.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="main/Menu/MultiPlayerMenuHead" unique_id=4226550]
+layout_mode = 0
+offset_left = 375.0
+offset_top = -317.0
+offset_right = 675.0
+offset_bottom = -188.0
+
+[node name="MultiplayerMenu" type="TabContainer" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer" unique_id=1673613055]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme = ExtResource("2_4hy44")
+current_tab = 0
+
+[node name="ENet" type="VBoxContainer" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu" unique_id=1880570163]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="BTN_ENet_Host" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=74806384]
+layout_mode = 2
+text = "Host"
+
+[node name="BTN_ENet_Join" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=1761767766]
+layout_mode = 2
+text = "Join"
+
+[node name="ENet_id_prompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=982690257]
+layout_mode = 2
+placeholder_text = "Lobby ID"
+alignment = 1
+
+[node name="Steam" type="VBoxContainer" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu" unique_id=260448844]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="BTN_Steam_Host" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam" unique_id=1103951631]
+layout_mode = 2
+text = "Host"
+
+[node name="BTN_Steam_LobbyBrowser" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam" unique_id=2051576210]
+layout_mode = 2
+text = "Lobby List"
+
+[node name="Back" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer" unique_id=1394364649]
+layout_mode = 2
+text = "Back"
+
+[node name="OptionsMenuHead" type="Control" parent="main/Menu" unique_id=854969838]
+anchors_preset = 0
+offset_top = -50.0
+offset_right = 40.0
+offset_bottom = -10.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="main/Menu/OptionsMenuHead" unique_id=1870779284]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="OptionsMenu" type="TabContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer" unique_id=225885966]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme = ExtResource("2_4hy44")
+current_tab = 0
+
+[node name="Graphics" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu" unique_id=588385908]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Resolution" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=283075007]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Resolution" unique_id=1784067721]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Resolution"
+
+[node name="Resolutions" type="OptionButton" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Resolution" unique_id=1557183715]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=1674739878]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Window Mode" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=107968590]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Window Mode" unique_id=1925430398]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Window Mode"
+
+[node name="WindowMode" type="OptionButton" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Window Mode" unique_id=967798000]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=173671121]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="AA" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=2124215802]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/AA" unique_id=856671925]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Antialiasing"
+
+[node name="AA Options" type="OptionButton" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/AA" unique_id=1582989711]
+layout_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=1095549737]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="VSync" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=850080912]
+layout_mode = 2
+alignment = 1
+
+[node name="VSyncToggle" type="CheckButton" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/VSync" unique_id=1865634729]
+layout_mode = 2
+theme = ExtResource("2_4hy44")
+theme_override_font_sizes/font_size = 30
+text = "VSync"
+
+[node name="Apply" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics" unique_id=2027574983]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Apply"
+
+[node name="Audio" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu" unique_id=1632129537]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio" unique_id=539692796]
+layout_mode = 2
+
+[node name="Master" type="Control" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer" unique_id=82757603]
+clip_contents = true
+custom_minimum_size = Vector2(450, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Master" unique_id=1302089825]
+layout_mode = 0
+offset_top = 6.0
+offset_right = 500.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 30
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Master" unique_id=899932273]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 66.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="SFX" type="Control" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer" unique_id=1782352432]
+clip_contents = true
+custom_minimum_size = Vector2(450, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/SFX" unique_id=2137667647]
+layout_mode = 0
+offset_top = 6.0
+offset_right = 500.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 30
+text = "SFX"
+
+[node name="SfxSlider" type="HSlider" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/SFX" unique_id=148735327]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 66.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="Music" type="Control" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer" unique_id=197474749]
+clip_contents = true
+custom_minimum_size = Vector2(450, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Music" unique_id=1490820016]
+layout_mode = 0
+offset_top = 6.0
+offset_right = 500.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 30
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Music" unique_id=1581922261]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 66.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="Scares" type="Control" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer" unique_id=699692107]
+clip_contents = true
+custom_minimum_size = Vector2(450, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Scares" unique_id=54140858]
+layout_mode = 0
+offset_top = 6.0
+offset_right = 500.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 30
+text = "Scares"
+
+[node name="ScaresSlider" type="HSlider" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Scares" unique_id=588936912]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 66.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="Voices" type="Control" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer" unique_id=1960643701]
+clip_contents = true
+custom_minimum_size = Vector2(450, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Voices" unique_id=1312697006]
+layout_mode = 0
+offset_top = 6.0
+offset_right = 500.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 30
+text = "Voices"
+
+[node name="VoicesSlider" type="HSlider" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Audio/VBoxContainer/Voices" unique_id=846719126]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 66.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+ticks_position = 3
+
+[node name="Back" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer" unique_id=548933785]
+layout_mode = 2
+text = "Back"
+
+[node name="SteamLobbyBrowser" parent="main/Menu" unique_id=1229592265 instance=ExtResource("4_4hy44")]
+visible = false
+layout_mode = 0
+offset_left = 239.0
+offset_right = 279.0
+
+[connection signal="pressed" from="main/Menu/Main/MultiPlayer" to="." method="_on_multiplayer_pressed"]
+[connection signal="pressed" from="main/Menu/Main/Options" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="main/Menu/Main/Exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Host" to="." method="_on_btn_host_pressed"]
+[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Join" to="." method="_on_btn_join_pressed"]
+[connection signal="text_changed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/ENet_id_prompt" to="." method="_on_id_prompt_text_changed"]
+[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_LobbyBrowser" to="." method="_on_steam_browser_pressed"]
+[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Apply" to="." method="_on_apply_pressed"]
+[connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
+
+[editable path="main/Menu/SteamLobbyBrowser"]
