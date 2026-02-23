@@ -52,7 +52,7 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	emit_signal("lobby_created", lobby_id)
 	# Filter lobbies
 	Steam.setLobbyData(lobby_id, "name", Lobby.local_player_info["name"] + "'s Lobby")
-	Steam.setLobbyData(lobby_id, "game", "YourGameName")
+	Steam.setLobbyData(lobby_id, "game", "WEEPGame")
 	# Let UI show lobby
 
 # Called when Steam indicates we joined/entered a lobby
