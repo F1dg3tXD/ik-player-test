@@ -50,6 +50,9 @@ var personaName := Steam.getPersonaName()
 # For later multiplayer
 #Steam.getPlayerAvatar(remote_steam_id, Steam.AVATAR_MEDIUM)
 
+func _enter_tree():
+	set_multiplayer_authority(int(name))
+
 func _ready() -> void:
 	if is_multiplayer_authority():
 		await get_tree().process_frame

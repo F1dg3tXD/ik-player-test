@@ -28,14 +28,14 @@ func _request_lobbies() -> void:
 		Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE
 	)
 	
-	# 🔵 Always filter by your game
+	# Always filter by your game
 	Steam.addRequestLobbyListStringFilter(
 		"game",
 		"WEEPGame",
 		Steam.LOBBY_COMPARISON_EQUAL
 	)
 	
-	# 🟢 Friends Only Filter
+	# Friends Only Filter
 	if friends_only.button_pressed:
 		Steam.addRequestLobbyListStringFilter(
 			"friends_only",
@@ -43,7 +43,7 @@ func _request_lobbies() -> void:
 			Steam.LOBBY_COMPARISON_EQUAL
 		)
 		
-	# 🟡 Password Filter
+	# Password Filter
 	if password.button_pressed:
 		Steam.addRequestLobbyListStringFilter(
 			"has_password",

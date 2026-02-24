@@ -57,6 +57,9 @@ Player="the player pawn"
 WeepingAngel=""
 World="world geometry"
 SpawnPoint=""
+PlayerSpawn=""
+NPCSpawn=""
+ItemSpawn=""
 
 [input]
 
@@ -160,5 +163,4 @@ textures/vram_compression/import_etc2_astc=true
 
 initialization/app_id=480
 initialization/initialize_on_startup=true
-initialization/embed_callbacks=true
 multiplayer_peer/max_channels=16

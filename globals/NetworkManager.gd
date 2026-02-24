@@ -55,22 +55,34 @@ func start_local_client(addr: String, port: int) -> Error:
 	return OK
 
 # Helper wrappers for SteamMultiplayerPeer:
-func start_steam_host(relay: bool = true) -> Error:
-	if peer_mode != PeerMode.STEAM:
-		set_peer_mode(PeerMode.STEAM)
-	peer.server_relay = true
-	var err = peer.create_host()
-	if err != OK:
-		return err
+func start_steam_host():
+	set_peer_mode(PeerMode.STEAM)
+	
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	var result = peer.create_host(0)
+	
+	if result != OK:
+		print("Failed to host:", result)
+		return
+	
 	update_multiplayer_peer()
-	return OK
+	print("Steam Host Started")
 
-func start_steam_client(owner_steamid: int) -> Error:
-	if peer_mode != PeerMode.STEAM:
-		set_peer_mode(PeerMode.STEAM)
-	peer.server_relay = true
-	var err = peer.create_client(owner_steamid)
-	if err != OK:
-		return err
+func start_steam_client(host_steam_id: int):
+	set_peer_mode(PeerMode.STEAM)
+	
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	var result = peer.create_client(host_steam_id, 0)
+	
+	if result != OK:
+		print("Failed to connect:", result)
+		return
+	
 	update_multiplayer_peer()
-	return OK
+	print("Connected to host")

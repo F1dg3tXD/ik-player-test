@@ -1,9 +1,12 @@
 [gd_scene format=3 uid="uid://do43d0lbdxge1"]
 
 [ext_resource type="PackedScene" uid="uid://d1ydcniaskip3" path="res://entities/van.tscn" id="1_b6npq"]
+[ext_resource type="Script" uid="uid://buwqdl3tjm46j" path="res://maps/lobby.gd" id="1_ccouh"]
 [ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="2_71o6c"]
+[ext_resource type="PackedScene" uid="uid://5ucq3gpglq0o" path="res://entities/env.tscn" id="4_ddprd"]
 
 [node name="Lobby" type="Node3D" unique_id=1456081684]
+script = ExtResource("1_ccouh")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=204713642]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
@@ -34,6 +37,9 @@ size = Vector3(3.555664, 3.7198486, 0.31464845)
 [node name="Van" parent="." unique_id=510339525 instance=ExtResource("1_b6npq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12556887, 0, -9.468712)
 
+[node name="Players" type="Node3D" parent="." unique_id=1812667407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+
 [node name="spawnPoints" parent="." unique_id=998261882 instance=ExtResource("2_71o6c")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
@@ -63,5 +69,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, -1)
 
 [node name="spawn9" type="Marker3D" parent="spawnPoints" unique_id=667419127 groups=["SpawnPoint"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2118155235]
+_spawnable_scenes = PackedStringArray("uid://b5h3gn2xc5hv7")
+spawn_path = NodePath("../Players")
+
+[node name="env" parent="." unique_id=710608853 instance=ExtResource("4_ddprd")]
 
 [editable path="spawnPoints"]

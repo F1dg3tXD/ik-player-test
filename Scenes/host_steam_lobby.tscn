@@ -101,3 +101,7 @@ text = "Create"
 layout_mode = 2
 text = "Back
 "
+
+[connection signal="toggled" from="Panel/VBoxContainer/EnablePassword" to="." method="_on_password_toggle"]
+[connection signal="pressed" from="Panel/VBoxContainer/ButtonsRow/CreateButton" to="." method="_on_create_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/ButtonsRow/BackButton" to="." method="_on_back_pressed"]

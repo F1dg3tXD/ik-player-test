@@ -38,6 +38,7 @@ enum AngelState {IDLE, STALK, ATTACK}
 enum AngelRole {PRESSURE, FLANK, AMBUSH}
 
 func _ready():
+	self.set_multiplayer_authority(1)
 	player = get_tree().get_first_node_in_group("Player")
 	player_camera = player.get_node("%Camera3D")
 	nav_agent.avoidance_enabled = true

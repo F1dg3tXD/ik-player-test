@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://blwdixrupw41w"]
 
-[node name="spawnPoints" type="Node3D" unique_id=998261882]
+[ext_resource type="Script" uid="uid://c3bhafo7wgj21" path="res://entities/spawn_points.gd" id="1_vo7jb"]
+
+[node name="spawnPoints" type="Node3D" unique_id=998261882 groups=["PlayerSpawn"]]
+script = ExtResource("1_vo7jb")
 
 [node name="spawn" type="Marker3D" parent="." unique_id=1572246236 groups=["SpawnPoint"]]

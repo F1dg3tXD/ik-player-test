@@ -6,6 +6,7 @@ signal player_disconnected(peer_id)
 signal lobby_joined(lobby_id)
 signal lobby_created(lobby_id)
 
+#var _last_seed : int = 0
 
 # A small player struct
 var players : Dictionary = {}
@@ -82,16 +83,28 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	get_tree().change_scene_to_file("res://maps/Lobby.tscn")
 
 # Called when Steam indicates we joined/entered a lobby
-func _on_steam_lobby_joined(lobby_id: int, permissions: int, locked: bool, response: int) -> void:
-	# The Steam extension uses response codes — check for success constant
-	if response == Steam.CHAT_ROOM_ENTER_RESPONSE_SUCCESS:
-		NetworkManager.set_peer_mode(NetworkManager.PeerMode.STEAM)
-		# If we are not host, create client peer to owner
-		var owner = Steam.getLobbyOwner(lobby_id)
-		NetworkManager.start_steam_client(owner)
+func _on_steam_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, _response: int) -> void:
+	
+	await get_tree().process_frame  # wait 1 frame
+	
+	var host_id = Steam.getLobbyOwner(lobby_id)
+	var my_id = Steam.getSteamID()
+	
+	print("My ID:", my_id)
+	print("Host ID:", host_id)
+	
+	if host_id == 0:
+		print("Steam not ready, waiting...")
+		await get_tree().create_timer(0.2).timeout
+		host_id = Steam.getLobbyOwner(lobby_id)
+		
+	if my_id == host_id:
 		emit_signal("lobby_joined", lobby_id)
+		NetworkManager.start_steam_host()
 	else:
-		push_warning("Failed to join steam lobby: %s" % response)
+		emit_signal("lobby_joined", lobby_id)
+		NetworkManager.start_steam_client(host_id)
+	
 
 # Friend invite handling: Steam overlay friend invite acceptance
 func _on_steam_join_requested(lobby_id: int) -> void:
@@ -141,15 +154,15 @@ func start_game_on_host(map_scene_path: String) -> void:
 	if not multiplayer.is_server():
 		push_warning("Only host should call start_game_on_host()")
 		return
-	var seed = randi() # or compute properly
+	var dungeon_seed = randi() # or compute properly
 	# broadcast to all peers: load_game_scene with seed & map path
-	rpc("_rpc_load_game_scene", seed, map_scene_path)
+	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path)
 
 @rpc("any_peer", "reliable")
-func _rpc_load_game_scene(seed: int, map_scene_path: String) -> void:
+func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
 	# Each client loads the lobby map scene (or directly load the generated map scene)
 	# We'll load a dedicated "map loader" scene which contains a DungeonGenerator3D and MapSpawner
 	get_tree().change_scene_to_file(map_scene_path)
 	# When the map scene is ready it should read the seed from Lobby (or accept it via Lobby)
 	# Option: store the seed in Lobby so Map code can read it:
-	Lobby._last_seed = seed
+	Lobby._last_seed = dungeon_seed

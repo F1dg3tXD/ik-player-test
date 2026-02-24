@@ -31,6 +31,47 @@ height = 2.2299805
 transparency = 1
 albedo_color = Color(0, 1, 0, 0.4392157)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_j6gu7"]
+properties/0/path = NodePath(".:MOVE_SPEED")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:PLAYER_PATH")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:VIEW_THRESHOLD")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:MOVE_DELAY")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:ATTACK_RANGE")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:POSE_SWITCH_DELAY")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:OCCLUSION_MASK")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:TELEPORT_DISTANCE")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:TELEPORT_MIN_DISTANCE")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:VISIBILITY_RADIUS")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath(".:SEPARATION_STRENGTH")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath(".:position")
+properties/11/spawn = true
+properties/11/replication_mode = 1
+properties/12/path = NodePath(".:rotation")
+properties/12/spawn = true
+properties/12/replication_mode = 1
+
 [node name="NPC" type="CharacterBody3D" unique_id=1851256383 groups=["WeepingAngel"]]
 collision_layer = 4
 collision_mask = 5
@@ -85,5 +126,8 @@ radius = 0.18896484
 height = 0.33050537
 cone = true
 material = SubResource("StandardMaterial3D_j6gu7")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=540549860]
+replication_config = SubResource("SceneReplicationConfig_j6gu7")
 
 [editable path="weepingAngelMdl"]

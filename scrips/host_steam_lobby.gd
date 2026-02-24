@@ -10,9 +10,10 @@ extends Control
 @onready var back_button: Button = $Panel/VBoxContainer/ButtonsRow/BackButton
 
 func _ready() -> void:
-	enable_password.toggled.connect(_on_password_toggle)
-	create_button.pressed.connect(_on_create_pressed)
-	back_button.pressed.connect(_on_back_pressed)
+	pass
+	#enable_password.toggled.connect(_on_password_toggle)
+	#create_button.pressed.connect(_on_create_pressed)
+	#back_button.pressed.connect(_on_back_pressed)
 
 # ----------------------------------------------------
 # PASSWORD TOGGLE
@@ -33,7 +34,7 @@ func _on_create_pressed() -> void:
 		lobby_name.text = "WEEP Lobby"
 
 	Lobby.host_steam_lobby(
-		max_players.value,
+		int(max_players.value),
 		friends_only.button_pressed,
 		enable_password.button_pressed,
 		password_field.text
