@@ -6,6 +6,7 @@ signal player_disconnected(peer_id)
 signal lobby_joined(lobby_id)
 signal lobby_created(lobby_id)
 
+
 # A small player struct
 var players : Dictionary = {}
 var local_player_info : Dictionary = {
@@ -13,6 +14,12 @@ var local_player_info : Dictionary = {
 	"color": Color.WHITE,
 	"avatar": null
 }
+
+# Steam lobby state
+var is_friends_only : bool = false
+var has_password : bool = false
+var lobby_password : String = ""
+var pending_lobby_name : String = "WEEP Lobby"
 
 # callbacks from SteamManager
 func _ready() -> void:
@@ -35,8 +42,22 @@ func join_local_game(addr: String, port: int = 7000) -> void:
 	NetworkManager.start_local_client(addr, port)
 	# after connected, connected_to_server will trigger
 
-func host_steam_lobby(max_players: int = 8) -> void:
-	SteamManager.create_lobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
+func host_steam_lobby(max_players: int = 8, 
+	friends_only_flag: bool = false, 
+	password_enabled: bool = false, 
+	password_text: String = ""
+) -> void:
+	
+	is_friends_only = friends_only_flag
+	has_password = password_enabled
+	lobby_password = password_text
+	
+	var lobby_type = Steam.LOBBY_TYPE_PUBLIC
+	
+	if is_friends_only:
+		lobby_type = Steam.LOBBY_TYPE_FRIENDS_ONLY
+		
+	SteamManager.create_lobby(lobby_type, max_players)
 
 func join_steam_lobby(lobby_id: int) -> void:
 	SteamManager.join_lobby(lobby_id)
@@ -51,9 +72,14 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	NetworkManager.start_steam_host()
 	emit_signal("lobby_created", lobby_id)
 	# Filter lobbies
-	Steam.setLobbyData(lobby_id, "name", Lobby.local_player_info["name"] + "'s Lobby")
+	Steam.setLobbyData(lobby_id, "name", pending_lobby_name)
 	Steam.setLobbyData(lobby_id, "game", "WEEPGame")
+	# Friends only flag
+	Steam.setLobbyData(lobby_id, "friends_only", "1" if is_friends_only else "0")
+	# Password flag
+	Steam.setLobbyData(lobby_id, "has_password", "1" if has_password else "0")
 	# Let UI show lobby
+	get_tree().change_scene_to_file("res://maps/Lobby.tscn")
 
 # Called when Steam indicates we joined/entered a lobby
 func _on_steam_lobby_joined(lobby_id: int, permissions: int, locked: bool, response: int) -> void:

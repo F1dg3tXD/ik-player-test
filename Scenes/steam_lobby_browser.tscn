@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://daoklrpvjgf8w"]
 
+[ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="1_anikp"]
 [ext_resource type="Script" uid="uid://d3vsobckqqhv6" path="res://scrips/steam_lobby_browser.gd" id="1_jdb4c"]
 
 [node name="SteamLobbyBrowser" type="Control" unique_id=1229592265]
@@ -7,6 +8,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+theme = ExtResource("1_anikp")
 script = ExtResource("1_jdb4c")
 
 [node name="Panel" type="Panel" parent="." unique_id=218886949]
@@ -28,15 +30,40 @@ vertical_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=539647314]
 layout_mode = 2
+alignment = 1
 
 [node name="RefreshButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1246527674]
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 text = "Refresh"
 
 [node name="BackButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=2027200479]
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 text = "Back
 "
+
+[node name="friends" type="HBoxContainer" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1625911032]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer/friends" unique_id=1734943105]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Friends Only"
+
+[node name="FriendsOnly" type="CheckBox" parent="Panel/VBoxContainer/HBoxContainer/friends" unique_id=1776883152]
+layout_mode = 2
+
+[node name="password" type="HBoxContainer" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1788216265]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer/password" unique_id=1639260548]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Password"
+
+[node name="Password" type="CheckBox" parent="Panel/VBoxContainer/HBoxContainer/password" unique_id=39653126]
+layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Panel/VBoxContainer" unique_id=2076699563]
 custom_minimum_size = Vector2(500, 300)

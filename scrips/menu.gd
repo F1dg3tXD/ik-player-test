@@ -20,6 +20,7 @@ extends Node2D
 @onready var btn_steam_host: Button = $main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_Host
 @onready var btn_steam_lobby_browser: Button = $main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_LobbyBrowser
 @onready var steam_browser: Control = $main/Menu/SteamLobbyBrowser
+@onready var host_steam_lobby: Control = $main/Menu/HostSteamLobby
 
 # Graphics
 @onready var graphics: VBoxContainer = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics
@@ -104,6 +105,11 @@ func _on_back_pressed() -> void:
 
 func _on_steam_browser_pressed() -> void:
 	steam_browser.show()
+	host_steam_lobby.hide()
+
+func _on_btn_steam_host_pressed() -> void:
+	host_steam_lobby.show()
+	steam_browser.hide()
 
 # ----------------------------------------------------
 # BUTTON CONNECTIONS

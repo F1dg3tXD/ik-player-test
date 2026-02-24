@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://632qvwp7b5sy"]
+
+[ext_resource type="Script" uid="uid://bk537clam3t40" path="res://scrips/host_steam_lobby.gd" id="1_4xjj1"]
+
+[node name="HostSteamLobby" type="Control" unique_id=522363193]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4xjj1")
+
+[node name="Panel" type="Panel" parent="." unique_id=748806575]
+custom_minimum_size = Vector2(500, 400)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Title" type="Label" parent="Panel" unique_id=28424545]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -92.5
+offset_right = 92.5
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "Host Steam Lobby"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1926762937]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 44.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LobbyNameRow" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1372189213]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/LobbyNameRow" unique_id=1565135574]
+layout_mode = 2
+text = "Lobby Name"
+
+[node name="LobbyName" type="LineEdit" parent="Panel/VBoxContainer/LobbyNameRow" unique_id=346679488]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+placeholder_text = "My Lobby"
+alignment = 1
+
+[node name="MaxPlayersRow" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=45286618]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/MaxPlayersRow" unique_id=884898591]
+layout_mode = 2
+text = "Max  Players"
+
+[node name="MaxPlayers" type="SpinBox" parent="Panel/VBoxContainer/MaxPlayersRow" unique_id=1342685506]
+layout_mode = 2
+
+[node name="FriendsOnly" type="CheckBox" parent="Panel/VBoxContainer" unique_id=12881105]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Friends Only"
+
+[node name="EnablePassword" type="CheckBox" parent="Panel/VBoxContainer" unique_id=1535732556]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Password Protected"
+
+[node name="PasswordField" type="LineEdit" parent="Panel/VBoxContainer" unique_id=738903388]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+placeholder_text = "Password"
+alignment = 1
+editable = false
+secret = true
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer" unique_id=630234698]
+layout_mode = 2
+
+[node name="ButtonsRow" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1662722371]
+layout_mode = 2
+alignment = 1
+
+[node name="CreateButton" type="Button" parent="Panel/VBoxContainer/ButtonsRow" unique_id=1591042900]
+layout_mode = 2
+text = "Create"
+
+[node name="BackButton" type="Button" parent="Panel/VBoxContainer/ButtonsRow" unique_id=504585533]
+layout_mode = 2
+text = "Back
+"

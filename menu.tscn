@@ -4,6 +4,7 @@
 [ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="2_4hy44"]
 [ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="3_ytr4m"]
 [ext_resource type="PackedScene" uid="uid://daoklrpvjgf8w" path="res://Scenes/steam_lobby_browser.tscn" id="4_4hy44"]
+[ext_resource type="PackedScene" uid="uid://632qvwp7b5sy" path="res://Scenes/host_steam_lobby.tscn" id="5_ytr4m"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
 font = ExtResource("3_ytr4m")
@@ -129,6 +130,7 @@ layout_mode = 2
 text = "Back"
 
 [node name="OptionsMenuHead" type="Control" parent="main/Menu" unique_id=854969838]
+visible = false
 anchors_preset = 0
 offset_top = -50.0
 offset_right = 40.0
@@ -348,8 +350,20 @@ text = "Back"
 [node name="SteamLobbyBrowser" parent="main/Menu" unique_id=1229592265 instance=ExtResource("4_4hy44")]
 visible = false
 layout_mode = 0
-offset_left = 239.0
-offset_right = 279.0
+offset_left = 240.0
+offset_right = 280.0
+
+[node name="HostSteamLobby" parent="main/Menu" unique_id=522363193 instance=ExtResource("5_ytr4m")]
+visible = false
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 240.0
+offset_right = 280.0
+offset_bottom = 40.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="pressed" from="main/Menu/Main/MultiPlayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="main/Menu/Main/Options" to="." method="_on_options_pressed"]
@@ -357,9 +371,11 @@ offset_right = 279.0
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Host" to="." method="_on_btn_host_pressed"]
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Join" to="." method="_on_btn_join_pressed"]
 [connection signal="text_changed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/ENet_id_prompt" to="." method="_on_id_prompt_text_changed"]
+[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_Host" to="." method="_on_btn_steam_host_pressed"]
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_LobbyBrowser" to="." method="_on_steam_browser_pressed"]
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Apply" to="." method="_on_apply_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
 
 [editable path="main/Menu/SteamLobbyBrowser"]
+[editable path="main/Menu/HostSteamLobby"]

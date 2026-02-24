@@ -3,6 +3,8 @@ extends Control
 @onready var refresh_button : Button = $Panel/VBoxContainer/HBoxContainer/RefreshButton
 @onready var back_button : Button = $Panel/VBoxContainer/HBoxContainer/BackButton
 @onready var lobby_list : VBoxContainer = $Panel/VBoxContainer/ScrollContainer/LobbyList
+@onready var friends_only: CheckBox = $Panel/VBoxContainer/HBoxContainer/friends/FriendsOnly
+@onready var password: CheckBox = $Panel/VBoxContainer/HBoxContainer/password/Password
 
 var found_lobbies : Array = []
 
@@ -22,15 +24,39 @@ func _ready() -> void:
 func _request_lobbies() -> void:
 	_clear_lobby_list()
 	
-	# Clear previous filters first (important when refreshing)
-	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
+	Steam.addRequestLobbyListDistanceFilter(
+		Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE
+	)
 	
-	# Filter by game tag
-	Steam.addRequestLobbyListStringFilter("game", "WEEPGame", Steam.LOBBY_COMPARISON_EQUAL)
+	# 🔵 Always filter by your game
+	Steam.addRequestLobbyListStringFilter(
+		"game",
+		"WEEPGame",
+		Steam.LOBBY_COMPARISON_EQUAL
+	)
+	
+	# 🟢 Friends Only Filter
+	if friends_only.button_pressed:
+		Steam.addRequestLobbyListStringFilter(
+			"friends_only",
+			"1",
+			Steam.LOBBY_COMPARISON_EQUAL
+		)
+		
+	# 🟡 Password Filter
+	if password.button_pressed:
+		Steam.addRequestLobbyListStringFilter(
+			"has_password",
+			"1",
+			Steam.LOBBY_COMPARISON_EQUAL
+		)
+		
 	Steam.requestLobbyList()
-	
 
 func _on_refresh_pressed() -> void:
+	_request_lobbies()
+	
+func _on_filter_changed(_value: bool) -> void:
 	_request_lobbies()
 
 # ----------------------------------------------------
