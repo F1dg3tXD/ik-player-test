@@ -22,13 +22,13 @@ func _ready() -> void:
 func _request_lobbies() -> void:
 	_clear_lobby_list()
 	
-	# Optional: filter by distance
+	# Clear previous filters first (important when refreshing)
 	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
 	
-	# Optional: filter by metadata key if you set one when creating lobby
-	# Steam.addRequestLobbyListStringFilter("game", "MyGame", Steam.LOBBY_COMPARISON_EQUAL)
-	
+	# Filter by game tag
+	Steam.addRequestLobbyListStringFilter("game", "WEEPGame", Steam.LOBBY_COMPARISON_EQUAL)
 	Steam.requestLobbyList()
+	
 
 func _on_refresh_pressed() -> void:
 	_request_lobbies()

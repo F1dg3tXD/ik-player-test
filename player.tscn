@@ -1329,3 +1329,7 @@ transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.013
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2018578722]
 replication_config = SubResource("SceneReplicationConfig_4flbx")
+
+[node name="ProxNetwork" type="AudioStreamPlayer3D" parent="." unique_id=1087441877]
+
+[node name="ProxLocal" type="AudioStreamPlayer3D" parent="." unique_id=8649465]

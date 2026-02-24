@@ -53,6 +53,7 @@ theme = ExtResource("2_4hy44")
 
 [node name="SinglePlayer" type="Button" parent="main/Menu/Main" unique_id=923507596]
 layout_mode = 2
+tooltip_text = "Singlplayer is not available yet."
 theme_override_font_sizes/font_size = 50
 text = "Singleplayer"
 
