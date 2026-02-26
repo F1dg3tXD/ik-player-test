@@ -13,18 +13,20 @@ var player_spawn_markers: Array[Node3D] = []
 #var npc_spawn_markers: Array[Marker3D] = []
 #var item_spawn_markers: Array[Marker3D] = []
 
-
 func _ready():
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if multiplayer.is_server():
 		_collect_spawn_points()
-		#_spawn_npcs()
-		#_spawn_items()
+		# IMPORTANT: server must also check if it's alone
+		if multiplayer.get_peers().is_empty():
+			print("Singleplayer host — spawning immediately")
+			spawn_all_players()
 	else:
-		# Notify server we finished loading
+		# Wait a moment to ensure multiplayer is ready
+		await get_tree().create_timer(0.2).timeout
+		print("Client sending ready")
 		Lobby._notify_scene_ready.rpc_id(1)
-
 
 # --------------------------------------------------
 # Collect Spawn Markers From Entire Map

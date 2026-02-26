@@ -193,6 +193,8 @@ func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
 	# Host marks itself ready
 	if multiplayer.is_server():
 		players_ready[multiplayer.get_unique_id()] = true
+		await get_tree().process_frame
+		_check_all_ready()
 	
 @rpc("any_peer", "reliable")
 func _rpc_load_simple_scene(map_scene_path: String) -> void:
@@ -201,6 +203,7 @@ func _rpc_load_simple_scene(map_scene_path: String) -> void:
 @rpc("any_peer", "reliable")
 func _notify_scene_ready():
 	var sender = multiplayer.get_remote_sender_id()
+	print("Ready received from:", sender)
 	players_ready[sender] = true
 	if multiplayer.is_server():
 		_check_all_ready()
