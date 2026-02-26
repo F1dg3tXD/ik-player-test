@@ -147,6 +147,9 @@ func _check_all_ready():
 	var peer_ids = multiplayer.get_peers()
 	peer_ids.append(multiplayer.get_unique_id())
 	
+	print("Ready list:", players_ready)
+	print("Peers:", multiplayer.get_peers())
+	
 	for id in peer_ids:
 		if not players_ready.has(id):
 			return
@@ -185,8 +188,11 @@ func start_game_on_host(map_scene_path: String) -> void:
 @rpc("any_peer", "reliable")
 func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
 	_last_seed = dungeon_seed
-	get_tree().change_scene_to_file(map_scene_path)
 	players_ready.clear()
+	get_tree().change_scene_to_file(map_scene_path)
+	# Host marks itself ready
+	if multiplayer.is_server():
+		players_ready[multiplayer.get_unique_id()] = true
 	
 @rpc("any_peer", "reliable")
 func _rpc_load_simple_scene(map_scene_path: String) -> void:

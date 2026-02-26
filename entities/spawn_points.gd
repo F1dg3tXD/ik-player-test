@@ -15,14 +15,14 @@ var player_spawn_markers: Array[Node3D] = []
 
 
 func _ready():
-	if not multiplayer.is_server():
-		return
 	await get_tree().process_frame
 	await get_tree().process_frame
-	_collect_spawn_points()
-	#_spawn_npcs()
-	#_spawn_items()
-	if not multiplayer.is_server():
+	if multiplayer.is_server():
+		_collect_spawn_points()
+		#_spawn_npcs()
+		#_spawn_items()
+	else:
+		# Notify server we finished loading
 		Lobby._notify_scene_ready.rpc_id(1)
 
 
