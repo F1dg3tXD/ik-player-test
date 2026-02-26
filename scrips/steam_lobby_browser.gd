@@ -1,3 +1,4 @@
+# steam_lobby_browser.gd
 extends Control
 
 @onready var refresh_button : Button = $Panel/VBoxContainer/HBoxContainer/RefreshButton

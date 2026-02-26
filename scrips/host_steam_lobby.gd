@@ -1,5 +1,5 @@
+# host_steam_lobby.gd
 extends Control
-#$Panel/VBoxContainer/LobbyNameRow/LobbyName
 @onready var lobby_name: LineEdit = $Panel/VBoxContainer/LobbyNameRow/LobbyName
 @onready var max_players: SpinBox = $Panel/VBoxContainer/MaxPlayersRow/MaxPlayers
 @onready var friends_only: CheckBox = $Panel/VBoxContainer/FriendsOnly
@@ -11,9 +11,6 @@ extends Control
 
 func _ready() -> void:
 	pass
-	#enable_password.toggled.connect(_on_password_toggle)
-	#create_button.pressed.connect(_on_create_pressed)
-	#back_button.pressed.connect(_on_back_pressed)
 
 # ----------------------------------------------------
 # PASSWORD TOGGLE
