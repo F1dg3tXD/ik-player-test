@@ -137,28 +137,30 @@ func _on_server_disconnected() -> void:
 	
 # ---------- Scene: default loader ----------
 func start_simple_scene(map_scene_path: String) -> void:
+	# Only server should invoke this shortcut.
 	if not multiplayer.is_server():
 		return
 	_last_seed = 0
+	# Host loads the simple scene for themselves and tells clients to load it
 	_rpc_load_simple_scene(map_scene_path)
 	rpc("_rpc_load_simple_scene", map_scene_path)
 	
 func _check_all_ready():
 	var peer_ids = multiplayer.get_peers()
 	peer_ids.append(multiplayer.get_unique_id())
-	
-	print("Ready list:", players_ready)
-	print("Peers:", multiplayer.get_peers())
-	
+	print("[Lobby] players_ready:", players_ready, " peers:", peer_ids)
 	for id in peer_ids:
 		if not players_ready.has(id):
+			print("[Lobby] Waiting for peer %s to be ready..." % str(id))
 			return
-	
-	print("All players ready — spawning players")
-	
-	# Tell SpawnPoints to spawn
-	var spawn_node = get_tree().get_current_scene().get_node("spawnPoints")
-	spawn_node.spawn_all_players()
+	print("[Lobby] All players ready — instructing SpawnPoints to spawn players")
+	var spawn_node: Node = get_tree().get_current_scene().get_node_or_null("spawnPoints")
+	if not spawn_node:
+		push_error("[Lobby] spawnPoints node not found in current scene.")
+		return
+	# Tell spawn node to spawn (server-only)
+	if multiplayer.is_server():
+		spawn_node.spawn_all_players()
 
 # ---------- RPCs: info transfer ----------
 @rpc("any_peer", "reliable")
@@ -177,37 +179,43 @@ func _sync_full_roster(roster: Dictionary) -> void:
 	# UI hook: update player list
 
 # ---------- Host starts the real game ----------
-# Host calls start_game_on_host; which will generate dungeon seed and notify clients
+# Called when host wants to start whole game with generated map (seeded)
 func start_game_on_host(map_scene_path: String) -> void:
 	if not multiplayer.is_server():
 		return
-	# Wait until at least one peer is connected
+	# If host wants to ensure at least one client is connected, wait:
 	if multiplayer.get_peers().is_empty():
-		print("Waiting for peer connection before starting game...")
+		print("[Lobby] Waiting for at least one peer to be connected before starting...")
 		await multiplayer.peer_connected
 	var dungeon_seed = randi()
-	_rpc_load_game_scene(dungeon_seed, map_scene_path)
+	# Host executes local load (so host runs the same logic as clients)
+	_rpc_load_game_scene(dungeon_seed, map_scene_path) # runs locally
+	# Then tell clients to load
 	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path)
 
 @rpc("any_peer", "reliable")
 func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
+	# Store the seed for the map loader to read
 	_last_seed = dungeon_seed
 	players_ready.clear()
+	print("[Lobby] Loading map scene:", map_scene_path, " seed:", dungeon_seed)
 	get_tree().change_scene_to_file(map_scene_path)
-	# Host marks itself ready
+	# Host marks itself ready; clients will notify via Lobby._notify_scene_ready
 	if multiplayer.is_server():
 		players_ready[multiplayer.get_unique_id()] = true
+		# allow one frame so SpawnPoints can collect markers
 		await get_tree().process_frame
 		_check_all_ready()
 	
 @rpc("any_peer", "reliable")
 func _rpc_load_simple_scene(map_scene_path: String) -> void:
+	print("[Lobby] _rpc_load_simple_scene -> loading:", map_scene_path)
 	get_tree().change_scene_to_file(map_scene_path)
 	
 @rpc("any_peer", "reliable")
-func _notify_scene_ready():
-	var sender = multiplayer.get_remote_sender_id()
-	print("Ready received from:", sender)
+func _notify_scene_ready() -> void:
+	var sender := multiplayer.get_remote_sender_id()
+	print("[Lobby] _notify_scene_ready received from:", sender)
 	players_ready[sender] = true
 	if multiplayer.is_server():
 		_check_all_ready()

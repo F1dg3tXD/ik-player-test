@@ -1,7 +1,6 @@
 # Lobby Map Script
 extends Node3D
-#
-#@onready var spawner: MultiplayerSpawner = $MultiplayerSpawner
+
 @onready var spawn_points_parent: Node3D = $spawnPoints
 @onready var players_parent: Node3D = $Players
 

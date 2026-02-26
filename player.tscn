@@ -686,83 +686,6 @@ albedo_color = Color(0, 0.4627451, 1, 0.12156863)
 [sub_resource type="ViewportTexture" id="ViewportTexture_onrkg"]
 viewport_path = NodePath("SteamName")
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_4flbx"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:rotation")
-properties/1/spawn = true
-properties/1/replication_mode = 1
-properties/2/path = NodePath("neck/head:rotation")
-properties/2/spawn = true
-properties/2/replication_mode = 1
-properties/3/path = NodePath("player_mdl/roller:rotation")
-properties/3/spawn = true
-properties/3/replication_mode = 1
-properties/4/path = NodePath(".:SPEED")
-properties/4/spawn = true
-properties/4/replication_mode = 1
-properties/5/path = NodePath(".:ACCEL")
-properties/5/spawn = true
-properties/5/replication_mode = 1
-properties/6/path = NodePath(".:DECEL")
-properties/6/spawn = true
-properties/6/replication_mode = 1
-properties/7/path = NodePath(".:JUMP_VELOCITY")
-properties/7/spawn = true
-properties/7/replication_mode = 1
-properties/8/path = NodePath(".:ROLL_RADIUS")
-properties/8/spawn = true
-properties/8/replication_mode = 1
-properties/9/path = NodePath(".:ROLL_DAMP")
-properties/9/spawn = true
-properties/9/replication_mode = 1
-properties/10/path = NodePath(".:STRAFE_YAW_ANGLE")
-properties/10/spawn = true
-properties/10/replication_mode = 1
-properties/11/path = NodePath("player_mdl/roller/IKPole_R:position")
-properties/11/spawn = true
-properties/11/replication_mode = 1
-properties/12/path = NodePath("player_mdl/roller/IKPole_L:position")
-properties/12/spawn = true
-properties/12/replication_mode = 1
-properties/13/path = NodePath("player_mdl/roller/walker/RemoteTransform3D_L:position")
-properties/13/spawn = true
-properties/13/replication_mode = 1
-properties/14/path = NodePath("player_mdl/roller/walker/RemoteTransform3D_R:position")
-properties/14/spawn = true
-properties/14/replication_mode = 1
-properties/15/path = NodePath("neck/head/LookTarget/HeadTarget:position")
-properties/15/spawn = true
-properties/15/replication_mode = 1
-properties/16/path = NodePath("neck/head/LookTarget/SpineTarget:position")
-properties/16/spawn = true
-properties/16/replication_mode = 1
-properties/17/path = NodePath("player_mdl/Armature/Skeleton3D/LeftLegIK3D:position")
-properties/17/spawn = true
-properties/17/replication_mode = 1
-properties/18/path = NodePath("player_mdl/Armature/Skeleton3D/LeftLegIK3D:rotation")
-properties/18/spawn = true
-properties/18/replication_mode = 1
-properties/19/path = NodePath("player_mdl/Armature/Skeleton3D/RightLegIK3D:position")
-properties/19/spawn = true
-properties/19/replication_mode = 1
-properties/20/path = NodePath("player_mdl/Armature/Skeleton3D/RightLegIK3D:rotation")
-properties/20/spawn = true
-properties/20/replication_mode = 1
-properties/21/path = NodePath("player_mdl/Armature/Skeleton3D/HeadLook:position")
-properties/21/spawn = true
-properties/21/replication_mode = 1
-properties/22/path = NodePath("player_mdl/Armature/Skeleton3D/ChestLook:position")
-properties/22/spawn = true
-properties/22/replication_mode = 1
-properties/23/path = NodePath("player_mdl/Armature/Skeleton3D/HeadLook:rotation")
-properties/23/spawn = true
-properties/23/replication_mode = 1
-properties/24/path = NodePath("player_mdl/Armature/Skeleton3D/ChestLook:rotation")
-properties/24/spawn = true
-properties/24/replication_mode = 1
-
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
 collision_mask = 3
@@ -1327,10 +1250,3 @@ transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.013
 
 [node name="SpineTarget" type="Marker3D" parent="neck/head/LookTarget" unique_id=2000576735]
 transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.01306852, -0.9999146, 7.342934e-08, 0.9999151, -0.013068601, -2.5093811e-08, -0.6358312, -0.45835948)
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2018578722]
-replication_config = SubResource("SceneReplicationConfig_4flbx")
-
-[node name="ProxNetwork" type="AudioStreamPlayer3D" parent="." unique_id=1087441877]
-
-[node name="ProxLocal" type="AudioStreamPlayer3D" parent="." unique_id=8649465]
