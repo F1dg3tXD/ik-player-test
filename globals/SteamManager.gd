@@ -11,20 +11,12 @@ var steam_initialized := false
 func _ready() -> void:
 	# Make sure Steam overlay & APIs can initialize
 	OS.set_environment("SteamAppId", str(app_id))
-	#var init_response = Steam.steamInit()
-	#Steam.steamInitEx() # prefer steamInitEx to get more info
 	# Hook signals we rely on
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joined)
 	Steam.lobby_match_list.connect(_on_lobby_match_list)
 	Steam.join_requested.connect(_on_join_requested) # friend invite acceptance
 	# NOTE: subscribe any additional Steam signals you need (e.g. avatar_loaded)
-	
-	#if init_response["status"] == 1:
-		#print("Steam initialized")
-		#steam_initialized = true
-	#else:
-		#print("Steam failed to initialize")
 
 func _process(_delta: float) -> void:
 	#pass
