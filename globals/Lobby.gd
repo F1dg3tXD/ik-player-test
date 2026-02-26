@@ -10,6 +10,7 @@ var _last_seed : int = 0
 
 # A small player struct
 var players : Dictionary = {}
+var players_ready : Dictionary = {}
 var local_player_info : Dictionary = {
 	"name": Steam.getPersonaName(),
 	"color": Color.WHITE,
@@ -142,6 +143,20 @@ func start_simple_scene(map_scene_path: String) -> void:
 	_rpc_load_simple_scene(map_scene_path)
 	rpc("_rpc_load_simple_scene", map_scene_path)
 	
+func _check_all_ready():
+	var peer_ids = multiplayer.get_peers()
+	peer_ids.append(multiplayer.get_unique_id())
+	
+	for id in peer_ids:
+		if not players_ready.has(id):
+			return
+	
+	print("All players ready — spawning players")
+	
+	# Tell SpawnPoints to spawn
+	var spawn_node = get_tree().get_current_scene().get_node("spawnPoints")
+	spawn_node.spawn_all_players()
+
 # ---------- RPCs: info transfer ----------
 @rpc("any_peer", "reliable")
 func _send_local_player_info() -> void:
@@ -171,7 +186,15 @@ func start_game_on_host(map_scene_path: String) -> void:
 func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
 	_last_seed = dungeon_seed
 	get_tree().change_scene_to_file(map_scene_path)
+	players_ready.clear()
 	
 @rpc("any_peer", "reliable")
 func _rpc_load_simple_scene(map_scene_path: String) -> void:
 	get_tree().change_scene_to_file(map_scene_path)
+	
+@rpc("any_peer", "reliable")
+func _notify_scene_ready():
+	var sender = multiplayer.get_remote_sender_id()
+	players_ready[sender] = true
+	if multiplayer.is_server():
+		_check_all_ready()

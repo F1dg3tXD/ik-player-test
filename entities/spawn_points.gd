@@ -17,15 +17,13 @@ var player_spawn_markers: Array[Node3D] = []
 func _ready():
 	if not multiplayer.is_server():
 		return
-	# If seed exists, use it
-	if Lobby._last_seed != 0:
-		seed(Lobby._last_seed)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_collect_spawn_points()
-	_spawn_players()
 	#_spawn_npcs()
 	#_spawn_items()
+	if not multiplayer.is_server():
+		Lobby._notify_scene_ready.rpc_id(1)
 
 
 # --------------------------------------------------
@@ -50,6 +48,9 @@ func _collect_spawn_points():
 # --------------------------------------------------
 # Players
 # --------------------------------------------------
+
+func spawn_all_players():
+	_spawn_players()
 
 func _spawn_players():
 	
