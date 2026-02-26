@@ -1,8 +1,12 @@
 [gd_scene format=3 uid="uid://blwdixrupw41w"]
 
 [ext_resource type="Script" uid="uid://c3bhafo7wgj21" path="res://entities/spawn_points.gd" id="1_vo7jb"]
+[ext_resource type="PackedScene" uid="uid://b5h3gn2xc5hv7" path="res://player.tscn" id="2_uy485"]
+[ext_resource type="PackedScene" uid="uid://d18oyfo5mo4b0" path="res://NPC/weepingAngel.tscn" id="3_n6na0"]
 
 [node name="spawnPoints" type="Node3D" unique_id=998261882 groups=["PlayerSpawn"]]
 script = ExtResource("1_vo7jb")
+player_scene = ExtResource("2_uy485")
+npc_scene = ExtResource("3_n6na0")
 
-[node name="spawn" type="Marker3D" parent="." unique_id=1572246236 groups=["SpawnPoint"]]
+[node name="spawn" type="Node3D" parent="." unique_id=1600414792 groups=["PlayerSpawn"]]

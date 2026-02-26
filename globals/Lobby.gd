@@ -6,7 +6,7 @@ signal player_disconnected(peer_id)
 signal lobby_joined(lobby_id)
 signal lobby_created(lobby_id)
 
-#var _last_seed : int = 0
+var _last_seed : int = 0
 
 # A small player struct
 var players : Dictionary = {}
@@ -131,12 +131,20 @@ func _on_connection_failed() -> void:
 
 func _on_server_disconnected() -> void:
 	push_error("Server disconnected — handle return to menu")
-
+	
+# ---------- Scene: default loader ----------
+func start_simple_scene(map_scene_path: String) -> void:
+	if not multiplayer.is_server():
+		return
+	_last_seed = 0
+	_rpc_load_simple_scene(map_scene_path)
+	rpc("_rpc_load_simple_scene", map_scene_path)
+	
 # ---------- RPCs: info transfer ----------
 @rpc("any_peer", "reliable")
 func _send_local_player_info() -> void:
 	# Called on server by client (rpc_id from client) or called on clients by server
-	var from = multiplayer.get_rpc_sender_id()
+	var from = multiplayer.get_remote_sender_id()
 	players[from] = local_player_info.duplicate(true)
 	emit_signal("player_connected", from, players[from])
 	# Server should then broadcast roster to everyone if desired:
@@ -152,17 +160,16 @@ func _sync_full_roster(roster: Dictionary) -> void:
 # Host calls start_game_on_host; which will generate dungeon seed and notify clients
 func start_game_on_host(map_scene_path: String) -> void:
 	if not multiplayer.is_server():
-		push_warning("Only host should call start_game_on_host()")
 		return
-	var dungeon_seed = randi() # or compute properly
-	# broadcast to all peers: load_game_scene with seed & map path
-	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path)
+	var dungeon_seed = randi()
+	_rpc_load_game_scene(dungeon_seed, map_scene_path) # host
+	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path) # clients
 
 @rpc("any_peer", "reliable")
 func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
-	# Each client loads the lobby map scene (or directly load the generated map scene)
-	# We'll load a dedicated "map loader" scene which contains a DungeonGenerator3D and MapSpawner
+	_last_seed = dungeon_seed
 	get_tree().change_scene_to_file(map_scene_path)
-	# When the map scene is ready it should read the seed from Lobby (or accept it via Lobby)
-	# Option: store the seed in Lobby so Map code can read it:
-	Lobby._last_seed = dungeon_seed
+	
+@rpc("any_peer", "reliable")
+func _rpc_load_simple_scene(map_scene_path: String) -> void:
+	get_tree().change_scene_to_file(map_scene_path)
