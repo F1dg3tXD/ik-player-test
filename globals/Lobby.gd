@@ -104,6 +104,8 @@ func _on_steam_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, _re
 	else:
 		emit_signal("lobby_joined", lobby_id)
 		NetworkManager.start_steam_client(host_id)
+		# Have to load the Lobby map on the client first
+		get_tree().change_scene_to_file("res://maps/Lobby.tscn")
 	
 
 # Friend invite handling: Steam overlay friend invite acceptance
