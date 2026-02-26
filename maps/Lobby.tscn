@@ -1,12 +1,10 @@
 [gd_scene format=3 uid="uid://do43d0lbdxge1"]
 
 [ext_resource type="PackedScene" uid="uid://d1ydcniaskip3" path="res://entities/van.tscn" id="1_b6npq"]
-[ext_resource type="Script" uid="uid://buwqdl3tjm46j" path="res://maps/lobby.gd" id="1_ccouh"]
 [ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="2_71o6c"]
 [ext_resource type="PackedScene" uid="uid://5ucq3gpglq0o" path="res://entities/env.tscn" id="4_ddprd"]
 
 [node name="Lobby" type="Node3D" unique_id=1456081684]
-script = ExtResource("1_ccouh")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=204713642]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
@@ -69,10 +67,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, -1)
 
 [node name="spawn9" type="Node3D" parent="spawnPoints" unique_id=507367077 groups=["PlayerSpawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2118155235]
-_spawnable_scenes = PackedStringArray("uid://b5h3gn2xc5hv7")
-spawn_path = NodePath("../spawnPoints")
 
 [node name="env" parent="." unique_id=710608853 instance=ExtResource("4_ddprd")]
 

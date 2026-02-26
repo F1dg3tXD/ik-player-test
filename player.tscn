@@ -1317,6 +1317,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17386842, 0)
 [node name="Camera3D" type="Camera3D" parent="neck/head" unique_id=2053508083]
 unique_name_in_owner = true
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+current = true
 
 [node name="LookTarget" type="Node3D" parent="neck/head" unique_id=2077054665]
 transform = Transform3D(1, -9.334053e-08, 7.259832e-08, -7.3812124e-08, -0.013068594, 0.9999141, -9.2383814e-08, -0.99991465, -0.013068514, 4.0819735e-08, -0.018010497, 0.015722938)
