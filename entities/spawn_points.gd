@@ -18,15 +18,8 @@ func _ready():
 	await get_tree().process_frame
 	if multiplayer.is_server():
 		_collect_spawn_points()
-		# IMPORTANT: server must also check if it's alone
-		if multiplayer.get_peers().is_empty():
-			print("Singleplayer host — spawning immediately")
-			spawn_all_players()
-	else:
-		# Wait a moment to ensure multiplayer is ready
-		await get_tree().create_timer(0.2).timeout
-		print("Client sending ready")
-		Lobby._notify_scene_ready.rpc_id(1)
+		await get_tree().process_frame
+		spawn_all_players()
 
 # --------------------------------------------------
 # Collect Spawn Markers From Entire Map

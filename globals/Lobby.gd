@@ -181,9 +181,13 @@ func _sync_full_roster(roster: Dictionary) -> void:
 func start_game_on_host(map_scene_path: String) -> void:
 	if not multiplayer.is_server():
 		return
+	# Wait until at least one peer is connected
+	if multiplayer.get_peers().is_empty():
+		print("Waiting for peer connection before starting game...")
+		await multiplayer.peer_connected
 	var dungeon_seed = randi()
-	_rpc_load_game_scene(dungeon_seed, map_scene_path) # host
-	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path) # clients
+	_rpc_load_game_scene(dungeon_seed, map_scene_path)
+	rpc("_rpc_load_game_scene", dungeon_seed, map_scene_path)
 
 @rpc("any_peer", "reliable")
 func _rpc_load_game_scene(dungeon_seed: int, map_scene_path: String) -> void:
