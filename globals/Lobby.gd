@@ -36,6 +36,7 @@ func _on_lobby_created(result:int, lobby_id:int):
 	print("Steam lobby created")
 	NetworkManager.start_steam_host()
 	await get_tree().process_frame
+	await get_tree().process_frame
 	var spawn := get_tree().current_scene.get_node("spawnPoints")
 	spawn.spawn_player(multiplayer.get_unique_id())
 	Steam.setLobbyData(lobby_id,"game","WEEPGame")

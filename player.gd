@@ -52,12 +52,14 @@ var personaName := Steam.getPersonaName()
 # For later multiplayer
 #Steam.getPlayerAvatar(remote_steam_id, Steam.AVATAR_MEDIUM)
 
-func _enter_tree():
-	set_multiplayer_authority(int(name))
+# This breaks shit for some reason
+#func _enter_tree():
+	#set_multiplayer_authority(int(name))
 
 func _ready():
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
+		await get_tree().process_frame
 		await get_tree().process_frame
 		camera_3d.make_current()
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)

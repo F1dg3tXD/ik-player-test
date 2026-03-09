@@ -81,7 +81,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
 
 [node name="MenuCamera" type="Camera3D" parent="Cameras" unique_id=741738876]
 transform = Transform3D(-0.9659258, 0, -0.25881913, 0, 1, 0, 0.25881913, 0, -0.9659258, 0, 1, -1)
-current = true
 
 [node name="Menu" parent="Cameras/MenuCamera" unique_id=298708851 instance=ExtResource("4_smn20")]
 
