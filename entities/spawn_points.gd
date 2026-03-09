@@ -19,7 +19,7 @@ func _ready():
 		print("[SpawnPoints] Client scene ready")
 		Lobby.client_scene_ready.rpc_id(1)
 	
-	if multiplayer.is_server():
+	if multiplayer.multiplayer_peer != null and multiplayer.is_server():
 		print("[SpawnPoints] Server: collected %d spawn markers" % player_spawn_markers.size())
 		return
 	# CLIENT: wait until actually connected before notifying server

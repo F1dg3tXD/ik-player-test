@@ -91,7 +91,7 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	Steam.setLobbyData(lobby_id, "has_password", "1" if has_password else "0")
 	# Spawn host player
 	var spawn = get_tree().current_scene.get_node("spawnPoints")
-	spawn.spawn_player(multiplayer.get_unique_id())
+	
 	# Hide menu
 	var menu = get_tree().current_scene.get_node("Cameras/MenuCamera/Menu")
 	menu.hide()
@@ -104,11 +104,9 @@ func _on_steam_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, _re
 	print("Host ID:", host_id)
 	emit_signal("lobby_joined", lobby_id)
 	if my_id == host_id:
-		NetworkManager.start_steam_host()
+		if multiplayer.multiplayer_peer == null:
+			NetworkManager.start_steam_host()
 	else:
-		await get_tree().process_frame
-		await get_tree().process_frame
-		print("Connecting to Steam host:", host_id)
 		NetworkManager.start_steam_client(host_id)
 
 # Friend invite handling: Steam overlay friend invite acceptance
@@ -128,6 +126,9 @@ func _on_peer_disconnected(id: int) -> void:
 	emit_signal("player_disconnected", id)
 
 func _on_connected_to_server() -> void:
+	if multiplayer.is_server():
+		var spawn = get_tree().current_scene.get_node("spawnPoints")
+		spawn.spawn_player(multiplayer.get_unique_id())
 	# local client: send our info immediately to server
 	rpc_id(1, "_send_local_player_info")
 	rpc_id(1, "client_scene_ready")
