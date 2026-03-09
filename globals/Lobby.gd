@@ -78,6 +78,8 @@ func _hide_menu_if_player_exists():
 
 # Called when Steam returns that lobby was created (host side)
 func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
+	if multiplayer.multiplayer_peer != null:
+		return
 	if result != Steam.Result.RESULT_OK:
 		push_error("Failed to create steam lobby: %s" % result)
 		return
@@ -95,8 +97,8 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	# Spawn host player
 	
 	# Hide menu
-	var menu = get_tree().current_scene.get_node("Cameras/MenuCamera/Menu")
-	menu.hide()
+	var menu_camera = get_tree().current_scene.get_node("Cameras/MenuCamera")
+	menu_camera.enabled = false
 
 # Called when Steam indicates we joined/entered a lobby
 func _on_steam_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, _response: int) -> void:
