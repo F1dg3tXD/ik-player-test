@@ -2,7 +2,7 @@
 extends Node
 
 enum PeerMode { NONE, ENET, STEAM }
-
+var already_hosting := false
 var peer_mode : PeerMode = PeerMode.NONE
 var peer : Object = null
 
@@ -57,7 +57,9 @@ func start_local_client(addr: String, port: int) -> Error:
 # Helper wrappers for SteamMultiplayerPeer:
 func start_steam_host():
 	set_peer_mode(PeerMode.STEAM)
-	
+	if already_hosting:
+		return
+		
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null

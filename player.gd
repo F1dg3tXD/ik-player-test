@@ -1,3 +1,4 @@
+# player.gd
 extends CharacterBody3D
 
 @export var SPEED := 5.0
@@ -44,6 +45,7 @@ var cam_pitch: float = -15.0
 @onready var display_name: Label = $SteamName/displayName
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
 @onready var name_plate: Sprite3D = $namePlate
+var steam_id : int
 
 var personaName := Steam.getPersonaName()
 
@@ -53,23 +55,18 @@ var personaName := Steam.getPersonaName()
 func _enter_tree():
 	set_multiplayer_authority(int(name))
 
-func _ready() -> void:
+func _ready():
 	if is_multiplayer_authority():
-		await get_tree().process_frame
+		print("Local player ready -> enabling camera")
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	Steam.getPlayerAvatar(Steam.AVATAR_LARGE)
-	Steam.avatar_loaded.connect(_on_loaded_avatar)
-	display_name.text = personaName
-	
-	if is_multiplayer_authority():
+		camera_3d.current = true
 		player_mdl.visible = true
 		name_plate.visible = false
 		beta_joints.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		beta_surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
-		camera_3d.current = true
 	else:
 		camera_3d.current = false
-	
+
 func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByteArray) -> void:
 	print("Avatar for user: %s" % user_id)
 	print("Size: %s" % avatar_size)

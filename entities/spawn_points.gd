@@ -1,6 +1,7 @@
 # spawn_points.gd
 extends Node3D
 
+signal spawn_points_ready
 @export var player_scene: PackedScene
 @onready var players_parent: Node3D = $"../Players"
 
@@ -13,6 +14,11 @@ func _ready():
 	
 	_collect_spawn_points()
 	# SERVER: do NOT auto-spawn here.
+	
+	if not multiplayer.is_server():
+		print("[SpawnPoints] Client scene ready")
+		Lobby.client_scene_ready.rpc_id(1)
+	
 	if multiplayer.is_server():
 		print("[SpawnPoints] Server: collected %d spawn markers" % player_spawn_markers.size())
 		return
@@ -21,6 +27,7 @@ func _ready():
 	await multiplayer.connected_to_server
 	print("[SpawnPoints] Client connected. Notifying server.")
 	Lobby._notify_scene_ready.rpc_id(1)
+	emit_signal("spawn_points_ready")
 
 # --------------------------------------------------
 # Collect Spawn Markers From Entire Map
@@ -37,24 +44,21 @@ func _collect_spawn_points():
 # Players
 # --------------------------------------------------
 
-func spawn_all_players():
-	_spawn_players()
-
-func _spawn_players():
-	var peer_ids: Array = multiplayer.get_peers()
-	peer_ids.append(multiplayer.get_unique_id()) # include host
-	peer_ids.sort()
-	print("[SpawnPoints] Spawning players. Peer order:", peer_ids)
-	for i in range(peer_ids.size()):
-		var peer_id: int = peer_ids[i]
-		if i >= player_spawn_markers.size():
-			push_warning("[SpawnPoints] Not enough player spawn markers! (%d players, %d markers)" % [peer_ids.size(), player_spawn_markers.size()])
-			break
-		var marker: Node3D = player_spawn_markers[i]
-		var player = player_scene.instantiate()
-		player.name = str(peer_id)
-		player.global_transform = marker.global_transform
-		# IMPORTANT: add first, then set authority
-		players_parent.add_child(player)
-		player.set_multiplayer_authority(peer_id)
-		print("[SpawnPoints] Spawned player %s at marker %d." % [str(peer_id), i])
+func spawn_player(peer_id:int):
+	if not multiplayer.is_server():
+		return
+	# Prevent duplicate players
+	if players_parent.has_node(str(peer_id)):
+		return
+	var index := players_parent.get_child_count()
+	if index >= player_spawn_markers.size():
+		push_warning("[SpawnPoints] Not enough spawn markers! (%d players, %d markers)" % [index, player_spawn_markers.size()])
+		return
+	var marker: Node3D = player_spawn_markers[index]
+	var player = player_scene.instantiate()
+	player.name = str(peer_id)
+	players_parent.add_child(player)
+	player.set_multiplayer_authority(peer_id)
+	player.global_transform = marker.global_transform
+	print("[SpawnPoints] Spawned player %s at marker %d" % [peer_id, index])
+	
