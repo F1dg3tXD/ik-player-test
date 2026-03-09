@@ -25,22 +25,12 @@ func _on_password_toggle(enabled: bool) -> void:
 # CREATE LOBBY
 # ----------------------------------------------------
 
-func _on_create_pressed() -> void:
-
+func _on_create_pressed():
 	if lobby_name.text.strip_edges() == "":
 		lobby_name.text = "WEEP Lobby"
-
-	Lobby.host_steam_lobby(
-		int(max_players.value),
-		friends_only.button_pressed,
-		enable_password.button_pressed,
-		password_field.text
-	)
+	Lobby.pending_lobby_name = lobby_name.text
+	Lobby.host_steam_lobby(int(max_players.value))
 	hide()
 
-# ----------------------------------------------------
-# BACK
-# ----------------------------------------------------
-
-func _on_back_pressed() -> void:
+func _on_back_pressed():
 	hide()
