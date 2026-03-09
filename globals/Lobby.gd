@@ -35,6 +35,9 @@ func _ready() -> void:
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	
+func _get_menu():
+	return get_tree().current_scene.get_node("Cameras/MenuCamera/Menu")
 
 # ---------- Public API used by UI ----------
 func host_local_game(port: int = 7000, max_clients: int = 8) -> void:
@@ -63,6 +66,15 @@ func host_steam_lobby(max_players: int = 8,
 
 func join_steam_lobby(lobby_id: int) -> void:
 	SteamManager.join_lobby(lobby_id)
+	
+func _hide_menu_if_player_exists():
+	var scene = get_tree().current_scene
+	if scene == null:
+		return
+	var players = scene.get_node("Players")
+	var my_id = multiplayer.get_unique_id()
+	if players.has_node(str(my_id)):
+		_get_menu().hide()
 
 # Called when Steam returns that lobby was created (host side)
 func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
@@ -153,9 +165,10 @@ func client_scene_ready():
 		return
 	var peer_id = multiplayer.get_remote_sender_id()
 	print("Client scene ready:", peer_id)
-	var spawn = get_tree().get_current_scene().get_node("spawnPoints")
+	var spawn = get_tree().current_scene.get_node("spawnPoints")
 	await spawn.spawn_points_ready
 	spawn.spawn_player(peer_id)
+	_hide_menu_if_player_exists()
 
 # ---------- Host starts the real game ----------
 # Called when host wants to start whole game with generated map (seeded)

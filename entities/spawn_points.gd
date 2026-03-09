@@ -24,9 +24,10 @@ func _ready():
 		return
 	# CLIENT: wait until actually connected before notifying server
 	print("[SpawnPoints] Client waiting for connected_to_server...")
-	await multiplayer.connected_to_server
-	print("[SpawnPoints] Client connected. Notifying server.")
-	Lobby._notify_scene_ready.rpc_id(1)
+	if not multiplayer.is_server():
+		await multiplayer.connected_to_server
+		print("[SpawnPoints] Client ready -> notifying server")
+		Lobby.client_scene_ready.rpc_id(1)
 	emit_signal("spawn_points_ready")
 
 # --------------------------------------------------
@@ -46,7 +47,8 @@ func _collect_spawn_points():
 
 func spawn_player(peer_id:int):
 	if not multiplayer.is_server():
-		return
+		print("[SpawnPoints] Client scene ready")
+		Lobby.client_scene_ready.rpc_id(1)
 	# Prevent duplicate players
 	if players_parent.has_node(str(peer_id)):
 		return
