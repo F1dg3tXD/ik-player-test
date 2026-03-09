@@ -21,6 +21,7 @@ func _ready():
 	
 	if multiplayer.multiplayer_peer != null and multiplayer.is_server():
 		print("[SpawnPoints] Server: collected %d spawn markers" % player_spawn_markers.size())
+		emit_signal("spawn_points_ready")
 		return
 	# CLIENT: wait until actually connected before notifying server
 	print("[SpawnPoints] Client waiting for connected_to_server...")

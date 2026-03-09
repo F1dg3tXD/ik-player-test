@@ -86,8 +86,8 @@ func _on_steam_lobby_created(result: int, lobby_id: int) -> void:
 	print("Steam Host Started")
 	NetworkManager.set_peer_mode(NetworkManager.PeerMode.STEAM)
 	NetworkManager.start_steam_host()
-	await get_tree().process_frame
 	var spawn = get_tree().current_scene.get_node("spawnPoints")
+	await spawn.spawn_points_ready
 	spawn.spawn_player(multiplayer.get_unique_id())
 	emit_signal("lobby_created", lobby_id)
 	Steam.setLobbyData(lobby_id, "name", pending_lobby_name)
