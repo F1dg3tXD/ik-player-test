@@ -59,7 +59,8 @@ func _ready():
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		camera_3d.current = true
+		await get_tree().process_frame
+		camera_3d.make_current()
 		player_mdl.visible = true
 		name_plate.visible = false
 		beta_joints.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY

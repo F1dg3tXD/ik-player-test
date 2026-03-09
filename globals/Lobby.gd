@@ -71,9 +71,9 @@ func _hide_menu_if_player_exists():
 	var scene = get_tree().current_scene
 	if scene == null:
 		return
-	var players = scene.get_node("Players")
+	var players_node = scene.get_node("Players")
 	var my_id = multiplayer.get_unique_id()
-	if players.has_node(str(my_id)):
+	if players_node.has_node(str(my_id)):
 		_get_menu().hide()
 
 # Called when Steam returns that lobby was created (host side)
@@ -106,6 +106,9 @@ func _on_steam_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, _re
 	if my_id == host_id:
 		NetworkManager.start_steam_host()
 	else:
+		await get_tree().process_frame
+		await get_tree().process_frame
+		print("Connecting to Steam host:", host_id)
 		NetworkManager.start_steam_client(host_id)
 
 # Friend invite handling: Steam overlay friend invite acceptance
@@ -126,9 +129,12 @@ func _on_peer_disconnected(id: int) -> void:
 
 func _on_connected_to_server() -> void:
 	# local client: send our info immediately to server
-	rpc_id(1, "_send_local_player_info") # assuming server is 1 on high level API
+	rpc_id(1, "_send_local_player_info")
+	rpc_id(1, "client_scene_ready")
 
 func _on_connection_failed() -> void:
+	print("Steam connection failed.")
+	print("Peers:", multiplayer.get_peers())
 	push_error("Connection failed — cleanup if needed.")
 
 func _on_server_disconnected() -> void:
