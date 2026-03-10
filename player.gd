@@ -61,7 +61,7 @@ func _ready():
 		print("Local player ready -> enabling camera")
 		await get_tree().process_frame
 		await get_tree().process_frame
-		camera_3d.make_current()
+		camera_3d.current = true
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		player_mdl.visible = true
 		name_plate.visible = false

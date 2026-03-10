@@ -74,9 +74,9 @@ func _on_connected_to_server():
 # ------------------------------------------------
 
 func _hide_menu():
-	var cam: Camera3D = get_tree().current_scene.get_node("Cameras/MenuCamera")
-	if cam.current:
-		cam.current = false
-	var menu = cam.get_node("Menu")
+	var scene = get_tree().current_scene
+	if scene == null:
+		return
+	var menu = scene.get_node("Cameras/MenuCamera/Menu")
 	if menu:
-		menu.hide()
+		menu.visible = false
