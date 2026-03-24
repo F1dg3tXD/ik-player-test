@@ -15,11 +15,13 @@ var _is_host := false
 var _room_code := ""
 
 func _process(_delta: float) -> void:
-	if _signaling_socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+	var socket_state := _signaling_socket.get_ready_state()
+	if socket_state == WebSocketPeer.STATE_CONNECTING or socket_state == WebSocketPeer.STATE_OPEN:
 		_signaling_socket.poll()
-		while _signaling_socket.get_available_packet_count() > 0:
-			var raw := _signaling_socket.get_packet().get_string_from_utf8()
-			_handle_signaling_message(raw)
+		if _signaling_socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+			while _signaling_socket.get_available_packet_count() > 0:
+				var raw := _signaling_socket.get_packet().get_string_from_utf8()
+				_handle_signaling_message(raw)
 
 func close_connection() -> void:
 	multiplayer.multiplayer_peer = null
