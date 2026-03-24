@@ -4,6 +4,9 @@ enum PeerMode { NONE, WEBRTC }
 
 const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_STUN := "stun:stun.l.google.com:19302"
+const HOST_PEER_ID := 1
+const MIN_CLIENT_PEER_ID := 2
+const MAX_PEER_ID := 2147483647
 
 var peer_mode: PeerMode = PeerMode.NONE
 var peer: MultiplayerPeer
@@ -13,6 +16,7 @@ var _signaling_socket := WebSocketPeer.new()
 var _connections: Dictionary = {}
 var _is_host := false
 var _room_code := ""
+var _local_peer_id := 0
 
 func _process(_delta: float) -> void:
 	if _signaling_socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
@@ -26,6 +30,7 @@ func close_connection() -> void:
 	peer = null
 	peer_mode = PeerMode.NONE
 	_connections.clear()
+	_local_peer_id = 0
 	if _signaling_socket.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		_signaling_socket.close()
 
@@ -34,15 +39,20 @@ func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNAL
 	_room_code = room_code.strip_edges()
 	if _room_code.is_empty():
 		_room_code = "default"
+
 	_is_host = true
+	_local_peer_id = HOST_PEER_ID
 	_webrtc_mesh = WebRTCMultiplayerPeer.new()
-	var mesh_result := _webrtc_mesh.create_mesh(multiplayer.get_unique_id())
+
+	var mesh_result := _webrtc_mesh.create_mesh(_local_peer_id)
 	if mesh_result != OK:
 		push_error("Failed to create WebRTC mesh as host: %s" % mesh_result)
 		return mesh_result
+
 	multiplayer.multiplayer_peer = _webrtc_mesh
 	peer = _webrtc_mesh
 	peer_mode = PeerMode.WEBRTC
+
 	var ws_result := _signaling_socket.connect_to_url(signaling_url)
 	if ws_result != OK:
 		push_error("Failed to connect to signaling server: %s" % ws_result)
@@ -54,20 +64,36 @@ func start_webrtc_client(room_code: String, signaling_url: String = DEFAULT_SIGN
 	_room_code = room_code.strip_edges()
 	if _room_code.is_empty():
 		_room_code = "default"
+
 	_is_host = false
+	_local_peer_id = _generate_client_peer_id()
 	_webrtc_mesh = WebRTCMultiplayerPeer.new()
-	var mesh_result := _webrtc_mesh.create_mesh(multiplayer.get_unique_id())
+
+	var mesh_result := _webrtc_mesh.create_mesh(_local_peer_id)
 	if mesh_result != OK:
 		push_error("Failed to create WebRTC mesh as client: %s" % mesh_result)
 		return mesh_result
+
 	multiplayer.multiplayer_peer = _webrtc_mesh
 	peer = _webrtc_mesh
 	peer_mode = PeerMode.WEBRTC
+
 	var ws_result := _signaling_socket.connect_to_url(signaling_url)
 	if ws_result != OK:
 		push_error("Failed to connect to signaling server: %s" % ws_result)
 		return ws_result
 	return OK
+
+func _generate_client_peer_id() -> int:
+	var timestamp := Time.get_unix_time_from_system()
+	var micros := Time.get_ticks_usec()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("%s:%s:%s" % [OS.get_unique_id(), timestamp, micros])
+	return rng.randi_range(MIN_CLIENT_PEER_ID, MAX_PEER_ID)
+
+
+func get_local_peer_id() -> int:
+	return _local_peer_id
 
 func _send_signaling(payload: Dictionary) -> void:
 	if _signaling_socket.get_ready_state() != WebSocketPeer.STATE_OPEN:
@@ -85,11 +111,11 @@ func _handle_signaling_message(message: String) -> void:
 				"action": "join",
 				"room": _room_code,
 				"host": _is_host,
-				"peer_id": multiplayer.get_unique_id()
+				"peer_id": _local_peer_id
 			})
 		"peer_joined":
 			var peer_id := int(data.get("peer_id", 0))
-			if peer_id > 0 and peer_id != multiplayer.get_unique_id():
+			if peer_id > 0 and peer_id != _local_peer_id:
 				_create_connection(peer_id, _is_host)
 		"offer":
 			var from_peer := int(data.get("from", 0))
@@ -117,13 +143,13 @@ func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnect
 	conn.initialize({"iceServers": [{"urls": [DEFAULT_STUN]}]})
 	conn.session_description_created.connect(func(type: String, sdp: String):
 		conn.set_local_description(type, sdp)
-		_send_signaling({"action": type, "room": _room_code, "from": multiplayer.get_unique_id(), "to": remote_id, "sdp": sdp})
+		_send_signaling({"action": type, "room": _room_code, "from": _local_peer_id, "to": remote_id, "sdp": sdp})
 	)
 	conn.ice_candidate_created.connect(func(media: String, index: int, name: String):
 		_send_signaling({
 			"action": "ice",
 			"room": _room_code,
-			"from": multiplayer.get_unique_id(),
+			"from": _local_peer_id,
 			"to": remote_id,
 			"mid": media,
 			"index": index,
