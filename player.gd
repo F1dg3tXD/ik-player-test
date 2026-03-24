@@ -52,7 +52,7 @@ var cam_pitch: float = -15.0
 	#set_multiplayer_authority(int(name))
 
 func _ready():
-	multiplayer_authority_changed.connect(_on_multiplayer_authority_changed)
+	#multiplayer_authority_changed.connect(_on_multiplayer_authority_changed)
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
 		await get_tree().process_frame

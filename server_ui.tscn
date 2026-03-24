@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://crsmw428arff7"]
+
+[ext_resource type="Script" uid="uid://dd8heh4hiac3g" path="res://server_ui.gd" id="1_106a4"]
+[ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="1_l2pos"]
+
+[node name="serverUI" type="Node2D" unique_id=971282908]
+script = ExtResource("1_106a4")
+
+[node name="Control" type="Control" parent="." unique_id=1768959226]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Menu" type="Control" parent="Control" unique_id=1763083385]
+custom_minimum_size = Vector2(300, 400)
+anchors_preset = 0
+offset_left = 489.0
+offset_top = 252.0
+offset_right = 789.0
+offset_bottom = 652.00037
+pivot_offset = Vector2(150, 200)
+
+[node name="ServerListVBoxContainer" type="VBoxContainer" parent="Control/Menu" unique_id=1995313685]
+layout_mode = 0
+offset_left = -475.0
+offset_top = -228.0
+offset_right = -147.0
+offset_bottom = 452.0
+theme = ExtResource("1_l2pos")
+
+[node name="ServerButtonInstance" type="Button" parent="Control/Menu/ServerListVBoxContainer" unique_id=561489789]
+layout_mode = 2
+tooltip_text = "Singlplayer is not available yet."
+theme_override_font_sizes/font_size = 50
+text = "Singleplayer"
+
+[node name="PlayerListVBoxContainer" type="VBoxContainer" parent="Control/Menu" unique_id=1495254571]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -124.0
+offset_top = -228.0
+offset_right = 204.0
+offset_bottom = 452.0
+theme = ExtResource("1_l2pos")
+
+[node name="PlayerInfoHBoxContainer" type="HBoxContainer" parent="Control/Menu/PlayerListVBoxContainer" unique_id=829711715]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="player_name" type="Label" parent="Control/Menu/PlayerListVBoxContainer/PlayerInfoHBoxContainer" unique_id=1788364365]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "player_name"
+
+[node name="player_ping" type="Label" parent="Control/Menu/PlayerListVBoxContainer/PlayerInfoHBoxContainer" unique_id=851366321]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "player_ping"

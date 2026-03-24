@@ -84,8 +84,6 @@ transform = Transform3D(-0.9659258, 0, -0.25881913, 0, 1, 0, 0.25881913, 0, -0.9
 
 [node name="Menu" parent="Cameras/MenuCamera" unique_id=298708851 instance=ExtResource("4_smn20")]
 
-[editable path="spawnPoints"]
-
 [node name="PauseMenu" type="CanvasLayer" parent="." unique_id=125550001]
 
 [node name="PausePanel" type="PanelContainer" parent="PauseMenu" unique_id=125550002]
@@ -117,8 +115,8 @@ text = "Room Code"
 [node name="RoomCodeValue" type="LineEdit" parent="PauseMenu/PausePanel/VBoxContainer/RoomCodeRow" unique_id=125550007]
 layout_mode = 2
 size_flags_horizontal = 3
-editable = false
 placeholder_text = "No active room"
+editable = false
 
 [node name="CopyRoomCodeButton" type="Button" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=125550008]
 layout_mode = 2
@@ -130,3 +128,5 @@ text = "Room code copy is host-only."
 horizontal_alignment = 1
 
 [connection signal="pressed" from="PauseMenu/PausePanel/VBoxContainer/CopyRoomCodeButton" to="." method="_on_copy_room_code_button_pressed"]
+
+[editable path="spawnPoints"]
