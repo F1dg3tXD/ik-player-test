@@ -1,28 +1,142 @@
 extends Node
 
-enum PeerMode { NONE, ENET, STEAM }
+enum PeerMode { NONE, WEBRTC }
 
-var peer_mode : PeerMode = PeerMode.NONE
-var peer : MultiplayerPeer
+const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
+const DEFAULT_STUN := "stun:stun.l.google.com:19302"
 
-func start_steam_host():
-	peer_mode = PeerMode.STEAM
-	var steam_peer := SteamMultiplayerPeer.new()
-	var result = steam_peer.create_host(0)
-	if result != OK:
-		push_error("Failed to host: %s" % result)
+var peer_mode: PeerMode = PeerMode.NONE
+var peer: MultiplayerPeer
+
+var _webrtc_mesh: WebRTCMultiplayerPeer
+var _signaling_socket := WebSocketPeer.new()
+var _connections: Dictionary = {}
+var _is_host := false
+var _room_code := ""
+
+func _process(_delta: float) -> void:
+	if _signaling_socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+		_signaling_socket.poll()
+		while _signaling_socket.get_available_packet_count() > 0:
+			var raw := _signaling_socket.get_packet().get_string_from_utf8()
+			_handle_signaling_message(raw)
+
+func close_connection() -> void:
+	multiplayer.multiplayer_peer = null
+	peer = null
+	peer_mode = PeerMode.NONE
+	_connections.clear()
+	if _signaling_socket.get_ready_state() != WebSocketPeer.STATE_CLOSED:
+		_signaling_socket.close()
+
+func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
+	close_connection()
+	_room_code = room_code.strip_edges()
+	if _room_code.is_empty():
+		_room_code = "default"
+	_is_host = true
+	_webrtc_mesh = WebRTCMultiplayerPeer.new()
+	var mesh_result := _webrtc_mesh.create_mesh(multiplayer.get_unique_id())
+	if mesh_result != OK:
+		push_error("Failed to create WebRTC mesh as host: %s" % mesh_result)
+		return mesh_result
+	multiplayer.multiplayer_peer = _webrtc_mesh
+	peer = _webrtc_mesh
+	peer_mode = PeerMode.WEBRTC
+	var ws_result := _signaling_socket.connect_to_url(signaling_url)
+	if ws_result != OK:
+		push_error("Failed to connect to signaling server: %s" % ws_result)
+		return ws_result
+	return OK
+
+func start_webrtc_client(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
+	close_connection()
+	_room_code = room_code.strip_edges()
+	if _room_code.is_empty():
+		_room_code = "default"
+	_is_host = false
+	_webrtc_mesh = WebRTCMultiplayerPeer.new()
+	var mesh_result := _webrtc_mesh.create_mesh(multiplayer.get_unique_id())
+	if mesh_result != OK:
+		push_error("Failed to create WebRTC mesh as client: %s" % mesh_result)
+		return mesh_result
+	multiplayer.multiplayer_peer = _webrtc_mesh
+	peer = _webrtc_mesh
+	peer_mode = PeerMode.WEBRTC
+	var ws_result := _signaling_socket.connect_to_url(signaling_url)
+	if ws_result != OK:
+		push_error("Failed to connect to signaling server: %s" % ws_result)
+		return ws_result
+	return OK
+
+func _send_signaling(payload: Dictionary) -> void:
+	if _signaling_socket.get_ready_state() != WebSocketPeer.STATE_OPEN:
 		return
-	multiplayer.multiplayer_peer = steam_peer
-	peer = steam_peer
-	print("Steam host started")
+	_signaling_socket.send_text(JSON.stringify(payload))
 
-func start_steam_client(host_steam_id:int):
-	peer_mode = PeerMode.STEAM
-	var steam_peer := SteamMultiplayerPeer.new()
-	var result = steam_peer.create_client(host_steam_id,0)
-	if result != OK:
-		push_error("Failed to connect")
+func _handle_signaling_message(message: String) -> void:
+	var data = JSON.parse_string(message)
+	if typeof(data) != TYPE_DICTIONARY:
 		return
-	multiplayer.multiplayer_peer = steam_peer
-	peer = steam_peer
-	print("Steam client started")
+	var action := str(data.get("action", ""))
+	match action:
+		"hello":
+			_send_signaling({
+				"action": "join",
+				"room": _room_code,
+				"host": _is_host,
+				"peer_id": multiplayer.get_unique_id()
+			})
+		"peer_joined":
+			var peer_id := int(data.get("peer_id", 0))
+			if peer_id > 0 and peer_id != multiplayer.get_unique_id():
+				_create_connection(peer_id, _is_host)
+		"offer":
+			var from_peer := int(data.get("from", 0))
+			var conn = _create_connection(from_peer, false)
+			if conn:
+				conn.set_remote_description("offer", str(data.get("sdp", "")))
+		"answer":
+			var answer_from := int(data.get("from", 0))
+			if _connections.has(answer_from):
+				_connections[answer_from].set_remote_description("answer", str(data.get("sdp", "")))
+		"ice":
+			var ice_from := int(data.get("from", 0))
+			if _connections.has(ice_from):
+				_connections[ice_from].add_ice_candidate(
+					str(data.get("mid", "0")),
+					int(data.get("index", 0)),
+					str(data.get("candidate", ""))
+				)
+
+func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnection:
+	if _connections.has(remote_id):
+		return _connections[remote_id]
+
+	var conn := WebRTCPeerConnection.new()
+	conn.initialize({"iceServers": [{"urls": [DEFAULT_STUN]}]})
+	conn.session_description_created.connect(func(type: String, sdp: String):
+		conn.set_local_description(type, sdp)
+		_send_signaling({"action": type, "room": _room_code, "from": multiplayer.get_unique_id(), "to": remote_id, "sdp": sdp})
+	)
+	conn.ice_candidate_created.connect(func(media: String, index: int, name: String):
+		_send_signaling({
+			"action": "ice",
+			"room": _room_code,
+			"from": multiplayer.get_unique_id(),
+			"to": remote_id,
+			"mid": media,
+			"index": index,
+			"candidate": name
+		})
+	)
+
+	var add_result := _webrtc_mesh.add_peer(conn, remote_id)
+	if add_result != OK:
+		push_error("Could not add peer %s to mesh" % remote_id)
+		return null
+
+	_connections[remote_id] = conn
+	if create_offer:
+		conn.create_offer()
+	return conn

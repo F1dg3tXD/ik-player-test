@@ -29,7 +29,7 @@ buses/default_bus_layout="uid://datjiw3jjdo0s"
 Console="*uid://ouiu5xh1cs8n"
 Terminal="*uid://b57oidlvdiwvv"
 NetworkManager="*uid://bbayd6bi5w5tt"
-SteamManager="*uid://cut8vti1g3bw2"
+ProfileManager="*res://globals/ProfileManager.gd"
 Lobby="*uid://2yvjfoighqbo"
 
 [console]
@@ -157,9 +157,3 @@ ai_assistant_hub/preferences/always_scroll_to_bottom=false
 rendering_device/driver.windows="d3d12"
 textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
-
-[steam]
-
-initialization/app_id=480
-initialization/initialize_on_startup=true
-multiplayer_peer/max_channels=16

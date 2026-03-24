@@ -41,16 +41,10 @@ var cam_pitch: float = -15.0
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
-#Steam Stuff
+#Player profile UI
 @onready var display_name: Label = $SteamName/displayName
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
 @onready var name_plate: Sprite3D = $namePlate
-var steam_id : int
-
-var personaName := Steam.getPersonaName()
-
-# For later multiplayer
-#Steam.getPlayerAvatar(remote_steam_id, Steam.AVATAR_MEDIUM)
 
 # This breaks shit for some reason
 #func _enter_tree():
@@ -70,20 +64,9 @@ func _ready():
 	else:
 		camera_3d.current = false
 
-func _on_loaded_avatar(user_id: int, avatar_size: int, avatar_buffer: PackedByteArray) -> void:
-	print("Avatar for user: %s" % user_id)
-	print("Size: %s" % avatar_size)
-	# Check if user exists
-	if user_id != Steam.getSteamID():
-		return
-	# Create the image and texture for loading
-	var avatar_image: Image = Image.create_from_data(avatar_size, avatar_size, false, Image.FORMAT_RGBA8, avatar_buffer)
-	# Optionally resize the image if it is too large
-	avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
-	# Apply the image to a texture
-	var avatar_texture: ImageTexture = ImageTexture.create_from_image(avatar_image)
-	# Set the texture to a Sprite, TextureRect, etc.
-	avatar_sprite.set_texture(avatar_texture)
+	if is_multiplayer_authority():
+		_sync_profile.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
@@ -208,6 +191,17 @@ func update_walker(delta: float) -> void:
 	var strafe_dir: float = clamp(strafe_speed / SPEED, -1.0, 1.0)
 	var target_yaw: float = deg_to_rad(0.0) * strafe_dir
 	walker.rotation.y = lerp(walker.rotation.y, target_yaw, delta * 8.0)
+
+
+@rpc("authority", "call_local", "reliable")
+func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
+	display_name.text = player_name
+	var avatar_image := Image.new()
+	if icon_png.is_empty() or avatar_image.load_png_from_buffer(icon_png) != OK:
+		avatar_image.create(128, 128, false, Image.FORMAT_RGBA8)
+		avatar_image.fill(Color(0.8, 0.1, 0.1, 1.0))
+	avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
+	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
 func set_fly_mode(enabled: bool) -> void:
 	is_flying = enabled

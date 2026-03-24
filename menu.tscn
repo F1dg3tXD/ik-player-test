@@ -3,8 +3,6 @@
 [ext_resource type="Script" uid="uid://bg4wpf7vxcbl6" path="res://scrips/menu.gd" id="1_mae5d"]
 [ext_resource type="Theme" uid="uid://bs82yxmgegsx5" path="res://themes/main.tres" id="2_4hy44"]
 [ext_resource type="FontFile" uid="uid://dqfl2s2y01qlw" path="res://fonts/RockwellNova-BoldItalic.ttf" id="3_ytr4m"]
-[ext_resource type="PackedScene" uid="uid://daoklrpvjgf8w" path="res://Scenes/steam_lobby_browser.tscn" id="4_4hy44"]
-[ext_resource type="PackedScene" uid="uid://632qvwp7b5sy" path="res://Scenes/host_steam_lobby.tscn" id="5_ytr4m"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
 font = ExtResource("3_ytr4m")
@@ -101,29 +99,25 @@ metadata/_tab_index = 0
 
 [node name="BTN_ENet_Host" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=74806384]
 layout_mode = 2
-text = "Host"
+text = "Host P2P"
 
 [node name="BTN_ENet_Join" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=1761767766]
 layout_mode = 2
-text = "Join"
+text = "Join P2P"
 
 [node name="ENet_id_prompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=982690257]
 layout_mode = 2
-placeholder_text = "Lobby ID"
+placeholder_text = "Room Code"
 alignment = 1
 
-[node name="Steam" type="VBoxContainer" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu" unique_id=260448844]
-visible = false
+[node name="SignalURLPrompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
 layout_mode = 2
-metadata/_tab_index = 1
+placeholder_text = "Signaling URL (ws://127.0.0.1:9080)"
 
-[node name="BTN_Steam_Host" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam" unique_id=1103951631]
+[node name="StatusLabel" type="Label" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
 layout_mode = 2
-text = "Host"
+text = "Idle"
 
-[node name="BTN_Steam_LobbyBrowser" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam" unique_id=2051576210]
-layout_mode = 2
-text = "Lobby List"
 
 [node name="Back" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer" unique_id=1394364649]
 layout_mode = 2
@@ -343,27 +337,42 @@ tick_count = 10
 ticks_on_borders = true
 ticks_position = 3
 
+
+[node name="Profile" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="UsernameRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Username"
+
+[node name="UsernamePrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Player"
+
+[node name="IconRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Icon Path"
+
+[node name="IconPathPrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "C:/Users/.../avatar.png"
+
 [node name="Back" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer" unique_id=548933785]
 layout_mode = 2
 text = "Back"
 
-[node name="SteamLobbyBrowser" parent="main/Menu" unique_id=1229592265 instance=ExtResource("4_4hy44")]
-visible = false
-layout_mode = 0
-offset_left = 240.0
-offset_right = 280.0
-
-[node name="HostSteamLobby" parent="main/Menu" unique_id=522363193 instance=ExtResource("5_ytr4m")]
-visible = false
-layout_mode = 0
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 240.0
-offset_right = 280.0
-offset_bottom = 40.0
-grow_horizontal = 1
-grow_vertical = 1
 
 [connection signal="pressed" from="main/Menu/Main/MultiPlayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="main/Menu/Main/Options" to="." method="_on_options_pressed"]
@@ -371,11 +380,7 @@ grow_vertical = 1
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Host" to="." method="_on_btn_host_pressed"]
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/BTN_ENet_Join" to="." method="_on_btn_join_pressed"]
 [connection signal="text_changed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet/ENet_id_prompt" to="." method="_on_id_prompt_text_changed"]
-[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_Host" to="." method="_on_btn_steam_host_pressed"]
-[connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/Steam/BTN_Steam_LobbyBrowser" to="." method="_on_steam_browser_pressed"]
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Apply" to="." method="_on_apply_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
 
-[editable path="main/Menu/SteamLobbyBrowser"]
-[editable path="main/Menu/HostSteamLobby"]

@@ -1,0 +1,13 @@
+{
+  "name": "weep-relay-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "relay_server.js",
+  "scripts": {
+    "start": "node relay_server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.1"
+  }
+}
