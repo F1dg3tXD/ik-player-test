@@ -17,6 +17,7 @@ var roll_angle: float = 0.0
 @onready var beta_surface: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_Surface
 
 var horizontal_vel := Vector3.ZERO
+var _profile_synced := false
 
 @export var MOUSE_SENS := 0.002
 @export var TURN_SPEED := 8.0
@@ -51,6 +52,7 @@ var cam_pitch: float = -15.0
 	#set_multiplayer_authority(int(name))
 
 func _ready():
+	multiplayer_authority_changed.connect(_on_multiplayer_authority_changed)
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
 		await get_tree().process_frame
@@ -64,9 +66,17 @@ func _ready():
 	else:
 		camera_3d.current = false
 
-	if is_multiplayer_authority():
-		_sync_profile.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
+	_try_sync_profile()
 
+
+func _on_multiplayer_authority_changed() -> void:
+	_try_sync_profile()
+
+func _try_sync_profile() -> void:
+	if _profile_synced or not is_multiplayer_authority():
+		return
+	_profile_synced = true
+	_sync_profile.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
