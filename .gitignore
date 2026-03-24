@@ -20,3 +20,5 @@ export_presets.cfg
 /src
 /.vscode
 *.import
+/dedicated_server/node_modules
+dedicated_server/package-lock.json
