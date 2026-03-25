@@ -205,7 +205,10 @@ func update_walker(delta: float) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
-	display_name.text = player_name
+	var safe_name := player_name.strip_edges()
+	if safe_name.is_empty():
+		safe_name = "Player"
+	display_name.text = safe_name
 	var avatar_image := Image.new()
 	if icon_png.is_empty() or avatar_image.load_png_from_buffer(icon_png) != OK:
 		avatar_image = Image.create(128, 128, false, Image.FORMAT_RGBA8)

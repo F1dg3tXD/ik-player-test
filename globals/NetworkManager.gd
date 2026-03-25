@@ -4,6 +4,8 @@ enum PeerMode { NONE, WEBRTC }
 
 const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_STUN := "stun:stun.l.google.com:19302"
+const DEFAULT_ROOM_CODE := "DEFAULT"
+const ROOM_CODE_LENGTH := 6
 const HOST_PEER_ID := 1
 const MIN_CLIENT_PEER_ID := 2
 const MAX_PEER_ID := 2147483647
@@ -40,9 +42,8 @@ func close_connection() -> void:
 
 func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
 	close_connection()
-	_room_code = room_code.strip_edges()
-	if _room_code.is_empty():
-		_room_code = "default"
+	_room_code = _resolve_room_code(room_code, true)
+	signaling_url = _resolve_signaling_url(signaling_url)
 
 	_is_host = true
 	_local_peer_id = HOST_PEER_ID
@@ -65,9 +66,8 @@ func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNAL
 
 func start_webrtc_client(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
 	close_connection()
-	_room_code = room_code.strip_edges()
-	if _room_code.is_empty():
-		_room_code = "default"
+	_room_code = _resolve_room_code(room_code, false)
+	signaling_url = _resolve_signaling_url(signaling_url)
 
 	_is_host = false
 	_local_peer_id = _generate_client_peer_id()
@@ -94,6 +94,40 @@ func _generate_client_peer_id() -> int:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%s:%s:%s" % [OS.get_unique_id(), timestamp, micros])
 	return rng.randi_range(MIN_CLIENT_PEER_ID, MAX_PEER_ID)
+
+func generate_room_code() -> String:
+	var characters := "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var output := ""
+	for i in ROOM_CODE_LENGTH:
+		output += characters[rng.randi_range(0, characters.length() - 1)]
+	return output
+
+func get_active_room_code() -> String:
+	return _room_code
+
+func _resolve_signaling_url(signaling_url: String) -> String:
+	var clean_url := signaling_url.strip_edges()
+	if clean_url.is_empty():
+		return DEFAULT_SIGNALING_URL
+	return clean_url
+
+func _normalize_room_code(room_code: String) -> String:
+	var cleaned := room_code.strip_edges().to_upper()
+	var normalized := ""
+	for ch in cleaned:
+		if ch.is_valid_ascii_identifier() or ch.is_valid_int():
+			normalized += ch
+	return normalized
+
+func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
+	var normalized := _normalize_room_code(input_room_code)
+	if not normalized.is_empty():
+		return normalized
+	if is_host:
+		return generate_room_code()
+	return DEFAULT_ROOM_CODE
 
 
 func get_local_peer_id() -> int:
@@ -138,6 +172,8 @@ func _handle_signaling_message(message: String) -> void:
 					int(data.get("index", 0)),
 					str(data.get("candidate", ""))
 				)
+		"room_assigned":
+			_room_code = _resolve_room_code(str(data.get("room", _room_code)), true)
 
 func _create_connection(remote_id: int, should_create_offer: bool) -> WebRTCPeerConnection:
 	if _connections.has(remote_id):
