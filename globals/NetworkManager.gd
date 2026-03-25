@@ -48,9 +48,9 @@ func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNAL
 	_local_peer_id = HOST_PEER_ID
 	_webrtc_mesh = WebRTCMultiplayerPeer.new()
 
-	var mesh_result := _webrtc_mesh.create_mesh(_local_peer_id)
+	var mesh_result := _webrtc_mesh.create_server()
 	if mesh_result != OK:
-		push_error("Failed to create WebRTC mesh as host: %s" % mesh_result)
+		push_error("Failed to create WebRTC server peer: %s" % mesh_result)
 		return mesh_result
 
 	multiplayer.multiplayer_peer = _webrtc_mesh
@@ -73,9 +73,9 @@ func start_webrtc_client(room_code: String, signaling_url: String = DEFAULT_SIGN
 	_local_peer_id = _generate_client_peer_id()
 	_webrtc_mesh = WebRTCMultiplayerPeer.new()
 
-	var mesh_result := _webrtc_mesh.create_mesh(_local_peer_id)
+	var mesh_result := _webrtc_mesh.create_client(_local_peer_id)
 	if mesh_result != OK:
-		push_error("Failed to create WebRTC mesh as client: %s" % mesh_result)
+		push_error("Failed to create WebRTC client peer: %s" % mesh_result)
 		return mesh_result
 
 	multiplayer.multiplayer_peer = _webrtc_mesh
@@ -139,7 +139,7 @@ func _handle_signaling_message(message: String) -> void:
 					str(data.get("candidate", ""))
 				)
 
-func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnection:
+func _create_connection(remote_id: int, should_create_offer: bool) -> WebRTCPeerConnection:
 	if _connections.has(remote_id):
 		return _connections[remote_id]
 
@@ -149,7 +149,7 @@ func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnect
 		conn.set_local_description(type, sdp)
 		_send_signaling({"action": type, "room": _room_code, "from": _local_peer_id, "to": remote_id, "sdp": sdp})
 	)
-	conn.ice_candidate_created.connect(func(media: String, index: int, name: String):
+	conn.ice_candidate_created.connect(func(media: String, index: int, candidate_name: String):
 		_send_signaling({
 			"action": "ice",
 			"room": _room_code,
@@ -157,7 +157,7 @@ func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnect
 			"to": remote_id,
 			"mid": media,
 			"index": index,
-			"candidate": name
+			"candidate": candidate_name
 		})
 	)
 
@@ -167,6 +167,6 @@ func _create_connection(remote_id: int, create_offer: bool) -> WebRTCPeerConnect
 		return null
 
 	_connections[remote_id] = conn
-	if create_offer:
+	if should_create_offer:
 		conn.create_offer()
 	return conn

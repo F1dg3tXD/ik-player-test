@@ -4,6 +4,7 @@ signal lobby_created(room_code: String)
 signal lobby_joined(room_code: String)
 
 const DEDICATED_SERVER_FLAG := "-server"
+const SERVER_UI_SCENE := preload("res://server_ui.tscn")
 
 var active_room_code := ""
 
@@ -47,6 +48,7 @@ func join_webrtc_lobby(room_code: String, signaling_url: String) -> Error:
 	return OK
 
 func _start_dedicated_server() -> void:
+	_mount_server_ui()
 	var room_code := _get_dedicated_arg_value("-room=", "default")
 	var signaling_url := _get_dedicated_arg_value("-signaling-url=", NetworkManager.DEFAULT_SIGNALING_URL)
 	var result := await host_webrtc_lobby(room_code, signaling_url, false)
@@ -57,6 +59,19 @@ func _start_dedicated_server() -> void:
 	print("[Dedicated Server] Started room '%s' with signaling URL %s" % [room_code, signaling_url])
 	print("[Dedicated Server] Server peer ID: %s" % NetworkManager.get_local_peer_id())
 	print("[Dedicated Server] Waiting for players to connect...")
+
+
+func _mount_server_ui() -> void:
+	if SERVER_UI_SCENE == null:
+		return
+	var scene := _scene_tree.current_scene
+	if scene == null:
+		return
+	if scene.get_node_or_null("ServerUI"):
+		return
+	var server_ui := SERVER_UI_SCENE.instantiate()
+	server_ui.name = "ServerUI"
+	scene.add_child(server_ui)
 
 func _is_dedicated_server_mode() -> bool:
 	for arg in OS.get_cmdline_args():

@@ -208,9 +208,10 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 	display_name.text = player_name
 	var avatar_image := Image.new()
 	if icon_png.is_empty() or avatar_image.load_png_from_buffer(icon_png) != OK:
-		avatar_image.create(128, 128, false, Image.FORMAT_RGBA8)
+		avatar_image = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 		avatar_image.fill(Color(0.8, 0.1, 0.1, 1.0))
-	avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
+	else:
+		avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
 func set_fly_mode(enabled: bool) -> void:
