@@ -10,6 +10,13 @@ const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_ROOM_CODE := "DEFAULT"
 const ROOM_CODE_LENGTH := 6
 const HOST_PEER_ID := 1
+const TUBE_CLIENT_SCRIPT_PATH := "res://addons/tube/tube_client.gd"
+const TUBE_CONTEXT_PATHS := [
+	"res://globals/TubeContext.tres",
+	"res://tube_context.tres",
+	"res://addons/tube/tube_context.tres"
+]
+const SESSION_SETUP_TIMEOUT_SEC := 15.0
 
 var peer_mode: PeerMode = PeerMode.NONE
 var peer: MultiplayerPeer
@@ -30,6 +37,10 @@ func _ready() -> void:
 func close_connection() -> void:
 	if _tube_client and _tube_client.has_method("leave_session"):
 		_tube_client.call("leave_session")
+	if _tube_client and is_instance_valid(_tube_client):
+		_tube_client.queue_free()
+	_tube_client = null
+	_tube_connected = false
 	multiplayer.multiplayer_peer = null
 	peer = null
 	peer_mode = PeerMode.NONE
@@ -44,6 +55,8 @@ func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNA
 	_is_host = true
 	_room_code = _resolve_room_code(room_code, true)
 
+	if not _is_webrtc_supported():
+		return ERR_UNAVAILABLE
 	if not _ensure_tube_client():
 		return ERR_UNAVAILABLE
 	if not _tube_client.has_method("create_session"):
@@ -60,8 +73,8 @@ func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNA
 		return wait_error
 
 	_room_code = _pending_result_room_code
-	_local_peer_id = multiplayer.get_unique_id()
-	peer = multiplayer.multiplayer_peer
+	_local_peer_id = _resolve_local_peer_id()
+	peer = _resolve_active_peer()
 	peer_mode = PeerMode.WEBRTC
 	return OK
 
@@ -73,6 +86,8 @@ func start_webrtc_client(room_code: String, _signaling_url: String = DEFAULT_SIG
 		push_error("A valid Tube session ID is required to join.")
 		return ERR_INVALID_PARAMETER
 
+	if not _is_webrtc_supported():
+		return ERR_UNAVAILABLE
 	if not _ensure_tube_client():
 		return ERR_UNAVAILABLE
 	if not _tube_client.has_method("join_session"):
@@ -89,8 +104,8 @@ func start_webrtc_client(room_code: String, _signaling_url: String = DEFAULT_SIG
 		return wait_error
 
 	_room_code = _pending_result_room_code
-	_local_peer_id = multiplayer.get_unique_id()
-	peer = multiplayer.multiplayer_peer
+	_local_peer_id = _resolve_local_peer_id()
+	peer = _resolve_active_peer()
 	peer_mode = PeerMode.WEBRTC
 	return OK
 
@@ -113,12 +128,18 @@ func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
 	return DEFAULT_ROOM_CODE
 
 func _wait_for_pending_tube_action() -> Error:
+	var start_time_msec := Time.get_ticks_msec()
 	while not _pending_tube_action.is_empty():
 		if not _pending_result_error.is_empty():
 			push_error(_pending_result_error)
 			return FAILED
 		if not _pending_result_room_code.is_empty():
 			return OK
+		var elapsed_sec := float(Time.get_ticks_msec() - start_time_msec) / 1000.0
+		if elapsed_sec >= SESSION_SETUP_TIMEOUT_SEC:
+			_pending_result_error = "Timed out while waiting for Tube to %s a session." % _pending_tube_action
+			push_error(_pending_result_error)
+			return ERR_TIMEOUT
 		await get_tree().process_frame
 	return FAILED
 
@@ -131,11 +152,7 @@ func _ensure_tube_client() -> bool:
 	if _tube_client and is_instance_valid(_tube_client):
 		return true
 
-	if not ClassDB.class_exists("TubeClient"):
-		push_error("Tube plugin is not available. Install/enable addons/tube and restart Godot.")
-		return false
-
-	_tube_client = ClassDB.instantiate("TubeClient")
+	_tube_client = _instantiate_tube_client()
 	if _tube_client == null:
 		push_error("Failed to instantiate TubeClient.")
 		return false
@@ -145,6 +162,29 @@ func _ensure_tube_client() -> bool:
 	_connect_tube_signals()
 	_load_default_tube_context()
 	return true
+
+func _instantiate_tube_client() -> Node:
+	if ClassDB.class_exists("TubeClient"):
+		return ClassDB.instantiate("TubeClient")
+	if not ResourceLoader.exists(TUBE_CLIENT_SCRIPT_PATH):
+		push_error("Tube addon not found at %s. Install/enable addons/tube." % TUBE_CLIENT_SCRIPT_PATH)
+		return null
+	var tube_script := load(TUBE_CLIENT_SCRIPT_PATH) as Script
+	if tube_script == null:
+		push_error("Unable to load TubeClient script at %s." % TUBE_CLIENT_SCRIPT_PATH)
+		return null
+	var client_instance: Variant = tube_script.new()
+	if not (client_instance is Node):
+		push_error("Unable to instantiate TubeClient from %s." % TUBE_CLIENT_SCRIPT_PATH)
+		return null
+	var client: Node = client_instance
+	return client
+
+func _is_webrtc_supported() -> bool:
+	if ClassDB.class_exists("WebRTCPeerConnection"):
+		return true
+	push_error("WebRTC support is missing. Install/enable webrtc-native for non-HTML5 exports.")
+	return false
 
 func _connect_tube_signals() -> void:
 	if _tube_connected or _tube_client == null:
@@ -162,16 +202,12 @@ func _load_default_tube_context() -> void:
 		return
 	if _tube_client.get("context") != null:
 		return
-	var context_paths := [
-		"res://globals/TubeContext.tres",
-		"res://tube_context.tres",
-		"res://addons/tube/tube_context.tres"
-	]
-	for context_path in context_paths:
+	for context_path in TUBE_CONTEXT_PATHS:
 		if ResourceLoader.exists(context_path):
 			var context_resource := load(context_path)
 			if context_resource != null:
 				_tube_client.set("context", context_resource)
+				_tube_client.set("multiplayer_root_node", get_tree().root)
 				return
 	push_warning("Tube context resource not found. Create a TubeContext resource and assign it to NetworkManager's TubeClient.")
 
@@ -199,7 +235,21 @@ func _on_tube_error_raised(code: int, message: String) -> void:
 		emit_signal("tube_session_joined", "")
 
 func _on_connected_to_server() -> void:
-	_local_peer_id = multiplayer.get_unique_id()
+	_local_peer_id = _resolve_local_peer_id()
 
 func _on_peer_connected(_id: int) -> void:
-	_local_peer_id = multiplayer.get_unique_id()
+	_local_peer_id = _resolve_local_peer_id()
+
+func _resolve_local_peer_id() -> int:
+	if _tube_client and is_instance_valid(_tube_client):
+		var tube_peer_id := int(_tube_client.get("peer_id"))
+		if tube_peer_id > 0:
+			return tube_peer_id
+	return multiplayer.get_unique_id()
+
+func _resolve_active_peer() -> MultiplayerPeer:
+	if _tube_client and is_instance_valid(_tube_client):
+		var tube_peer_candidate: MultiplayerPeer = _tube_client.get("multiplayer_peer") as MultiplayerPeer
+		if tube_peer_candidate != null:
+			return tube_peer_candidate
+	return multiplayer.multiplayer_peer
