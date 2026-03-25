@@ -584,15 +584,16 @@ func _send_signaling_data(p_peer: TubePeer, p_tracker: TubeTracker = null):
 	
 	if _local_signaling_peer:
 		if is_server:
-			_local_signaling_peer.send_signaling_data(
-				p_peer.local_address,
-				context.app_id,
-				session_id,
-				peer_id,
-				p_peer.id,
-				p_peer.local_session_description,
-				p_peer.ice_candidates,
-			)
+			if not p_peer.local_address.strip_edges().is_empty():
+				_local_signaling_peer.send_signaling_data(
+					p_peer.local_address,
+					context.app_id,
+					session_id,
+					peer_id,
+					p_peer.id,
+					p_peer.local_session_description,
+					p_peer.ice_candidates,
+				)
 		else:
 			_local_signaling_peer.broadcast_signaling_data(
 				context.app_id,
