@@ -11,6 +11,15 @@ The project now uses a lightweight WebRTC mesh approach with a WebSocket signali
 - Players can configure profile name + icon path in the options profile tab.
 - Player profile is synchronized to the in-world head display.
 
+### Multiplayer plugin dependency
+
+The project now expects the **Tube** addon for session handling:
+
+- Repo: https://github.com/koopmyers/tube
+- Install into `addons/tube` and enable it in `Project Settings -> Plugins`.
+
+Tube uses WebRTC under the hood and requires a configured `TubeContext` resource (trackers/STUN settings) shared by all players.
+
 ## Dedicated server relay
 
 A standalone relay/signaling server bundle is provided in `dedicated_server/` for dedicated-server style deployment.
