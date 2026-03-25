@@ -6,6 +6,7 @@ signal remote_profile_received(peer_id: int, player_name: String, icon_png_base6
 const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_STUN := "stun:stun.l.google.com:19302"
 const DEFAULT_ROOM_CODE := "DEFAULT"
+const ROOM_CODE_LENGTH := 6
 const HOST_PEER_ID := 1
 const MIN_CLIENT_PEER_ID := 2
 const MAX_PEER_ID := 2147483647
@@ -95,6 +96,15 @@ func _generate_client_peer_id() -> int:
 	rng.seed = hash("%s:%s:%s" % [OS.get_unique_id(), timestamp, micros])
 	return rng.randi_range(MIN_CLIENT_PEER_ID, MAX_PEER_ID)
 
+func generate_room_code() -> String:
+	var characters := "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var output := ""
+	for i in ROOM_CODE_LENGTH:
+		output += characters[rng.randi_range(0, characters.length() - 1)]
+	return output
+
 func get_active_room_code() -> String:
 	return _room_code
 
@@ -117,7 +127,7 @@ func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
 	if not normalized.is_empty():
 		return normalized
 	if is_host:
-		return ""
+		return generate_room_code()
 	return DEFAULT_ROOM_CODE
 
 
@@ -168,30 +178,6 @@ func _handle_signaling_message(message: String) -> void:
 				)
 		"room_assigned":
 			_room_code = _resolve_room_code(str(data.get("room", _room_code)), true)
-		"profiles_snapshot":
-			var profiles = data.get("profiles", [])
-			if typeof(profiles) == TYPE_ARRAY:
-				for item in profiles:
-					if typeof(item) != TYPE_DICTIONARY:
-						continue
-					_emit_remote_profile(item)
-		"player_profile":
-			_emit_remote_profile(data)
-		"peer_left":
-			var left_peer := int(data.get("peer_id", 0))
-			if _connections.has(left_peer):
-				_connections.erase(left_peer)
-
-func _emit_remote_profile(profile_data: Dictionary) -> void:
-	var peer_id := int(profile_data.get("peer_id", 0))
-	if peer_id <= 0:
-		return
-	emit_signal(
-		"remote_profile_received",
-		peer_id,
-		str(profile_data.get("player_name", "Player")),
-		str(profile_data.get("icon_png_base64", ""))
-	)
 
 func _create_connection(remote_id: int, should_create_offer: bool) -> WebRTCPeerConnection:
 	if _connections.has(remote_id):

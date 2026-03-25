@@ -75,6 +75,8 @@ func _on_back_pressed() -> void:
 func _on_btn_host_pressed() -> void:
 	ProfileManager.save_profile(username_prompt.text, icon_path_prompt.text)
 	var room := room_code_prompt.text.strip_edges()
+	if room.is_empty():
+		room = NetworkManager.generate_room_code()
 	var signaling_url := signaling_prompt.text.strip_edges()
 	var result := await Lobby.host_webrtc_lobby(room, signaling_url)
 	if result == OK:
