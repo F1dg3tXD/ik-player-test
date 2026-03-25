@@ -19,6 +19,9 @@ The project now expects the **Tube** addon for session handling:
 - Install into `addons/tube` and enable it in `Project Settings -> Plugins`.
 
 Tube uses WebRTC under the hood and requires a configured `TubeContext` resource (trackers/STUN settings) shared by all players.
+Tube sessions are created/joined by **room code (session ID)** only; signaling endpoints are configured in `TubeContext`, not per-match input fields.
+
+> Non-web exports require the `webrtc-native` GDExtension plugin (per Tube README).
 
 ## Dedicated server relay
 
