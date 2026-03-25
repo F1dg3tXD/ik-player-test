@@ -119,10 +119,12 @@ func _handle_signaling_message(message: String) -> void:
 			})
 		"peer_joined":
 			var peer_id := int(data.get("peer_id", 0))
-			if peer_id > 0 and peer_id != _local_peer_id:
+			if _should_connect_to_peer(peer_id):
 				_create_connection(peer_id, _is_host)
 		"offer":
 			var from_peer := int(data.get("from", 0))
+			if not _should_connect_to_peer(from_peer):
+				return
 			var conn = _create_connection(from_peer, false)
 			if conn:
 				conn.set_remote_description("offer", str(data.get("sdp", "")))
@@ -138,6 +140,13 @@ func _handle_signaling_message(message: String) -> void:
 					int(data.get("index", 0)),
 					str(data.get("candidate", ""))
 				)
+
+func _should_connect_to_peer(peer_id: int) -> bool:
+	if peer_id <= 0 or peer_id == _local_peer_id:
+		return false
+	if _is_host:
+		return true
+	return peer_id == HOST_PEER_ID
 
 func _create_connection(remote_id: int, should_create_offer: bool) -> WebRTCPeerConnection:
 	if _connections.has(remote_id):
