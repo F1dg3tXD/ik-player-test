@@ -114,15 +114,8 @@ func _ensure_tube_client() -> bool:
 	if _tube_client and is_instance_valid(_tube_client):
 		return true
 
-	var scene_client := _find_existing_tube_client()
-	if scene_client != null:
-		_tube_client = scene_client
-		_connect_tube_signals()
-		_load_default_tube_context()
-		return true
-
 	if not ClassDB.class_exists("TubeClient"):
-		push_error("TubeClient node not found in scene tree and Tube class is unavailable. Ensure the Tube plugin is enabled and a TubeClient node exists in the active scene.")
+		push_error("Tube plugin is not available. Install/enable addons/tube and restart Godot.")
 		return false
 
 	_tube_client = ClassDB.instantiate("TubeClient")
@@ -135,43 +128,6 @@ func _ensure_tube_client() -> bool:
 	_connect_tube_signals()
 	_load_default_tube_context()
 	return true
-
-func _find_existing_tube_client() -> Node:
-	var tree := get_tree()
-	if tree == null:
-		return null
-	var root := tree.root
-	if root == null:
-		return null
-
-	var named_client := root.find_child("TubeClient", true, false)
-	if _is_tube_client_node(named_client):
-		return named_client
-
-	return _find_tube_client_recursive(root)
-
-func _find_tube_client_recursive(node: Node) -> Node:
-	for child in node.get_children():
-		if not (child is Node):
-			continue
-		var child_node := child as Node
-		if _is_tube_client_node(child_node):
-			return child_node
-		var nested := _find_tube_client_recursive(child_node)
-		if nested != null:
-			return nested
-	return null
-
-func _is_tube_client_node(node: Node) -> bool:
-	if node == null:
-		return false
-	if not node.has_method("create_session"):
-		return false
-	if not node.has_method("join_session"):
-		return false
-	if not node.has_method("leave_session"):
-		return false
-	return node.has_signal("session_created") and node.has_signal("session_joined")
 
 func _connect_tube_signals() -> void:
 	if _tube_connected or _tube_client == null:

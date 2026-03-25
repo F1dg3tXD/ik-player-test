@@ -22,3 +22,4 @@ export_presets.cfg
 *.import
 /dedicated_server/node_modules
 dedicated_server/package-lock.json
+/dedicated_server/icons
