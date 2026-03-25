@@ -21,7 +21,7 @@ func _ready() -> void:
 		call_deferred("_start_dedicated_server")
 
 func host_webrtc_lobby(room_code: String, signaling_url: String, spawn_local_player: bool = true) -> Error:
-	var result := NetworkManager.start_webrtc_host(room_code, signaling_url)
+	var result := await NetworkManager.start_webrtc_host(room_code, signaling_url)
 	if result != OK:
 		return result
 
@@ -36,7 +36,7 @@ func host_webrtc_lobby(room_code: String, signaling_url: String, spawn_local_pla
 	return OK
 
 func join_webrtc_lobby(room_code: String, signaling_url: String) -> Error:
-	var result := NetworkManager.start_webrtc_client(room_code, signaling_url)
+	var result := await NetworkManager.start_webrtc_client(room_code, signaling_url)
 	if result != OK:
 		return result
 
