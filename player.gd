@@ -217,6 +217,12 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 		avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
+func apply_remote_profile(player_name: String, icon_png_base64: String) -> void:
+	var png_buffer := PackedByteArray()
+	if not icon_png_base64.is_empty():
+		png_buffer = Marshalls.base64_to_raw(icon_png_base64)
+	_sync_profile(player_name, png_buffer)
+
 func set_fly_mode(enabled: bool) -> void:
 	is_flying = enabled
 	

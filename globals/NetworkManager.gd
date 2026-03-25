@@ -1,6 +1,7 @@
 extends Node
 
 enum PeerMode { NONE, WEBRTC }
+signal remote_profile_received(peer_id: int, player_name: String, icon_png_base64: String)
 
 const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_STUN := "stun:stun.l.google.com:19302"
@@ -145,11 +146,14 @@ func _handle_signaling_message(message: String) -> void:
 	var action := str(data.get("action", ""))
 	match action:
 		"hello":
+			var icon_base64 := Marshalls.raw_to_base64(ProfileManager.get_icon_png_buffer())
 			_send_signaling({
 				"action": "join",
 				"room": _room_code,
 				"host": _is_host,
-				"peer_id": _local_peer_id
+				"peer_id": _local_peer_id,
+				"player_name": ProfileManager.username,
+				"icon_png_base64": icon_base64
 			})
 		"peer_joined":
 			var peer_id := int(data.get("peer_id", 0))
