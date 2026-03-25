@@ -21,7 +21,9 @@ func load_profile() -> void:
 	username = str(data.get("username", username)).strip_edges()
 	if username.is_empty():
 		username = "Player"
-	icon_path = str(data.get("icon_path", ""))
+	icon_path = str(data.get("icon_path", "")).strip_edges()
+	if icon_path.is_empty() or not FileAccess.file_exists(icon_path):
+		icon_path = ""
 
 func save_profile(new_username: String, source_icon_path: String) -> void:
 	username = new_username.strip_edges()
@@ -34,6 +36,8 @@ func save_profile(new_username: String, source_icon_path: String) -> void:
 			image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 			image.save_png(ICON_COPY_PATH)
 			icon_path = ICON_COPY_PATH
+	else:
+		icon_path = ""
 
 	var file := FileAccess.open(PROFILE_PATH, FileAccess.WRITE)
 	if file:

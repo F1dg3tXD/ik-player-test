@@ -23,9 +23,7 @@ func host_webrtc_lobby(room_code: String, signaling_url: String, spawn_local_pla
 	if result != OK:
 		return result
 
-	active_room_code = room_code.strip_edges()
-	if active_room_code.is_empty():
-		active_room_code = "default"
+	active_room_code = NetworkManager.get_active_room_code()
 
 	if spawn_local_player:
 		await _scene_tree.process_frame
@@ -40,23 +38,21 @@ func join_webrtc_lobby(room_code: String, signaling_url: String) -> Error:
 	if result != OK:
 		return result
 
-	active_room_code = room_code.strip_edges()
-	if active_room_code.is_empty():
-		active_room_code = "default"
+	active_room_code = NetworkManager.get_active_room_code()
 
 	emit_signal("lobby_joined", active_room_code)
 	return OK
 
 func _start_dedicated_server() -> void:
 	_mount_server_ui()
-	var room_code := _get_dedicated_arg_value("-room=", "default")
+	var room_code := _get_dedicated_arg_value("-room=", "")
 	var signaling_url := _get_dedicated_arg_value("-signaling-url=", NetworkManager.DEFAULT_SIGNALING_URL)
 	var result := await host_webrtc_lobby(room_code, signaling_url, false)
 	if result != OK:
 		push_error("[Dedicated Server] Failed to start host (%s) using %s" % [result, signaling_url])
 		return
 
-	print("[Dedicated Server] Started room '%s' with signaling URL %s" % [room_code, signaling_url])
+	print("[Dedicated Server] Started room '%s' with signaling URL %s" % [active_room_code, signaling_url])
 	print("[Dedicated Server] Server peer ID: %s" % NetworkManager.get_local_peer_id())
 	print("[Dedicated Server] Waiting for players to connect...")
 
