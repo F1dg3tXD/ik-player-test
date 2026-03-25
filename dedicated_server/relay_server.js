@@ -4,6 +4,8 @@ const host = process.env.HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 9080);
 
 const rooms = new Map();
+const ROOM_CODE_LENGTH = 6;
+const ROOM_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function roomPeers(room) {
   if (!rooms.has(room)) rooms.set(room, new Map());
@@ -12,6 +14,27 @@ function roomPeers(room) {
 
 function send(ws, payload) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(payload));
+}
+
+function generateRoomCode() {
+  let code = '';
+  for (let i = 0; i < ROOM_CODE_LENGTH; i += 1) {
+    code += ROOM_CODE_CHARS[Math.floor(Math.random() * ROOM_CODE_CHARS.length)];
+  }
+  return code;
+}
+
+function sanitizeRoomCode(rawValue) {
+  return String(rawValue || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function getHostRoomCode(preferredRoom) {
+  if (preferredRoom && !rooms.has(preferredRoom)) return preferredRoom;
+  let generated = generateRoomCode();
+  while (rooms.has(generated)) {
+    generated = generateRoomCode();
+  }
+  return generated;
 }
 
 const wss = new WebSocketServer({ host, port });
@@ -26,12 +49,15 @@ wss.on('connection', (ws) => {
     try { data = JSON.parse(message.toString()); } catch { return; }
 
     if (data.action === 'join') {
-      const room = String(data.room || 'default');
+      const isHost = Boolean(data.host);
+      const preferredRoom = sanitizeRoomCode(data.room);
+      const room = isHost ? getHostRoomCode(preferredRoom) : (preferredRoom || 'DEFAULT');
       const peerId = Number(data.peer_id || 0);
       if (!peerId) return;
       ws.peerId = peerId;
       ws.room = room;
       const peers = roomPeers(room);
+      send(ws, { action: 'room_assigned', room });
 
       for (const [id, existing] of peers.entries()) {
         if (id !== peerId) {

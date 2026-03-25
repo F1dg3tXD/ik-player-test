@@ -1,9 +1,11 @@
 extends Node
 
 enum PeerMode { NONE, WEBRTC }
+signal remote_profile_received(peer_id: int, player_name: String, icon_png_base64: String)
 
 const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
 const DEFAULT_STUN := "stun:stun.l.google.com:19302"
+const DEFAULT_ROOM_CODE := "DEFAULT"
 const HOST_PEER_ID := 1
 const MIN_CLIENT_PEER_ID := 2
 const MAX_PEER_ID := 2147483647
@@ -40,9 +42,8 @@ func close_connection() -> void:
 
 func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
 	close_connection()
-	_room_code = room_code.strip_edges()
-	if _room_code.is_empty():
-		_room_code = "default"
+	_room_code = _resolve_room_code(room_code, true)
+	signaling_url = _resolve_signaling_url(signaling_url)
 
 	_is_host = true
 	_local_peer_id = HOST_PEER_ID
@@ -65,9 +66,8 @@ func start_webrtc_host(room_code: String, signaling_url: String = DEFAULT_SIGNAL
 
 func start_webrtc_client(room_code: String, signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
 	close_connection()
-	_room_code = room_code.strip_edges()
-	if _room_code.is_empty():
-		_room_code = "default"
+	_room_code = _resolve_room_code(room_code, false)
+	signaling_url = _resolve_signaling_url(signaling_url)
 
 	_is_host = false
 	_local_peer_id = _generate_client_peer_id()
@@ -95,6 +95,31 @@ func _generate_client_peer_id() -> int:
 	rng.seed = hash("%s:%s:%s" % [OS.get_unique_id(), timestamp, micros])
 	return rng.randi_range(MIN_CLIENT_PEER_ID, MAX_PEER_ID)
 
+func get_active_room_code() -> String:
+	return _room_code
+
+func _resolve_signaling_url(signaling_url: String) -> String:
+	var clean_url := signaling_url.strip_edges()
+	if clean_url.is_empty():
+		return DEFAULT_SIGNALING_URL
+	return clean_url
+
+func _normalize_room_code(room_code: String) -> String:
+	var cleaned := room_code.strip_edges().to_upper()
+	var normalized := ""
+	for ch in cleaned:
+		if ch.is_valid_ascii_identifier() or ch.is_valid_int():
+			normalized += ch
+	return normalized
+
+func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
+	var normalized := _normalize_room_code(input_room_code)
+	if not normalized.is_empty():
+		return normalized
+	if is_host:
+		return ""
+	return DEFAULT_ROOM_CODE
+
 
 func get_local_peer_id() -> int:
 	return _local_peer_id
@@ -111,11 +136,14 @@ func _handle_signaling_message(message: String) -> void:
 	var action := str(data.get("action", ""))
 	match action:
 		"hello":
+			var icon_base64 := Marshalls.raw_to_base64(ProfileManager.get_icon_png_buffer())
 			_send_signaling({
 				"action": "join",
 				"room": _room_code,
 				"host": _is_host,
-				"peer_id": _local_peer_id
+				"peer_id": _local_peer_id,
+				"player_name": ProfileManager.username,
+				"icon_png_base64": icon_base64
 			})
 		"peer_joined":
 			var peer_id := int(data.get("peer_id", 0))
@@ -138,6 +166,32 @@ func _handle_signaling_message(message: String) -> void:
 					int(data.get("index", 0)),
 					str(data.get("candidate", ""))
 				)
+		"room_assigned":
+			_room_code = _resolve_room_code(str(data.get("room", _room_code)), true)
+		"profiles_snapshot":
+			var profiles = data.get("profiles", [])
+			if typeof(profiles) == TYPE_ARRAY:
+				for item in profiles:
+					if typeof(item) != TYPE_DICTIONARY:
+						continue
+					_emit_remote_profile(item)
+		"player_profile":
+			_emit_remote_profile(data)
+		"peer_left":
+			var left_peer := int(data.get("peer_id", 0))
+			if _connections.has(left_peer):
+				_connections.erase(left_peer)
+
+func _emit_remote_profile(profile_data: Dictionary) -> void:
+	var peer_id := int(profile_data.get("peer_id", 0))
+	if peer_id <= 0:
+		return
+	emit_signal(
+		"remote_profile_received",
+		peer_id,
+		str(profile_data.get("player_name", "Player")),
+		str(profile_data.get("icon_png_base64", ""))
+	)
 
 func _create_connection(remote_id: int, should_create_offer: bool) -> WebRTCPeerConnection:
 	if _connections.has(remote_id):

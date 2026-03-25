@@ -4,16 +4,17 @@ This folder contains files used to run a dedicated relay/signaling server for th
 
 ## Contents
 
-- `relay_server.js`: Minimal WebSocket signaling relay for room-based offer/answer/ICE exchange.
-- `package.json`: Node.js dependency manifest.
-- `.env.example`: Environment variables for port and host binding.
+- `server.py`: Python dedicated relay server that auto-assigns host room codes, logs player joins, and stores uploaded player icons per room.
+- `requirements.txt`: Python dependencies for the dedicated relay server.
 
 ## Run
 
 ```bash
 cd dedicated_server
-npm install
-npm start
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python server.py
 ```
 
 Default signaling URL for clients is:
