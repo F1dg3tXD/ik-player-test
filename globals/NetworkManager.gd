@@ -173,7 +173,7 @@ func _instantiate_tube_client() -> Node:
 	if tube_script == null:
 		push_error("Unable to load TubeClient script at %s." % TUBE_CLIENT_SCRIPT_PATH)
 		return null
-	var client: Node = tube_script.new()
+	var client := tube_script.new()
 	if client == null:
 		push_error("Unable to instantiate TubeClient from %s." % TUBE_CLIENT_SCRIPT_PATH)
 		return null
@@ -248,8 +248,7 @@ func _resolve_local_peer_id() -> int:
 
 func _resolve_active_peer() -> MultiplayerPeer:
 	if _tube_client and is_instance_valid(_tube_client):
-		var tube_peer_variant: Variant = _tube_client.get("multiplayer_peer")
-		if tube_peer_variant is MultiplayerPeer:
-			var tube_peer: MultiplayerPeer = tube_peer_variant
+		var tube_peer := _tube_client.get("multiplayer_peer")
+		if tube_peer is MultiplayerPeer:
 			return tube_peer
 	return multiplayer.multiplayer_peer
