@@ -45,6 +45,7 @@ func _ready() -> void:
 	_populate_aa_dropdown()
 	_load_current_settings()
 	_load_profile_ui()
+	signaling_prompt.text = ""
 	_show_main()
 
 func _show_main() -> void:
@@ -81,7 +82,7 @@ func _on_btn_host_pressed() -> void:
 	var result := await Lobby.host_webrtc_lobby(room, signaling_url)
 	if result == OK:
 		room_code_prompt.text = Lobby.active_room_code
-		status_label.text = "Host started. Room: %s" % Lobby.active_room_code
+		status_label.text = "Host started. Share room code: %s" % Lobby.active_room_code
 	else:
 		status_label.text = "Host failed: %s" % result
 
@@ -92,7 +93,7 @@ func _on_btn_join_pressed() -> void:
 	var result := await Lobby.join_webrtc_lobby(room, signaling_url)
 	if result == OK:
 		room_code_prompt.text = Lobby.active_room_code
-		status_label.text = "Joining room %s..." % Lobby.active_room_code
+		status_label.text = "Joined room %s." % Lobby.active_room_code
 	else:
 		status_label.text = "Join failed: %s" % result
 

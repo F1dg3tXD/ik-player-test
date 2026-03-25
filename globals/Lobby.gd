@@ -41,6 +41,7 @@ func join_webrtc_lobby(room_code: String, signaling_url: String) -> Error:
 		return result
 
 	active_room_code = NetworkManager.get_active_room_code()
+	_hide_menu()
 
 	emit_signal("lobby_joined", active_room_code)
 	return OK
@@ -91,13 +92,15 @@ func _on_connected_to_server() -> void:
 func _on_peer_connected(id: int) -> void:
 	if not multiplayer.is_server():
 		return
-	print("[Dedicated Server] Player connected: %s" % id)
+	if _is_dedicated_server_mode():
+		print("[Dedicated Server] Player connected: %s" % id)
 	_spawn_player(id)
 
 func _on_peer_disconnected(id: int) -> void:
 	if not multiplayer.is_server():
 		return
-	print("[Dedicated Server] Player disconnected: %s" % id)
+	if _is_dedicated_server_mode():
+		print("[Dedicated Server] Player disconnected: %s" % id)
 	var spawn := _get_spawn_points_node()
 	if spawn:
 		spawn.despawn_player(id)

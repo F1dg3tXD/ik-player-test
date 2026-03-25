@@ -112,7 +112,7 @@ alignment = 1
 
 [node name="SignalURLPrompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
 layout_mode = 2
-placeholder_text = "Signaling URL (ws://127.0.0.1:9080)"
+placeholder_text = "Optional (unused by Tube)"
 
 [node name="StatusLabel" type="Label" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
 layout_mode = 2
@@ -383,4 +383,3 @@ text = "Back"
 [connection signal="pressed" from="main/Menu/MultiPlayerMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Apply" to="." method="_on_apply_pressed"]
 [connection signal="pressed" from="main/Menu/OptionsMenuHead/VBoxContainer/Back" to="." method="_on_back_pressed"]
-

@@ -20,6 +20,8 @@ var _local_peer_id := 0
 var _tube_client: Node = null
 var _tube_connected := false
 var _pending_tube_action := ""
+var _pending_result_room_code := ""
+var _pending_result_error := ""
 
 func _ready() -> void:
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
@@ -33,7 +35,9 @@ func close_connection() -> void:
 	peer_mode = PeerMode.NONE
 	_room_code = ""
 	_local_peer_id = 0
-	_tube_connected = false
+	_pending_tube_action = ""
+	_pending_result_room_code = ""
+	_pending_result_error = ""
 
 func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
 	close_connection()
@@ -47,13 +51,15 @@ func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNA
 		return ERR_UNAVAILABLE
 
 	_pending_tube_action = "create"
+	_pending_result_room_code = ""
+	_pending_result_error = ""
 	_tube_client.call("create_session")
-	var created_payload: Array = await tube_session_created
+	var wait_error := await _wait_for_pending_tube_action()
 	_pending_tube_action = ""
-	if created_payload.is_empty():
-		return FAILED
+	if wait_error != OK:
+		return wait_error
 
-	_room_code = str(created_payload[0])
+	_room_code = _pending_result_room_code
 	_local_peer_id = multiplayer.get_unique_id()
 	peer = multiplayer.multiplayer_peer
 	peer_mode = PeerMode.WEBRTC
@@ -74,13 +80,15 @@ func start_webrtc_client(room_code: String, _signaling_url: String = DEFAULT_SIG
 		return ERR_UNAVAILABLE
 
 	_pending_tube_action = "join"
+	_pending_result_room_code = ""
+	_pending_result_error = ""
 	_tube_client.call("join_session", _room_code)
-	var joined_payload: Array = await tube_session_joined
+	var wait_error := await _wait_for_pending_tube_action()
 	_pending_tube_action = ""
-	if joined_payload.is_empty():
-		return FAILED
+	if wait_error != OK:
+		return wait_error
 
-	_room_code = str(joined_payload[0])
+	_room_code = _pending_result_room_code
 	_local_peer_id = multiplayer.get_unique_id()
 	peer = multiplayer.multiplayer_peer
 	peer_mode = PeerMode.WEBRTC
@@ -104,6 +112,15 @@ func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
 		return ""
 	return DEFAULT_ROOM_CODE
 
+func _wait_for_pending_tube_action() -> Error:
+	while not _pending_tube_action.is_empty():
+		if not _pending_result_error.is_empty():
+			push_error(_pending_result_error)
+			return FAILED
+		if not _pending_result_room_code.is_empty():
+			return OK
+		await get_tree().process_frame
+	return FAILED
 
 func get_local_peer_id() -> int:
 	if _local_peer_id > 0:
@@ -160,20 +177,25 @@ func _load_default_tube_context() -> void:
 
 func _on_tube_session_created() -> void:
 	_room_code = str(_tube_client.get("session_id"))
+	_pending_result_room_code = _room_code
 	emit_signal("tube_session_created", _room_code)
 
 func _on_tube_session_joined() -> void:
 	var joined_id := str(_tube_client.get("session_id"))
 	if not joined_id.is_empty():
 		_room_code = joined_id
+	_pending_result_room_code = _room_code
 	emit_signal("tube_session_joined", _room_code)
 
 func _on_tube_error_raised(code: int, message: String) -> void:
 	push_error("Tube error %s: %s" % [code, message])
-	emit_signal("tube_error", "%s: %s" % [code, message])
+	_pending_result_error = "Tube error %s: %s" % [code, message]
+	emit_signal("tube_error", _pending_result_error)
 	if _pending_tube_action == "create":
+		_pending_tube_action = ""
 		emit_signal("tube_session_created", "")
 	elif _pending_tube_action == "join":
+		_pending_tube_action = ""
 		emit_signal("tube_session_joined", "")
 
 func _on_connected_to_server() -> void:
