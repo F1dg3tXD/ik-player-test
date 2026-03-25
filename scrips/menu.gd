@@ -89,7 +89,7 @@ func _on_btn_join_pressed() -> void:
 	ProfileManager.save_profile(username_prompt.text, icon_path_prompt.text)
 	var room := room_code_prompt.text.strip_edges()
 	var signaling_url := signaling_prompt.text.strip_edges()
-	var result := Lobby.join_webrtc_lobby(room, signaling_url)
+	var result := await Lobby.join_webrtc_lobby(room, signaling_url)
 	if result == OK:
 		room_code_prompt.text = Lobby.active_room_code
 		status_label.text = "Joining room %s..." % Lobby.active_room_code
