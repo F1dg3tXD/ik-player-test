@@ -42,16 +42,19 @@ func save_profile(new_username: String, source_icon_path: String) -> void:
 			"icon_path": icon_path
 		}, "\t"))
 
+func _create_fallback_icon() -> Image:
+	var image := Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0.8, 0.1, 0.1, 1.0))
+	return image
+
 func get_icon_image() -> Image:
-	var image := Image.new()
 	if icon_path.is_empty():
-		image.create(128, 128, false, Image.FORMAT_RGBA8)
-		image.fill(Color(0.8, 0.1, 0.1, 1.0))
-		return image
+		return _create_fallback_icon()
+
+	var image := Image.new()
 	if image.load(icon_path) != OK:
-		image.create(128, 128, false, Image.FORMAT_RGBA8)
-		image.fill(Color(0.8, 0.1, 0.1, 1.0))
-		return image
+		return _create_fallback_icon()
+
 	image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	return image
 
