@@ -218,15 +218,17 @@ func _load_default_tube_context() -> void:
 func _configure_tube_signaling(signaling_url: String) -> void:
 	if _tube_client == null:
 		return
+	var tracker_urls := _parse_signaling_urls(signaling_url)
+	if tracker_urls.is_empty():
+		return
 	var context_resource = _tube_client.get("context")
 	if context_resource == null:
-		push_warning("Cannot configure signaling because Tube context is missing.")
+		push_warning("Cannot override signaling URL because Tube context is missing.")
 		return
 	var cloned_context = context_resource.duplicate(true)
 	if cloned_context == null:
-		push_warning("Cannot configure signaling because Tube context clone failed.")
+		push_warning("Cannot override signaling URL because Tube context clone failed.")
 		return
-	var tracker_urls := _parse_signaling_urls(signaling_url)
 	cloned_context.set("trackers_urls", tracker_urls)
 	_runtime_tube_context = cloned_context
 	_tube_client.set("context", _runtime_tube_context)
@@ -243,10 +245,7 @@ func _parse_signaling_urls(signaling_url: String) -> Array[String]:
 		if url.is_empty():
 			continue
 		if url.begins_with("ws://") or url.begins_with("wss://"):
-			if "/announce" in url:
-				urls.append(url)
-			else:
-				push_warning("Ignoring non-tracker signaling URL '%s'. Tube expects WebTorrent tracker URLs ending with /announce." % url)
+			urls.append(url)
 		else:
 			push_warning("Ignoring unsupported signaling URL '%s'. Expected ws:// or wss://." % url)
 	return urls
