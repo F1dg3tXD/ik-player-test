@@ -1,12 +1,13 @@
 extends Node
 
 enum PeerMode { NONE, WEBRTC }
+@warning_ignore("unused_signal")
 signal remote_profile_received(peer_id: int, player_name: String, icon_png_base64: String)
 signal tube_session_created(room_code: String)
 signal tube_session_joined(room_code: String)
 signal tube_error(message: String)
 
-const DEFAULT_SIGNALING_URL := "ws://127.0.0.1:9080"
+const DEFAULT_SIGNALING_URL := ""
 const DEFAULT_ROOM_CODE := "DEFAULT"
 const ROOM_CODE_LENGTH := 6
 const HOST_PEER_ID := 1
@@ -25,6 +26,7 @@ var _is_host := false
 var _room_code := ""
 var _local_peer_id := 0
 var _tube_client: Node = null
+var _runtime_tube_context: Resource = null
 var _tube_connected := false
 var _pending_tube_action := ""
 var _pending_result_room_code := ""
@@ -40,6 +42,7 @@ func close_connection() -> void:
 	if _tube_client and is_instance_valid(_tube_client):
 		_tube_client.queue_free()
 	_tube_client = null
+	_runtime_tube_context = null
 	_tube_connected = false
 	multiplayer.multiplayer_peer = null
 	peer = null
@@ -59,6 +62,7 @@ func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNA
 		return ERR_UNAVAILABLE
 	if not _ensure_tube_client():
 		return ERR_UNAVAILABLE
+	_configure_tube_signaling(_signaling_url)
 	if not _tube_client.has_method("create_session"):
 		push_error("TubeClient is missing create_session().")
 		return ERR_UNAVAILABLE
@@ -90,6 +94,7 @@ func start_webrtc_client(room_code: String, _signaling_url: String = DEFAULT_SIG
 		return ERR_UNAVAILABLE
 	if not _ensure_tube_client():
 		return ERR_UNAVAILABLE
+	_configure_tube_signaling(_signaling_url)
 	if not _tube_client.has_method("join_session"):
 		push_error("TubeClient is missing join_session().")
 		return ERR_UNAVAILABLE
@@ -209,6 +214,42 @@ func _load_default_tube_context() -> void:
 				_tube_client.set("multiplayer_root_node", get_tree().root)
 				return
 	push_warning("Tube context resource not found. Create a TubeContext resource and assign it to NetworkManager's TubeClient.")
+
+func _configure_tube_signaling(signaling_url: String) -> void:
+	if _tube_client == null:
+		return
+	var context_resource = _tube_client.get("context")
+	if context_resource == null:
+		push_warning("Cannot configure signaling because Tube context is missing.")
+		return
+	var cloned_context = context_resource.duplicate(true)
+	if cloned_context == null:
+		push_warning("Cannot configure signaling because Tube context clone failed.")
+		return
+	var tracker_urls := _parse_signaling_urls(signaling_url)
+	cloned_context.set("trackers_urls", tracker_urls)
+	_runtime_tube_context = cloned_context
+	_tube_client.set("context", _runtime_tube_context)
+
+func _parse_signaling_urls(signaling_url: String) -> Array[String]:
+	var raw := signaling_url.strip_edges()
+	if raw.is_empty():
+		return []
+	for separator in [";", " "]:
+		raw = raw.replace(separator, ",")
+	var urls: Array[String] = []
+	for item in raw.split(",", false):
+		var url := item.strip_edges()
+		if url.is_empty():
+			continue
+		if url.begins_with("ws://") or url.begins_with("wss://"):
+			if "/announce" in url:
+				urls.append(url)
+			else:
+				push_warning("Ignoring non-tracker signaling URL '%s'. Tube expects WebTorrent tracker URLs ending with /announce." % url)
+		else:
+			push_warning("Ignoring unsupported signaling URL '%s'. Expected ws:// or wss://." % url)
+	return urls
 
 func _on_tube_session_created() -> void:
 	_room_code = str(_tube_client.get("session_id"))

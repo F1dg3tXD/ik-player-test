@@ -38,6 +38,8 @@ func _upnp_init_task() -> void:
 	var error := upnp.discover()
 	
 	if error:
+		if error == UPNP.UPNP_RESULT_NO_DEVICES:
+			return
 		raise_warning.call_deferred(
 			"cannot map port, upnp discover error: {error}".format({
 			"error": ClassDB.class_get_enum_constants("UPNP", "UPNPResult")[int(error)], # UPNPResult
