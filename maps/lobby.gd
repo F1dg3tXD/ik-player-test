@@ -1,7 +1,7 @@
 extends Node3D
 
 @onready var players_parent: Node3D = $Players
-@onready var menu: Node2D = $Cameras/MenuCamera/Menu
+@onready var menu: Node2D = $Menu
 @onready var pause_menu: CanvasLayer = $PauseMenu
 @onready var pause_panel: PanelContainer = $PauseMenu/PausePanel
 @onready var room_code_value: LineEdit = $PauseMenu/PausePanel/VBoxContainer/RoomCodeRow/RoomCodeValue

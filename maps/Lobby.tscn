@@ -79,13 +79,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
 
 [node name="env" parent="." unique_id=710608853 instance=ExtResource("4_ddprd")]
 
-[node name="Cameras" type="Node3D" parent="." unique_id=729904803]
-
-[node name="MenuCamera" type="Camera3D" parent="Cameras" unique_id=741738876]
-transform = Transform3D(-0.9659258, 0, -0.25881913, 0, 1, 0, 0.25881913, 0, -0.9659258, 0, 1, -1)
-
-[node name="Menu" parent="Cameras/MenuCamera" unique_id=298708851 instance=ExtResource("4_smn20")]
-
 [node name="PauseMenu" type="CanvasLayer" parent="." unique_id=125550001]
 
 [node name="PausePanel" type="PanelContainer" parent="PauseMenu" unique_id=125550002]
@@ -134,6 +127,8 @@ script = ExtResource("6_o1g4s")
 context = ExtResource("7_ciptf")
 multiplayer_root_node = NodePath("..")
 metadata/_custom_type_script = "uid://cy006uvidc4y"
+
+[node name="Menu" parent="." unique_id=298708851 instance=ExtResource("4_smn20")]
 
 [connection signal="pressed" from="PauseMenu/PausePanel/VBoxContainer/CopyRoomCodeButton" to="." method="_on_copy_room_code_button_pressed"]
 
