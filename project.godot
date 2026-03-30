@@ -48,7 +48,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SimpleDungeons/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/tube/plugin.cfg")
+enabled=PackedStringArray("res://addons/SimpleDungeons/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/tile-run-instances/plugin.cfg", "res://addons/tube/plugin.cfg")
 
 [global_group]
 

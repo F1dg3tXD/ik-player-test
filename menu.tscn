@@ -110,14 +110,13 @@ layout_mode = 2
 placeholder_text = "Room Code"
 alignment = 1
 
-[node name="SignalURLPrompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
+[node name="SignalURLPrompt" type="LineEdit" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=1550538688]
 layout_mode = 2
 placeholder_text = "Optional (unused by Tube)"
 
-[node name="StatusLabel" type="Label" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet"]
+[node name="StatusLabel" type="Label" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer/MultiplayerMenu/ENet" unique_id=1200555901]
 layout_mode = 2
 text = "Idle"
-
 
 [node name="Back" type="Button" parent="main/Menu/MultiPlayerMenuHead/VBoxContainer" unique_id=1394364649]
 layout_mode = 2
@@ -337,34 +336,33 @@ tick_count = 10
 ticks_on_borders = true
 ticks_position = 3
 
-
-[node name="Profile" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu"]
+[node name="Profile" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu" unique_id=1747928007]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="UsernameRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile"]
+[node name="UsernameRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile" unique_id=853499171]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow"]
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow" unique_id=1449367678]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Username"
 
-[node name="UsernamePrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow"]
+[node name="UsernamePrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow" unique_id=553162760]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Player"
 
-[node name="IconRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile"]
+[node name="IconRow" type="HBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile" unique_id=125274743]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow"]
+[node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=1375343267]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Icon Path"
 
-[node name="IconPathPrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow"]
+[node name="IconPathPrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=221013873]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "C:/Users/.../avatar.png"
@@ -372,7 +370,6 @@ placeholder_text = "C:/Users/.../avatar.png"
 [node name="Back" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer" unique_id=548933785]
 layout_mode = 2
 text = "Back"
-
 
 [connection signal="pressed" from="main/Menu/Main/MultiPlayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="main/Menu/Main/Options" to="." method="_on_options_pressed"]
