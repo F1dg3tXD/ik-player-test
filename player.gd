@@ -42,17 +42,28 @@ var cam_pitch: float = -15.0
 @export_range(0.0, 1.0) var mouse_sensitivity = 0.01
 @export var tilt_limit = deg_to_rad(75)
 
-#Player profile UI
+# Player profile UI
 @onready var display_name: Label = $SteamName/displayName
 @onready var avatar_sprite: Sprite2D = $SteamIcon/avatarSprite
 @onready var name_plate: Sprite3D = $namePlate
 
-# This breaks shit for some reason
-#func _enter_tree():
-	#set_multiplayer_authority(int(name))
+# Transform replication
+@export var remote_position_lerp_speed := 18.0
+@export var remote_rotation_lerp_speed := 14.0
+@export var state_broadcast_interval := 0.05
+var _state_broadcast_timer := 0.0
+var _remote_position_target := Vector3.ZERO
+var _remote_body_yaw_target := 0.0
+var _remote_head_pitch_target := 0.0
 
-func _ready():
-	#multiplayer_authority_changed.connect(_on_multiplayer_authority_changed)
+func _enter_tree() -> void:
+	# Spawn code names each player with its owning peer id.
+	# Setting authority here keeps RPC authority checks consistent on all peers.
+	var peer_id := str(name).to_int()
+	if peer_id > 0:
+		set_multiplayer_authority(peer_id)
+
+func _ready() -> void:
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
 		await get_tree().process_frame
@@ -65,9 +76,18 @@ func _ready():
 		beta_surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 	else:
 		camera_3d.current = false
+		_remote_position_target = global_position
+		_remote_body_yaw_target = rotation.y
+		_remote_head_pitch_target = head.rotation.x
 
 	_try_sync_profile()
 
+func _process(delta: float) -> void:
+	if is_multiplayer_authority():
+		return
+	global_position = global_position.lerp(_remote_position_target, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
+	rotation.y = lerp_angle(rotation.y, _remote_body_yaw_target, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
+	head.rotation.x = lerp_angle(head.rotation.x, _remote_head_pitch_target, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
 
 func _on_multiplayer_authority_changed() -> void:
 	_try_sync_profile()
@@ -133,7 +153,6 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal_vel.x
 	velocity.z = horizontal_vel.z
 
-
 	# -------------------------------------------------
 	# VERTICAL LOGIC (Clean Separation)
 	# -------------------------------------------------
@@ -166,6 +185,14 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	update_walker(delta)
+	_broadcast_state(delta)
+
+func _broadcast_state(delta: float) -> void:
+	_state_broadcast_timer += delta
+	if _state_broadcast_timer < state_broadcast_interval:
+		return
+	_state_broadcast_timer = 0.0
+	_receive_state.rpc(global_position, rotation.y, head.rotation.x)
 
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
@@ -202,7 +229,6 @@ func update_walker(delta: float) -> void:
 	var target_yaw: float = deg_to_rad(0.0) * strafe_dir
 	walker.rotation.y = lerp(walker.rotation.y, target_yaw, delta * 8.0)
 
-
 @rpc("authority", "call_local", "reliable")
 func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 	var safe_name := player_name.strip_edges()
@@ -217,6 +243,14 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 		avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
+@rpc("authority", "call_remote", "unreliable_ordered")
+func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float) -> void:
+	if is_multiplayer_authority():
+		return
+	_remote_position_target = world_pos
+	_remote_body_yaw_target = body_yaw
+	_remote_head_pitch_target = head_pitch
+
 func apply_remote_profile(player_name: String, icon_png_base64: String) -> void:
 	var png_buffer := PackedByteArray()
 	if not icon_png_base64.is_empty():
@@ -225,14 +259,14 @@ func apply_remote_profile(player_name: String, icon_png_base64: String) -> void:
 
 func set_fly_mode(enabled: bool) -> void:
 	is_flying = enabled
-	
+
 	if is_flying:
 		motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
 	else:
 		motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
-	
+
 	velocity = Vector3.ZERO
-	
+
 @rpc("authority", "call_local")
-func apply_color(color: Color):
+func apply_color(color: Color) -> void:
 	$MeshInstance3D.material_override.albedo_color = color

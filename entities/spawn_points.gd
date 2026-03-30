@@ -4,20 +4,27 @@ extends Node3D
 @onready var players_parent: Node3D = $"../Players"
 
 var spawn_markers: Array[Node3D] = []
+var _pending_spawns: Array[int] = []
 
 func _ready() -> void:
-	await get_tree().process_frame
-	await get_tree().process_frame
-	for marker in get_tree().get_nodes_in_group("PlayerSpawn"):
-		if marker is Node3D:
-			spawn_markers.append(marker)
+	_collect_spawn_markers()
+	for peer_id in _pending_spawns:
+		spawn_player(peer_id)
+	_pending_spawns.clear()
+
+func _collect_spawn_markers() -> void:
+	spawn_markers.clear()
+	for child in get_children():
+		if child is Node3D and child.is_in_group("PlayerSpawn"):
+			spawn_markers.append(child)
 	print("Spawn markers:", spawn_markers.size())
 
 func spawn_player(peer_id: int) -> void:
 	if not multiplayer.is_server():
 		return
 	if spawn_markers.is_empty():
-		push_warning("No spawn markers configured.")
+		_pending_spawns.append(peer_id)
+		push_warning("No spawn markers configured yet. Queued spawn for peer %s." % peer_id)
 		return
 	if players_parent.has_node(str(peer_id)):
 		return

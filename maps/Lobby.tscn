@@ -5,8 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="2_71o6c"]
 [ext_resource type="PackedScene" uid="uid://5ucq3gpglq0o" path="res://entities/env.tscn" id="4_ddprd"]
 [ext_resource type="PackedScene" uid="uid://kcsq7yb4ckqk" path="res://menu.tscn" id="4_smn20"]
-[ext_resource type="Script" uid="uid://cy006uvidc4y" path="res://addons/tube/tube_client.gd" id="6_o1g4s"]
-[ext_resource type="Resource" uid="uid://c1me3kwv70xsr" path="res://globals/TubeContext.tres" id="7_ciptf"]
 
 [node name="Lobby" type="Node3D" unique_id=1456081684]
 script = ExtResource("1_smn20")
@@ -121,12 +119,6 @@ text = "Copy Room Code"
 layout_mode = 2
 text = "Room code copy is host-only."
 horizontal_alignment = 1
-
-[node name="TubeClient" type="Node" parent="." unique_id=117502316 node_paths=PackedStringArray("multiplayer_root_node")]
-script = ExtResource("6_o1g4s")
-context = ExtResource("7_ciptf")
-multiplayer_root_node = NodePath("..")
-metadata/_custom_type_script = "uid://cy006uvidc4y"
 
 [node name="Menu" parent="." unique_id=298708851 instance=ExtResource("4_smn20")]
 
