@@ -31,6 +31,7 @@ Terminal="*uid://b57oidlvdiwvv"
 NetworkManager="*uid://bbayd6bi5w5tt"
 ProfileManager="*res://globals/ProfileManager.gd"
 Lobby="*uid://2yvjfoighqbo"
+TileRunInstancesGlobal="*uid://b6fg6pu2bfi14"
 
 [console]
 

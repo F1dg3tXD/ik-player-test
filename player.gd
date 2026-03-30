@@ -192,7 +192,7 @@ func _broadcast_state(delta: float) -> void:
 	if _state_broadcast_timer < state_broadcast_interval:
 		return
 	_state_broadcast_timer = 0.0
-	_receive_state.rpc_unreliable(global_position, rotation.y, head.rotation.x)
+	_receive_state.rpc(global_position, rotation.y, head.rotation.x)
 
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
