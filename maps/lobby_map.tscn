@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://cvvrdusbv8tp6"]
+
+[ext_resource type="PackedScene" uid="uid://blwdixrupw41w" path="res://entities/spawnPoints.tscn" id="1_gv8wc"]
+[ext_resource type="PackedScene" uid="uid://5ucq3gpglq0o" path="res://entities/env.tscn" id="2_rtbyf"]
+
+[node name="LobbyMap" type="Node3D" unique_id=1352223765]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=993467401]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+use_collision = true
+size = Vector3(10, 0.1, 20)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGBox3D" unique_id=2082510967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
+size = Vector3(10, 5, 0.1)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="CSGBox3D" unique_id=1543556718]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 8)
+size = Vector3(10, 5, 0.1)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="CSGBox3D" unique_id=1089908304]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -4.9999995, 2, 0)
+size = Vector3(20, 5, 0.1)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="CSGBox3D" unique_id=1222266968]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 5.0000005, 2, 0)
+size = Vector3(20, 5, 0.1)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGBox3D" unique_id=1302167358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.887146, -9.985821)
+operation = 2
+size = Vector3(3.555664, 3.7198486, 0.31464845)
+
+[node name="spawnPoints" parent="." unique_id=998261882 instance=ExtResource("1_gv8wc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+
+[node name="spawn" parent="spawnPoints" index="0" unique_id=1600414792]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="spawn2" type="Node3D" parent="spawnPoints" unique_id=38573388 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+
+[node name="spawn3" type="Node3D" parent="spawnPoints" unique_id=1670382565 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 0)
+
+[node name="spawn4" type="Node3D" parent="spawnPoints" unique_id=1566233487 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1)
+
+[node name="spawn5" type="Node3D" parent="spawnPoints" unique_id=607841694 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1)
+
+[node name="spawn6" type="Node3D" parent="spawnPoints" unique_id=1126929665 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 1)
+
+[node name="spawn7" type="Node3D" parent="spawnPoints" unique_id=809075185 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1)
+
+[node name="spawn8" type="Node3D" parent="spawnPoints" unique_id=43353960 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, -1)
+
+[node name="spawn9" type="Node3D" parent="spawnPoints" unique_id=840932093 groups=["PlayerSpawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
+
+[node name="env" parent="." unique_id=710608853 instance=ExtResource("2_rtbyf")]
+
+[editable path="spawnPoints"]

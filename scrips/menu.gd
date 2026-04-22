@@ -75,27 +75,42 @@ func _on_back_pressed() -> void:
 
 func _on_btn_host_pressed() -> void:
 	ProfileManager.save_profile(username_prompt.text, icon_path_prompt.text)
-	var room := room_code_prompt.text.strip_edges()
-	if room.is_empty():
-		room = NetworkManager.generate_room_code()
 	var signaling_url := signaling_prompt.text.strip_edges()
-	var result := await Lobby.host_webrtc_lobby(room, signaling_url)
-	if result == OK:
-		room_code_prompt.text = Lobby.active_room_code
-		status_label.text = "Host started. Share room code: %s" % Lobby.active_room_code
+	var lobby = $"/root/Lobby"
+	if lobby:
+		var result: Error = lobby.host_lobby("", signaling_url)
+		if result == OK:
+			lobby.lobby_created.connect(_on_lobby_created)
+		else:
+			status_label.text = "Host failed: %s" % result
 	else:
-		status_label.text = "Host failed: %s" % result
+		status_label.text = "Lobby not available"
 
 func _on_btn_join_pressed() -> void:
 	ProfileManager.save_profile(username_prompt.text, icon_path_prompt.text)
 	var room := room_code_prompt.text.strip_edges()
 	var signaling_url := signaling_prompt.text.strip_edges()
-	var result := await Lobby.join_webrtc_lobby(room, signaling_url)
-	if result == OK:
-		room_code_prompt.text = Lobby.active_room_code
-		status_label.text = "Joined room %s." % Lobby.active_room_code
+	var lobby = $"/root/Lobby"
+	if lobby:
+		var result: Error = lobby.join_lobby(room, signaling_url)
+		if result == OK:
+			lobby.lobby_joined.connect(_on_lobby_joined)
+		else:
+			status_label.text = "Join failed: %s" % result
 	else:
-		status_label.text = "Join failed: %s" % result
+		status_label.text = "Lobby not available"
+
+func _on_lobby_created(room_code: String) -> void:
+	var lobby = $"/root/Lobby"
+	room_code_prompt.text = lobby.active_room_code if lobby else ""
+	status_label.text = "Host started. Share room code: %s" % lobby.active_room_code if lobby else ""
+	hide()
+
+func _on_lobby_joined(room_code: String) -> void:
+	var lobby = $"/root/Lobby"
+	room_code_prompt.text = lobby.active_room_code if lobby else ""
+	status_label.text = "Joined room %s." % lobby.active_room_code if lobby else ""
+	hide()
 
 func _on_id_prompt_text_changed(_new_text: String) -> void:
 	pass

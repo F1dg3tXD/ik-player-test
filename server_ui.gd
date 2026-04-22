@@ -7,14 +7,16 @@ extends Node2D
 
 var _refresh_interval_sec := 1.0
 var _refresh_accumulator := 0.0
+var _lobby_node: Node
 
 func _ready() -> void:
 	server_button_instance.visible = false
 	player_info_h_box_container.visible = false
 
-	if Lobby != null:
-		Lobby.lobby_created.connect(_on_lobby_changed)
-		Lobby.lobby_joined.connect(_on_lobby_changed)
+	_lobby_node = get_tree().root.get_node_or_null("Lobby")
+	if _lobby_node:
+		_lobby_node.lobby_created.connect(_on_lobby_changed)
+		_lobby_node.lobby_joined.connect(_on_lobby_changed)
 
 	multiplayer.peer_connected.connect(_on_peer_changed)
 	multiplayer.peer_disconnected.connect(_on_peer_changed)
@@ -41,7 +43,9 @@ func _refresh_all() -> void:
 func _refresh_server_list() -> void:
 	_clear_dynamic_children(server_list_v_box_container, server_button_instance)
 
-	var room_code := Lobby.active_room_code if Lobby != null else ""
+	var room_code := ""
+	if _lobby_node and _lobby_node.has("active_room_code"):
+		room_code = _lobby_node.get("active_room_code")
 	if room_code.is_empty():
 		room_code = "(starting...)"
 

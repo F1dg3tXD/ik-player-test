@@ -1,6 +1,8 @@
 # player.gd
 extends CharacterBody3D
 
+class_name Player
+
 @export var SPEED := 5.0
 @export var ACCEL := 10.0
 @export var DECEL := 12.0
@@ -56,14 +58,23 @@ var _remote_position_target := Vector3.ZERO
 var _remote_body_yaw_target := 0.0
 var _remote_head_pitch_target := 0.0
 
+# Player color 
+var beta_joints_mat := StandardMaterial3D.new()
+var beta_surface_mat := StandardMaterial3D.new()
+var _player_color: Color = Color(0.612501, 0.38787553, 0.35089412)
+
 func _enter_tree() -> void:
-	# Spawn code names each player with its owning peer id.
-	# Setting authority here keeps RPC authority checks consistent on all peers.
 	var peer_id := str(name).to_int()
 	if peer_id > 0:
 		set_multiplayer_authority(peer_id)
 
 func _ready() -> void:
+	beta_joints_mat.albedo_color = _player_color
+	beta_surface_mat.albedo_color = _player_color
+	beta_joints.set_surface_override_material(0, beta_joints_mat)
+	beta_surface.set_surface_override_material(0, beta_surface_mat)
+	_apply_player_color(_player_color)
+
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
 		await get_tree().process_frame
@@ -243,7 +254,7 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 		avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
-@rpc("authority", "call_remote", "unreliable_ordered")
+@rpc("authority", "call_local", "unreliable_ordered")
 func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float) -> void:
 	if is_multiplayer_authority():
 		return
@@ -267,6 +278,16 @@ func set_fly_mode(enabled: bool) -> void:
 
 	velocity = Vector3.ZERO
 
+func _on_color_changed(new_color: Color) -> void:
+	_player_color = new_color
+	_apply_player_color(new_color)
+	replicate_color.rpc(new_color)
+
 @rpc("authority", "call_local")
-func apply_color(color: Color) -> void:
-	$MeshInstance3D.material_override.albedo_color = color
+func replicate_color(color: Color) -> void:
+	_player_color = color
+	_apply_player_color(color)
+
+func _apply_player_color(color: Color) -> void:
+	beta_joints_mat.albedo_color = color
+	beta_surface_mat.albedo_color = color

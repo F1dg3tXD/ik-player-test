@@ -1,294 +1,249 @@
 extends Node
 
-enum PeerMode { NONE, WEBRTC }
-@warning_ignore("unused_signal")
 signal remote_profile_received(peer_id: int, player_name: String, icon_png_base64: String)
-signal tube_session_created(room_code: String)
-signal tube_session_joined(room_code: String)
-signal tube_error(message: String)
+signal session_created(room_code: String)
+signal session_joined(room_code: String)
+signal error_raised(message: String)
 
-const DEFAULT_SIGNALING_URL := ""
-const DEFAULT_ROOM_CODE := "DEFAULT"
-const ROOM_CODE_LENGTH := 6
-const HOST_PEER_ID := 1
-const TUBE_CLIENT_SCRIPT_PATH := "res://addons/tube/tube_client.gd"
-const TUBE_CONTEXT_PATHS := [
-	"res://globals/TubeContext.tres",
-	"res://tube_context.tres",
-	"res://addons/tube/tube_context.tres"
-]
-const SESSION_SETUP_TIMEOUT_SEC := 15.0
+const PLAYER = preload("res://player.tscn")
+const TUBE_CONTEXT = preload("res://globals/TubeContext.tres")
 
-var peer_mode: PeerMode = PeerMode.NONE
-var peer: MultiplayerPeer
+var tube_client: Node = null
+var tube_enabled := true
 
+var PORT := 9999
+var IP_ADDRESS := '127.0.0.1'
+
+var active_room_code := ""
+var _local_peer_id := 1
 var _is_host := false
-var _room_code := ""
-var _local_peer_id := 0
-var _tube_client: Node = null
-var _runtime_tube_context: Resource = null
-var _tube_connected := false
-var _pending_tube_action := ""
-var _pending_result_room_code := ""
-var _pending_result_error := ""
+
+var _pending_profile_sync: Dictionary = {}
+
+@onready var _scene_tree := get_tree()
 
 func _ready() -> void:
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	if tube_enabled:
+		_create_tube_client()
+
+func _create_tube_client() -> void:
+	if tube_client and is_instance_valid(tube_client):
+		return
+	
+	var TubeClientScript = load("res://addons/tube/tube_client.gd")
+	if TubeClientScript:
+		tube_client = TubeClientScript.new()
+	else:
+		push_error("TubeClient script not found")
+		return
+	
+	tube_client.context = TUBE_CONTEXT
+	tube_client.set("multiplayer_root_node", _scene_tree.root)
+	_scene_tree.root.add_child.call_deferred(tube_client)
+	
+	if tube_client.has_signal("session_created"):
+		tube_client.connect("session_created", Callable(self, "_on_session_created"))
+	if tube_client.has_signal("session_joined"):
+		tube_client.connect("session_joined", Callable(self, "_on_session_joined"))
+	if tube_client.has_signal("error_raised"):
+		tube_client.connect("error_raised", Callable(self, "_on_tube_error"))
+
+func create_session(as_host: bool = true) -> Error:
+	_is_host = as_host
 	multiplayer.peer_connected.connect(_on_peer_connected)
-
-func close_connection() -> void:
-	if _tube_client and _tube_client.has_method("leave_session"):
-		_tube_client.call("leave_session")
-	if _tube_client and is_instance_valid(_tube_client):
-		_tube_client.queue_free()
-	_tube_client = null
-	_runtime_tube_context = null
-	_tube_connected = false
-	multiplayer.multiplayer_peer = null
-	peer = null
-	peer_mode = PeerMode.NONE
-	_room_code = ""
-	_local_peer_id = 0
-	_pending_tube_action = ""
-	_pending_result_room_code = ""
-	_pending_result_error = ""
-
-func start_webrtc_host(room_code: String, _signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
-	close_connection()
-	_is_host = true
-	_room_code = _resolve_room_code(room_code, true)
-
-	if not _is_webrtc_supported():
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	
+	_create_tube_client()
+	if tube_client.has_method("create_session"):
+		tube_client.call("create_session")
+	else:
+		push_error("TubeClient missing create_session()")
 		return ERR_UNAVAILABLE
-	if not _ensure_tube_client():
-		return ERR_UNAVAILABLE
-	_configure_tube_signaling(_signaling_url)
-	if not _tube_client.has_method("create_session"):
-		push_error("TubeClient is missing create_session().")
-		return ERR_UNAVAILABLE
-
-	_pending_tube_action = "create"
-	_pending_result_room_code = ""
-	_pending_result_error = ""
-	_tube_client.call("create_session")
-	var wait_error := await _wait_for_pending_tube_action()
-	_pending_tube_action = ""
-	if wait_error != OK:
-		return wait_error
-
-	_room_code = _pending_result_room_code
-	_local_peer_id = _resolve_local_peer_id()
-	peer = _resolve_active_peer()
-	peer_mode = PeerMode.WEBRTC
+	
 	return OK
 
-func start_webrtc_client(room_code: String, _signaling_url: String = DEFAULT_SIGNALING_URL) -> Error:
-	close_connection()
+func join_session(session_id: String) -> Error:
 	_is_host = false
-	_room_code = _resolve_room_code(room_code, false)
-	if _room_code == DEFAULT_ROOM_CODE:
-		push_error("A valid Tube session ID is required to join.")
-		return ERR_INVALID_PARAMETER
-
-	if not _is_webrtc_supported():
+	active_room_code = session_id
+	
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	
+	_create_tube_client()
+	if tube_client.has_method("join_session"):
+		tube_client.call("join_session", session_id)
+	else:
+		push_error("TubeClient missing join_session()")
 		return ERR_UNAVAILABLE
-	if not _ensure_tube_client():
-		return ERR_UNAVAILABLE
-	_configure_tube_signaling(_signaling_url)
-	if not _tube_client.has_method("join_session"):
-		push_error("TubeClient is missing join_session().")
-		return ERR_UNAVAILABLE
-
-	_pending_tube_action = "join"
-	_pending_result_room_code = ""
-	_pending_result_error = ""
-	_tube_client.call("join_session", _room_code)
-	var wait_error := await _wait_for_pending_tube_action()
-	_pending_tube_action = ""
-	if wait_error != OK:
-		return wait_error
-
-	_room_code = _pending_result_room_code
-	_local_peer_id = _resolve_local_peer_id()
-	peer = _resolve_active_peer()
-	peer_mode = PeerMode.WEBRTC
+	
 	return OK
 
-func generate_room_code() -> String:
-	# Tube generates session IDs internally when hosting.
-	return ""
+func start_server() -> void:
+	var enet_peer := ENetMultiplayerPeer.new()
+	enet_peer.create_server(PORT)
+	multiplayer.multiplayer_peer = enet_peer
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	_is_host = true
 
-func get_active_room_code() -> String:
-	return _room_code
+func join_server() -> void:
+	var enet_peer := ENetMultiplayerPeer.new()
+	enet_peer.create_client(IP_ADDRESS, PORT)
+	multiplayer.multiplayer_peer = enet_peer
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	_is_host = false
 
-func _normalize_room_code(room_code: String) -> String:
-	return room_code.strip_edges()
+func _on_session_created() -> void:
+	active_room_code = str(tube_client.get("session_id"))
+	_local_peer_id = 1
+	_is_host = true
+	print("Session created: ", active_room_code)
+	emit_signal("session_created", active_room_code)
+	add_local_player()
 
-func _resolve_room_code(input_room_code: String, is_host: bool) -> String:
-	var normalized := _normalize_room_code(input_room_code)
-	if not normalized.is_empty():
-		return normalized
-	if is_host:
-		return ""
-	return DEFAULT_ROOM_CODE
+func _on_session_joined() -> void:
+	active_room_code = str(tube_client.get("session_id"))
+	print("Session joined: ", active_room_code)
+	emit_signal("session_joined", active_room_code)
 
-func _wait_for_pending_tube_action() -> Error:
-	var start_time_msec := Time.get_ticks_msec()
-	while not _pending_tube_action.is_empty():
-		if not _pending_result_error.is_empty():
-			push_error(_pending_result_error)
-			return FAILED
-		if not _pending_result_room_code.is_empty():
-			return OK
-		var elapsed_sec := float(Time.get_ticks_msec() - start_time_msec) / 1000.0
-		if elapsed_sec >= SESSION_SETUP_TIMEOUT_SEC:
-			_pending_result_error = "Timed out while waiting for Tube to %s a session." % _pending_tube_action
-			push_error(_pending_result_error)
-			return ERR_TIMEOUT
-		await get_tree().process_frame
-	return FAILED
+func _on_tube_error(code: int, message: String) -> void:
+	push_error("Tube error ", code, ": ", message)
+	emit_signal("error_raised", message)
 
-func get_local_peer_id() -> int:
-	if _local_peer_id > 0:
-		return _local_peer_id
-	return multiplayer.get_unique_id()
+func _on_peer_connected(id: int) -> void:
+	print("Peer connected: ", id)
+	_spawn_player(id)
 
-func _ensure_tube_client() -> bool:
-	if _tube_client and is_instance_valid(_tube_client):
-		return true
-
-	_tube_client = _instantiate_tube_client()
-	if _tube_client == null:
-		push_error("Failed to instantiate TubeClient.")
-		return false
-
-	_tube_client.name = "TubeClient"
-	add_child(_tube_client)
-	_connect_tube_signals()
-	_load_default_tube_context()
-	return true
-
-func _instantiate_tube_client() -> Node:
-	if ClassDB.class_exists("TubeClient"):
-		return ClassDB.instantiate("TubeClient")
-	if not ResourceLoader.exists(TUBE_CLIENT_SCRIPT_PATH):
-		push_error("Tube addon not found at %s. Install/enable addons/tube." % TUBE_CLIENT_SCRIPT_PATH)
-		return null
-	var tube_script := load(TUBE_CLIENT_SCRIPT_PATH) as Script
-	if tube_script == null:
-		push_error("Unable to load TubeClient script at %s." % TUBE_CLIENT_SCRIPT_PATH)
-		return null
-	var client: Node = tube_script.new()
-	if client == null:
-		push_error("Unable to instantiate TubeClient from %s." % TUBE_CLIENT_SCRIPT_PATH)
-		return null
-	return client
-
-func _is_webrtc_supported() -> bool:
-	if ClassDB.class_exists("WebRTCPeerConnection"):
-		return true
-	push_error("WebRTC support is missing. Install/enable webrtc-native for non-HTML5 exports.")
-	return false
-
-func _connect_tube_signals() -> void:
-	if _tube_connected or _tube_client == null:
-		return
-	if _tube_client.has_signal("session_created"):
-		_tube_client.connect("session_created", Callable(self, "_on_tube_session_created"))
-	if _tube_client.has_signal("session_joined"):
-		_tube_client.connect("session_joined", Callable(self, "_on_tube_session_joined"))
-	if _tube_client.has_signal("error_raised"):
-		_tube_client.connect("error_raised", Callable(self, "_on_tube_error_raised"))
-	_tube_connected = true
-
-func _load_default_tube_context() -> void:
-	if _tube_client == null:
-		return
-	if _tube_client.get("context") != null:
-		return
-	for context_path in TUBE_CONTEXT_PATHS:
-		if ResourceLoader.exists(context_path):
-			var context_resource := load(context_path)
-			if context_resource != null:
-				_tube_client.set("context", context_resource)
-				_tube_client.set("multiplayer_root_node", get_tree().root)
-				return
-	push_warning("Tube context resource not found. Create a TubeContext resource and assign it to NetworkManager's TubeClient.")
-
-func _configure_tube_signaling(signaling_url: String) -> void:
-	if _tube_client == null:
-		return
-	var tracker_urls := _parse_signaling_urls(signaling_url)
-	if tracker_urls.is_empty():
-		return
-	var context_resource = _tube_client.get("context")
-	if context_resource == null:
-		push_warning("Cannot override signaling URL because Tube context is missing.")
-		return
-	var cloned_context = context_resource.duplicate(true)
-	if cloned_context == null:
-		push_warning("Cannot override signaling URL because Tube context clone failed.")
-		return
-	cloned_context.set("trackers_urls", tracker_urls)
-	_runtime_tube_context = cloned_context
-	_tube_client.set("context", _runtime_tube_context)
-
-func _parse_signaling_urls(signaling_url: String) -> Array[String]:
-	var raw := signaling_url.strip_edges()
-	if raw.is_empty():
-		return []
-	for separator in [";", " "]:
-		raw = raw.replace(separator, ",")
-	var urls: Array[String] = []
-	for item in raw.split(",", false):
-		var url := item.strip_edges()
-		if url.is_empty():
-			continue
-		if url.begins_with("ws://") or url.begins_with("wss://"):
-			urls.append(url)
-		else:
-			push_warning("Ignoring unsupported signaling URL '%s'. Expected ws:// or wss://." % url)
-	return urls
-
-func _on_tube_session_created() -> void:
-	_room_code = str(_tube_client.get("session_id"))
-	_pending_result_room_code = _room_code
-	emit_signal("tube_session_created", _room_code)
-
-func _on_tube_session_joined() -> void:
-	var joined_id := str(_tube_client.get("session_id"))
-	if not joined_id.is_empty():
-		_room_code = joined_id
-	_pending_result_room_code = _room_code
-	emit_signal("tube_session_joined", _room_code)
-
-func _on_tube_error_raised(code: int, message: String) -> void:
-	push_error("Tube error %s: %s" % [code, message])
-	_pending_result_error = "Tube error %s: %s" % [code, message]
-	emit_signal("tube_error", _pending_result_error)
-	if _pending_tube_action == "create":
-		_pending_tube_action = ""
-		emit_signal("tube_session_created", "")
-	elif _pending_tube_action == "join":
-		_pending_tube_action = ""
-		emit_signal("tube_session_joined", "")
+func _on_peer_disconnected(id: int) -> void:
+	print("Peer disconnected: ", id)
+	_despawn_player(id)
 
 func _on_connected_to_server() -> void:
-	_local_peer_id = _resolve_local_peer_id()
+	_local_peer_id = multiplayer.get_unique_id()
+	print("Connected to server as peer: ", _local_peer_id)
+	_spawn_player(_local_peer_id)
+	send_local_profile.rpc_id(1)
 
-func _on_peer_connected(_id: int) -> void:
-	_local_peer_id = _resolve_local_peer_id()
+func add_local_player() -> void:
+	_local_peer_id = 1
+	_spawn_player(_local_peer_id)
+	send_local_profile.rpc_id(1)
 
-func _resolve_local_peer_id() -> int:
-	if _tube_client and is_instance_valid(_tube_client):
-		var tube_peer_id := int(_tube_client.get("peer_id"))
-		if tube_peer_id > 0:
-			return tube_peer_id
-	return multiplayer.get_unique_id()
+func _spawn_player(peer_id: int) -> void:
+	var main = _scene_tree.root.get_node_or_null("Main")
+	if main == null:
+		push_error("Main node not found")
+		return
+	
+	var players_parent = main.get_node_or_null("World/Players")
+	if players_parent == null:
+		push_error("World/Players not found in scene")
+		return
+	
+	if players_parent.has_node(str(peer_id)):
+		return
+	
+	var spawn_points = main.get_node_or_null("World/LobbyMap/spawnPoints")
+	var spawn_pos := Vector3(0, 1, 0)
+	
+	if spawn_points and spawn_points.is_inside_tree():
+		var spawn_markers = []
+		for child in spawn_points.get_children():
+			if child.is_in_group("PlayerSpawn"):
+				spawn_markers.append(child)
+		if not spawn_markers.is_empty():
+			var idx = players_parent.get_child_count() % spawn_markers.size()
+			spawn_pos = spawn_markers[idx].global_position
+	
+	var new_player = PLAYER.instantiate()
+	new_player.name = str(peer_id)
+	new_player.position = spawn_pos
+	players_parent.add_child(new_player, true)
+	new_player.set_multiplayer_authority(peer_id)
+	print("Spawned player: ", peer_id, " at ", spawn_pos)
 
-func _resolve_active_peer() -> MultiplayerPeer:
-	if _tube_client and is_instance_valid(_tube_client):
-		var tube_peer: MultiplayerPeer = _tube_client.get("multiplayer_peer")
-		if tube_peer is MultiplayerPeer:
-			return tube_peer
-	return multiplayer.multiplayer_peer
+func _despawn_player(peer_id: int) -> void:
+	var main = _scene_tree.root.get_node_or_null("Main")
+	if main == null:
+		return
+	
+	var players_parent = main.get_node_or_null("World/Players")
+	if players_parent == null:
+		return
+	
+	var player_node = players_parent.get_node_or_null(str(peer_id))
+	if player_node:
+		player_node.queue_free()
+
+@rpc("authority", "call_local")
+func send_local_profile() -> void:
+	var local_id = multiplayer.get_unique_id()
+	var path = "Main/World/Players/" + str(local_id)
+	var player_node = _scene_tree.root.get_node_or_null(path)
+	if player_node and player_node.has_method("apply_remote_profile"):
+		player_node.apply_remote_profile(ProfileManager.username, "")
+	_apply_remote_profile_for_pending(local_id)
+
+func _apply_remote_profile_for_pending(peer_id: int) -> void:
+	if not _pending_profile_sync.has(peer_id):
+		return
+	
+	var main = _scene_tree.root.get_node_or_null("Main")
+	if main == null:
+		return
+	
+	var players_parent = main.get_node_or_null("World/Players")
+	if players_parent == null:
+		return
+	
+	var player_node = players_parent.get_node_or_null(str(peer_id))
+	if player_node == null:
+		return
+	
+	if not player_node.has_method("apply_remote_profile"):
+		return
+	
+	var profile = _pending_profile_sync[peer_id]
+	player_node.apply_remote_profile(
+		str(profile.get("player_name", "Player")),
+		str(profile.get("icon_png_base64", ""))
+	)
+	_pending_profile_sync.erase(peer_id)
+
+@rpc("any_peer", "call_local")
+func receive_player_profile(peer_id: int, player_name: String, icon_png_base64: String) -> void:
+	emit_signal("remote_profile_received", peer_id, player_name, icon_png_base64)
+	
+	if _scene_tree.current_scene == null:
+		_pending_profile_sync[peer_id] = {
+			"player_name": player_name,
+			"icon_png_base64": icon_png_base64
+		}
+		_apply_remote_profile_for_pending(peer_id)
+		return
+	
+	_apply_remote_profile_for_pending(peer_id)
+
+func leave_session() -> void:
+	if tube_enabled and tube_client and tube_client.has_method("leave_session"):
+		tube_client.call("leave_session")
+	
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	multiplayer.peer_connected.disconnect(_on_peer_connected)
+	multiplayer.peer_disconnected.disconnect(_on_peer_disconnected)
+	multiplayer.connected_to_server.disconnect(_on_connected_to_server)
+	
+	active_room_code = ""
+	_local_peer_id = 0
+
+func is_host() -> bool:
+	return _is_host
+
+func get_local_peer_id() -> int:
+	return _local_peer_id if _local_peer_id > 0 else multiplayer.get_unique_id()

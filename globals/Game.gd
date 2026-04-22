@@ -1,10 +1,10 @@
 # Game.gd attached to root node named "Game"
 extends Node3D
 
-func _ready():
-	# Tell server we're loaded and ready
-	Lobby.player_loaded.rpc_id(1) # 1 is typically server
+func _ready() -> void:
+	var lobby = get_tree().root.get_node_or_null("Lobby")
+	if lobby and lobby.has_method("player_loaded"):
+		lobby.player_loaded.rpc_id(1)
 	
-func start_game():
+func start_game() -> void:
 	print("Game start: server told us to begin")
-	# enable gameplay, remove loading screen, etc.
