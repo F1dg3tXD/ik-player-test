@@ -36,6 +36,8 @@ var pending_resolution: Vector2i
 var pending_window_mode: int
 var pending_vsync: bool
 
+var _lobby_signals_connected := false
+
 func _ready() -> void:
 	btn_single_player.disabled = true
 	_connect_audio_sliders()
@@ -46,7 +48,17 @@ func _ready() -> void:
 	_load_current_settings()
 	_load_profile_ui()
 	signaling_prompt.text = ""
+	_connect_lobby_signals()
 	_show_main()
+
+func _connect_lobby_signals() -> void:
+	if _lobby_signals_connected:
+		return
+	var lobby = $"/root/Lobby"
+	if lobby:
+		lobby.lobby_created.connect(_on_lobby_created)
+		lobby.lobby_joined.connect(_on_lobby_joined)
+		_lobby_signals_connected = true
 
 func _show_main() -> void:
 	main.show()
@@ -79,9 +91,7 @@ func _on_btn_host_pressed() -> void:
 	var lobby = $"/root/Lobby"
 	if lobby:
 		var result: Error = lobby.host_lobby("", signaling_url)
-		if result == OK:
-			lobby.lobby_created.connect(_on_lobby_created)
-		else:
+		if result != OK:
 			status_label.text = "Host failed: %s" % result
 	else:
 		status_label.text = "Lobby not available"
@@ -93,9 +103,7 @@ func _on_btn_join_pressed() -> void:
 	var lobby = $"/root/Lobby"
 	if lobby:
 		var result: Error = lobby.join_lobby(room, signaling_url)
-		if result == OK:
-			lobby.lobby_joined.connect(_on_lobby_joined)
-		else:
+		if result != OK:
 			status_label.text = "Join failed: %s" % result
 	else:
 		status_label.text = "Lobby not available"

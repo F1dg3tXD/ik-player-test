@@ -11,6 +11,7 @@ var _session_started := false
 var _last_seed := 0
 var _network_manager: Node = null
 var _scene_tree: SceneTree = null
+var _signals_connected := false
 
 func _ready() -> void:
 	_scene_tree = get_tree()
@@ -33,9 +34,10 @@ func host_lobby(room_code: String, signaling_url: String = "") -> Error:
 	return OK
 
 func join_lobby(room_code: String, signaling_url: String = "") -> Error:
-	if _network_manager:
+	if not _signals_connected and _network_manager:
 		_network_manager.session_joined.connect(_on_session_joined)
 		_network_manager.error_raised.connect(_on_lobby_error)
+		_signals_connected = true
 	
 	var result: Error = ERR_CANT_CREATE
 	if _network_manager:

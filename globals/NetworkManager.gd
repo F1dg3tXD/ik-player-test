@@ -19,6 +19,7 @@ var _local_peer_id := 1
 var _is_host := false
 
 var _pending_profile_sync: Dictionary = {}
+var _signals_connected := false
 
 @onready var _scene_tree := get_tree()
 
@@ -48,11 +49,17 @@ func _create_tube_client() -> void:
 	if tube_client.has_signal("error_raised"):
 		tube_client.connect("error_raised", Callable(self, "_on_tube_error"))
 
-func create_session(as_host: bool = true) -> Error:
-	_is_host = as_host
+func _ensure_multiplayer_signals() -> void:
+	if _signals_connected:
+		return
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	_signals_connected = true
+
+func create_session(as_host: bool = true) -> Error:
+	_is_host = as_host
+	_ensure_multiplayer_signals()
 	
 	_create_tube_client()
 	if tube_client.has_method("create_session"):
@@ -66,10 +73,7 @@ func create_session(as_host: bool = true) -> Error:
 func join_session(session_id: String) -> Error:
 	_is_host = false
 	active_room_code = session_id
-	
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	_ensure_multiplayer_signals()
 	
 	_create_tube_client()
 	if tube_client.has_method("join_session"):
@@ -84,16 +88,14 @@ func start_server() -> void:
 	var enet_peer := ENetMultiplayerPeer.new()
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	_ensure_multiplayer_signals()
 	_is_host = true
 
 func join_server() -> void:
 	var enet_peer := ENetMultiplayerPeer.new()
 	enet_peer.create_client(IP_ADDRESS, PORT)
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	_ensure_multiplayer_signals()
 	_is_host = false
 
 func _on_session_created() -> void:
@@ -125,12 +127,12 @@ func _on_connected_to_server() -> void:
 	_local_peer_id = multiplayer.get_unique_id()
 	print("Connected to server as peer: ", _local_peer_id)
 	_spawn_player(_local_peer_id)
-	send_local_profile.rpc_id(1)
+	send_local_profile.rpc(ProfileManager.username)
 
 func add_local_player() -> void:
 	_local_peer_id = 1
 	_spawn_player(_local_peer_id)
-	send_local_profile.rpc_id(1)
+	send_local_profile.rpc(ProfileManager.username)
 
 func _spawn_player(peer_id: int) -> void:
 	var main = _scene_tree.root.get_node_or_null("Main")
@@ -178,14 +180,18 @@ func _despawn_player(peer_id: int) -> void:
 	if player_node:
 		player_node.queue_free()
 
-@rpc("authority", "call_local")
-func send_local_profile() -> void:
-	var local_id = multiplayer.get_unique_id()
-	var path = "Main/World/Players/" + str(local_id)
+@rpc("any_peer", "call_remote")
+func send_local_profile(player_name: String) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	var path = "Main/World/Players/" + str(sender_id)
 	var player_node = _scene_tree.root.get_node_or_null(path)
 	if player_node and player_node.has_method("apply_remote_profile"):
-		player_node.apply_remote_profile(ProfileManager.username, "")
-	_apply_remote_profile_for_pending(local_id)
+		player_node.apply_remote_profile(player_name, "")
+	_apply_remote_profile_for_pending(sender_id)
+
+@rpc("authority", "call_local")
+func broadcast_profile(player_name: String) -> void:
+	send_local_profile.rpc(player_name)
 
 func _apply_remote_profile_for_pending(peer_id: int) -> void:
 	if not _pending_profile_sync.has(peer_id):

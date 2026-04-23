@@ -57,6 +57,9 @@ var _state_broadcast_timer := 0.0
 var _remote_position_target := Vector3.ZERO
 var _remote_body_yaw_target := 0.0
 var _remote_head_pitch_target := 0.0
+var _remote_roll_angle := 0.0
+var _remote_walker_rot_x := 0.0
+var _remote_walker_scale := Vector3.ONE
 
 # Player color 
 var beta_joints_mat := StandardMaterial3D.new()
@@ -99,6 +102,9 @@ func _process(delta: float) -> void:
 	global_position = global_position.lerp(_remote_position_target, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
 	rotation.y = lerp_angle(rotation.y, _remote_body_yaw_target, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
 	head.rotation.x = lerp_angle(head.rotation.x, _remote_head_pitch_target, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
+	roll_angle = lerp_angle(roll_angle, _remote_roll_angle, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
+	walker.rotation.x = lerp_angle(walker.rotation.x, _remote_walker_rot_x, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
+	walker.scale = walker.scale.lerp(_remote_walker_scale, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
 
 func _on_multiplayer_authority_changed() -> void:
 	_try_sync_profile()
@@ -203,7 +209,7 @@ func _broadcast_state(delta: float) -> void:
 	if _state_broadcast_timer < state_broadcast_interval:
 		return
 	_state_broadcast_timer = 0.0
-	_receive_state.rpc(global_position, rotation.y, head.rotation.x)
+	_receive_state.rpc(global_position, rotation.y, head.rotation.x, roll_angle, walker.rotation.x, walker.scale)
 
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
@@ -254,13 +260,16 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 		avatar_image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
-@rpc("authority", "call_local", "unreliable_ordered")
-func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float) -> void:
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float, w_roll: float, w_rot_x: float, w_scale: Vector3) -> void:
 	if is_multiplayer_authority():
 		return
 	_remote_position_target = world_pos
 	_remote_body_yaw_target = body_yaw
 	_remote_head_pitch_target = head_pitch
+	_remote_roll_angle = w_roll
+	_remote_walker_rot_x = w_rot_x
+	_remote_walker_scale = w_scale
 
 func apply_remote_profile(player_name: String, icon_png_base64: String) -> void:
 	var png_buffer := PackedByteArray()
@@ -279,11 +288,13 @@ func set_fly_mode(enabled: bool) -> void:
 	velocity = Vector3.ZERO
 
 func _on_color_changed(new_color: Color) -> void:
+	if not is_multiplayer_authority():
+		return
 	_player_color = new_color
 	_apply_player_color(new_color)
 	replicate_color.rpc(new_color)
 
-@rpc("authority", "call_local")
+@rpc("authority", "call_remote", "reliable")
 func replicate_color(color: Color) -> void:
 	_player_color = color
 	_apply_player_color(color)
