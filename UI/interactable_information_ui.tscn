@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dirdhwl8qjw1f"]
 
 [ext_resource type="Script" uid="uid://chbgr2vxyqimp" path="res://demo/dot_cursor.gd" id="1_h5loj"]
+[ext_resource type="Script" uid="uid://d1ci63v1u7wlg" path="res://UI/interactable_information_ui.gd" id="1_hc2sc"]
 
 [node name="InteractableInformation" type="CanvasLayer" unique_id=758454014]
+script = ExtResource("1_hc2sc")
 
 [node name="Control" type="Control" parent="." unique_id=240889336]
 layout_mode = 3
