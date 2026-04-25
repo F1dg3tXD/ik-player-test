@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://cold77sq3qokv"]
+
+[ext_resource type="Script" uid="uid://i512735p2pyn" path="res://addons/virtual_joystick_plus/virtual_joystick_plus.gd" id="1_jaqsx"]
+[ext_resource type="Texture2D" uid="uid://b760w4hq720uw" path="res://addons/virtual_joystick_plus/resources/textures/joystick_texture_4.png" id="2_tolcl"]
+[ext_resource type="Texture2D" uid="uid://bnch74vx41kcc" path="res://addons/virtual_joystick_plus/resources/textures/stick_texture_5.png" id="3_5xfds"]
+
+[node name="TouchUI" type="Control" unique_id=1207565686]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1199568192]
+
+[node name="left_stick" type="Control" parent="CanvasLayer" unique_id=1364648306]
+visible = false
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 2.0
+offset_top = 161.0
+offset_right = 557.0
+offset_bottom = 723.0
+pivot_offset = Vector2(277.5, 281)
+script = ExtResource("1_jaqsx")
+joystick_mode = 1
+only_mobile = true
+joystick_preset_texture = 4
+joystick_texture = ExtResource("2_tolcl")
+stick_texture = ExtResource("3_5xfds")
+metadata/_custom_type_script = "uid://i512735p2pyn"
+
+[node name="right_stick" type="Control" parent="CanvasLayer" unique_id=33816869]
+visible = false
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 655.0
+offset_top = -4.0
+offset_right = 1278.0
+offset_bottom = 724.0
+pivot_offset = Vector2(311.5, 364)
+script = ExtResource("1_jaqsx")
+joystick_mode = 1
+only_mobile = true
+joystick_preset_texture = 4
+joystick_texture = ExtResource("2_tolcl")
+stick_texture = ExtResource("3_5xfds")
+metadata/_custom_type_script = "uid://i512735p2pyn"

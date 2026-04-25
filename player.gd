@@ -1,7 +1,7 @@
 # player.gd
 extends CharacterBody3D
 
-class_name Player
+#class_name Player
 
 @export var SPEED := 5.0
 @export var ACCEL := 10.0
@@ -62,9 +62,12 @@ var _remote_walker_rot_x := 0.0
 var _remote_walker_scale := Vector3.ONE
 
 # Player color 
-var beta_joints_mat := StandardMaterial3D.new()
-var beta_surface_mat := StandardMaterial3D.new()
-var _player_color: Color = Color(0.612501, 0.38787553, 0.35089412)
+@export var beta_joints_mat := StandardMaterial3D.new()
+@export var beta_surface_mat := StandardMaterial3D.new()
+@export var _player_color: Color = Color(0.612501, 0.38787553, 0.35089412)
+
+# Interaction Ray
+@onready var ray_cast_interactor_3d: RayCastInteractor3D = $neck/head/Camera3D/RayCastInteractor3D
 
 func _enter_tree() -> void:
 	var peer_id := str(name).to_int()

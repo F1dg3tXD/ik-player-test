@@ -21,11 +21,21 @@ var _is_host := false
 var _pending_profile_sync: Dictionary = {}
 var _signals_connected := false
 
-@onready var _scene_tree := get_tree()
-
 func _ready() -> void:
 	if tube_enabled:
 		_create_tube_client()
+
+func _exit_tree() -> void:
+	_cleanup_tube_client()
+
+func _cleanup_tube_client() -> void:
+	if tube_client and is_instance_valid(tube_client):
+		if tube_client.has_method("leave_session"):
+			tube_client.call("leave_session")
+		if tube_client.has_method("destroy"):
+			tube_client.call("destroy")
+		tube_client.queue_free()
+	tube_client = null
 
 func _create_tube_client() -> void:
 	if tube_client and is_instance_valid(tube_client):
@@ -39,8 +49,8 @@ func _create_tube_client() -> void:
 		return
 	
 	tube_client.context = TUBE_CONTEXT
-	tube_client.set("multiplayer_root_node", _scene_tree.root)
-	_scene_tree.root.add_child.call_deferred(tube_client)
+	tube_client.set("multiplayer_root_node", get_tree().root)
+	get_tree().root.add_child.call_deferred(tube_client)
 	
 	if tube_client.has_signal("session_created"):
 		tube_client.connect("session_created", Callable(self, "_on_session_created"))
@@ -135,7 +145,7 @@ func add_local_player() -> void:
 	send_local_profile.rpc(ProfileManager.username)
 
 func _spawn_player(peer_id: int) -> void:
-	var main = _scene_tree.root.get_node_or_null("Main")
+	var main = get_tree().root.get_node_or_null("Main")
 	if main == null:
 		push_error("Main node not found")
 		return
@@ -168,7 +178,7 @@ func _spawn_player(peer_id: int) -> void:
 	print("Spawned player: ", peer_id, " at ", spawn_pos)
 
 func _despawn_player(peer_id: int) -> void:
-	var main = _scene_tree.root.get_node_or_null("Main")
+	var main = get_tree().root.get_node_or_null("Main")
 	if main == null:
 		return
 	
@@ -184,7 +194,7 @@ func _despawn_player(peer_id: int) -> void:
 func send_local_profile(player_name: String) -> void:
 	var sender_id = multiplayer.get_remote_sender_id()
 	var path = "Main/World/Players/" + str(sender_id)
-	var player_node = _scene_tree.root.get_node_or_null(path)
+	var player_node = get_tree().root.get_node_or_null(path)
 	if player_node and player_node.has_method("apply_remote_profile"):
 		player_node.apply_remote_profile(player_name, "")
 	_apply_remote_profile_for_pending(sender_id)
@@ -197,7 +207,7 @@ func _apply_remote_profile_for_pending(peer_id: int) -> void:
 	if not _pending_profile_sync.has(peer_id):
 		return
 	
-	var main = _scene_tree.root.get_node_or_null("Main")
+	var main = get_tree().root.get_node_or_null("Main")
 	if main == null:
 		return
 	
@@ -223,7 +233,7 @@ func _apply_remote_profile_for_pending(peer_id: int) -> void:
 func receive_player_profile(peer_id: int, player_name: String, icon_png_base64: String) -> void:
 	emit_signal("remote_profile_received", peer_id, player_name, icon_png_base64)
 	
-	if _scene_tree.current_scene == null:
+	if get_tree().current_scene == null:
 		_pending_profile_sync[peer_id] = {
 			"player_name": player_name,
 			"icon_png_base64": icon_png_base64

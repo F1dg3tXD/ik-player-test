@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://usec1q8m8m5i"]
+
+[resource]
+resource_name = "Beta_Joints_MAT1"
+cull_mode = 2
+albedo_color = Color(0.612501, 0.38787553, 0.35089412, 1)
+metallic = 0.5
+roughness = 0.5527864
