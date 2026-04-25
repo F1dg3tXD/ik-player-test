@@ -36,6 +36,13 @@ func _enter_tree() -> void:
 	)
 	
 	add_custom_type(
+		"PlayerGrabber3D",
+		"Node3D",
+		preload("res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/player_grabber_3d.gd"),
+		preload("res://addons/ninetailsrabbit.interaction_kit_3d/assets/grabber.svg")
+	)
+	
+	add_custom_type(
 		"GrabbableInteractor3D",
 		"RayCast3D",
 		preload("res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/grabbable_raycast_interactor_3d.gd"),
@@ -84,6 +91,7 @@ func _exit_tree() -> void:
 	remove_custom_type("GrabbableInteractor3D")
 	
 	remove_custom_type("Grabber3D")
+	remove_custom_type("PlayerGrabber3D")
 	remove_custom_type("GrabbableAreaDetector3D")
 	remove_custom_type("Grabbable3D")
 	remove_custom_type("Interactable3D")

@@ -4,6 +4,8 @@
 [ext_resource type="Material" uid="uid://usec1q8m8m5i" path="res://materials/player_joints.tres" id="2_i3pqv"]
 [ext_resource type="Script" uid="uid://b13ku4ha6ywfi" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/raycast_interactor_3d.gd" id="2_onrkg"]
 [ext_resource type="Material" uid="uid://t02mc5idqc57" path="res://materials/player_mesh.tres" id="3_hqtel"]
+[ext_resource type="Script" uid="uid://cjv0cckxt2gv4" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/grabbable_raycast_interactor_3d.gd" id="5_sweqy"]
+[ext_resource type="PackedScene" uid="uid://dirdhwl8qjw1f" path="res://UI/interactable_information_ui.tscn" id="6_2hs0m"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mjshs"]
 resource_name = "Beta_Joints_MAT1"
@@ -1254,6 +1256,12 @@ target_position = Vector3(0, -2, 0)
 script = ExtResource("2_onrkg")
 metadata/_custom_type_script = "uid://b13ku4ha6ywfi"
 
+[node name="GrabbableRayCastInteractor3D" type="RayCast3D" parent="neck/head/Camera3D" unique_id=231665851]
+transform = Transform3D(1, 8.742278e-08, -8.742278e-08, -8.742278e-08, -4.371139e-08, -1, -8.742278e-08, 1, -4.371138e-08, 0, 0, 0)
+target_position = Vector3(0, -2, 0)
+script = ExtResource("5_sweqy")
+metadata/_custom_type_script = "uid://cjv0cckxt2gv4"
+
 [node name="LookTarget" type="Node3D" parent="neck/head" unique_id=2077054665]
 transform = Transform3D(1, -9.334053e-08, 7.259832e-08, -7.3812124e-08, -0.013068594, 0.9999141, -9.2383814e-08, -0.99991465, -0.013068514, 4.0819735e-08, -0.018010497, 0.015722938)
 
@@ -1262,3 +1270,10 @@ transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.013
 
 [node name="SpineTarget" type="Marker3D" parent="neck/head/LookTarget" unique_id=2000576735]
 transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.01306852, -0.9999146, 7.342934e-08, 0.9999151, -0.013068601, -2.5093811e-08, -0.6358312, -0.45835948)
+
+[node name="InteractableInformation" parent="." unique_id=758454014 instance=ExtResource("6_2hs0m")]
+
+[node name="Control" parent="InteractableInformation" index="0" unique_id=240889336]
+visible = false
+
+[editable path="InteractableInformation"]

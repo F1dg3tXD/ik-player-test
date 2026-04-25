@@ -27,7 +27,7 @@ var original_rotation: Vector3 = Vector3.ZERO
 func _input(event: InputEvent) -> void:
 	if target:
 		if event is InputEventMouseMotion and mouse_button_holded(event):
-			var motion: InputEventMouseMotion = event.xformed_by(get_tree().root.get_final_transform())
+			var motion: InputEventMouseMotion = event
 			var mouse_sens: float = mouse_sensitivity / 1000.0 # radians/pixel, 3 becomes 0.003
 			
 			target.rotate_x(motion.relative.y * mouse_sens)

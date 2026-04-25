@@ -3,7 +3,7 @@ extends CanvasLayer
 signal scan_started(target: Node3D)
 signal scan_ended(target: Node3D)
 
-@onready var scan_interactable: ScanInteractable = %ScanInteractable
+@onready var scan_interactable: ScanInteractable = $Control/SubViewportContainer/SubViewport/ScanInteractable
 @onready var control: Control = $Control
 
 var original_mouse_mode: Input.MouseMode

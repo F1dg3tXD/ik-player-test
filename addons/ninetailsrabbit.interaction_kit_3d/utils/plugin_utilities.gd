@@ -91,7 +91,7 @@ static func camera_forward_direction(camera: Camera3D) -> Vector3:
 static func create_physics_timer(wait_time: float = 1.0, autostart: bool = false, one_shot: bool = false) -> Timer:
 	var timer = Timer.new()
 	timer.wait_time = wait_time
-	timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	timer.timer_process_mode = 1
 	timer.autostart = autostart
 	timer.one_shot = one_shot
 	
