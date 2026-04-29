@@ -18,73 +18,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
 
 [node name="Grabbable3D" parent="World" unique_id=1502447545 instance=ExtResource("3_lquwl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1204307, 0.5500021, 1.5885108)
-outline_shader_color = Color(1, 0, 0, 1)
-outline_hull_color = Color(1, 0, 0, 1)
-title = "Box"
 description = "It's just a box."
-title_translation_key = &"box"
 description_translation_key = &"it\'s just a box."
 
 [node name="Van" parent="." unique_id=510339525 instance=ExtResource("2_0xm2m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12556887, 0, -9.468712)
 
-[node name="PauseMenu" type="CanvasLayer" parent="." unique_id=125550001]
-visible = false
-
-[node name="PausePanel" type="PanelContainer" parent="PauseMenu" unique_id=125550002]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -120.0
-offset_right = 220.0
-offset_bottom = 120.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu/PausePanel" unique_id=125550003]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=125550004]
-layout_mode = 2
-text = "Pause Menu"
-horizontal_alignment = 1
-
-[node name="RoomCodeRow" type="HBoxContainer" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=125550005]
-layout_mode = 2
-
-[node name="RoomCodeLabel" type="Label" parent="PauseMenu/PausePanel/VBoxContainer/RoomCodeRow" unique_id=125550006]
-layout_mode = 2
-text = "Room Code"
-
-[node name="RoomCodeValue" type="LineEdit" parent="PauseMenu/PausePanel/VBoxContainer/RoomCodeRow" unique_id=125550007]
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "No active room"
-editable = false
-
-[node name="CopyRoomCodeButton" type="Button" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=125550008]
-layout_mode = 2
-text = "Copy Room Code"
-
-[node name="StatusLabel" type="Label" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=125550009]
-layout_mode = 2
-text = "Room code copy is host-only."
-horizontal_alignment = 1
-
-[node name="Color" type="Label" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=1166914561]
-layout_mode = 2
-text = "Player Color"
-horizontal_alignment = 1
-
-[node name="ColorPickerButton" type="ColorPickerButton" parent="PauseMenu/PausePanel/VBoxContainer" unique_id=1264015854]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-color = Color(0.612501, 0.38787553, 0.35089412, 1)
-
 [node name="Menu" parent="." unique_id=298708851 instance=ExtResource("1_ig7tw")]
-
-[connection signal="pressed" from="PauseMenu/PausePanel/VBoxContainer/CopyRoomCodeButton" to="." method="_on_copy_room_code_button_pressed"]
 
 [editable path="World/LobbyMap"]
 [editable path="World/LobbyMap/spawnPoints"]

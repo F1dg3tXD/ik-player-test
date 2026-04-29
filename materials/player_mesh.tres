@@ -3,5 +3,5 @@
 [resource]
 resource_name = "Beta_HighLimbsGeoSG3"
 cull_mode = 2
-albedo_color = Color(0.9246135, 0.58587474, 0.55036527, 1)
+albedo_color = Color(1, 0, 0, 1)
 roughness = 0.5527864

@@ -4,9 +4,9 @@
 [ext_resource type="Material" uid="uid://usec1q8m8m5i" path="res://materials/player_joints.tres" id="2_i3pqv"]
 [ext_resource type="Script" uid="uid://b13ku4ha6ywfi" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/raycast_interactor_3d.gd" id="2_onrkg"]
 [ext_resource type="Material" uid="uid://t02mc5idqc57" path="res://materials/player_mesh.tres" id="3_hqtel"]
+[ext_resource type="PackedScene" uid="uid://cxppw8ewlh284" path="res://UI/pause_menu.tscn" id="4_b26j0"]
 [ext_resource type="Script" uid="uid://cjv0cckxt2gv4" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/grabbable_raycast_interactor_3d.gd" id="5_sweqy"]
 [ext_resource type="Script" uid="uid://bu76uqckoi0qr" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/grabber_3d.gd" id="6_1jxqw"]
-[ext_resource type="PackedScene" uid="uid://dirdhwl8qjw1f" path="res://UI/interactable_information_ui.tscn" id="6_2hs0m"]
 [ext_resource type="Script" uid="uid://ck3fmuiux0uf1" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/grabbable_area_detector_3d.gd" id="7_dw050"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mjshs"]
@@ -700,8 +700,6 @@ radius = 0.8901367
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_onrkg")
-beta_joints_mat = ExtResource("2_i3pqv")
-beta_surface_mat = ExtResource("3_hqtel")
 
 [node name="player_mdl" type="Node3D" parent="." unique_id=141917622]
 
@@ -1078,13 +1076,11 @@ bones/51/scale = Vector3(1, 0.99999994, 1)
 mesh = SubResource("ArrayMesh_0lnck")
 skin = SubResource("Skin_6cf3j")
 skeleton = NodePath("..")
-surface_material_override/0 = ExtResource("2_i3pqv")
 
 [node name="Beta_Surface" type="MeshInstance3D" parent="player_mdl/Armature/Skeleton3D" unique_id=21816873]
 mesh = SubResource("ArrayMesh_iqboh")
 skin = SubResource("Skin_6cf3j")
 skeleton = NodePath("..")
-surface_material_override/0 = ExtResource("3_hqtel")
 
 [node name="LeftLegIK3D" type="TwoBoneIK3D" parent="player_mdl/Armature/Skeleton3D" unique_id=402197417]
 setting_count = 1
@@ -1295,6 +1291,10 @@ transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.013
 [node name="SpineTarget" type="Marker3D" parent="neck/head/LookTarget" unique_id=2000576735]
 transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.01306852, -0.9999146, 7.342934e-08, 0.9999151, -0.013068601, -2.5093811e-08, -0.6358312, -0.45835948)
 
-[node name="InteractableInformation" parent="." unique_id=758454014 instance=ExtResource("6_2hs0m")]
+[node name="PauseMenu" parent="." unique_id=1935236065 instance=ExtResource("4_b26j0")]
+visible = false
 
-[editable path="InteractableInformation"]
+[connection signal="color_changed" from="PauseMenu/PausePanel/VBoxContainer/ColorRow/JointsColorPicker" to="." method="_on_joints_color_changed"]
+[connection signal="color_changed" from="PauseMenu/PausePanel/VBoxContainer/ColorRow/SurfaceColorPicker" to="." method="_on_surface_color_changed"]
+
+[editable path="PauseMenu"]

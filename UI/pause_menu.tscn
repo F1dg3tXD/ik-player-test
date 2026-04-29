@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://cxppw8ewlh284"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=1935236065]
+
+[node name="PausePanel" type="PanelContainer" parent="." unique_id=8562570]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -120.0
+offset_right = 220.0
+offset_bottom = 120.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel" unique_id=1731990860]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PausePanel/VBoxContainer" unique_id=1294862281]
+layout_mode = 2
+text = "Pause Menu"
+horizontal_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="PausePanel/VBoxContainer" unique_id=999807744]
+layout_mode = 2
+
+[node name="RoomCodeRow" type="HBoxContainer" parent="PausePanel/VBoxContainer" unique_id=20693243]
+layout_mode = 2
+
+[node name="RoomCodeLabel" type="Label" parent="PausePanel/VBoxContainer/RoomCodeRow" unique_id=750875667]
+layout_mode = 2
+text = "Room Code"
+
+[node name="RoomCodeValue" type="LineEdit" parent="PausePanel/VBoxContainer/RoomCodeRow" unique_id=2135390040]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "No active room"
+editable = false
+
+[node name="CopyRoomCodeButton" type="Button" parent="PausePanel/VBoxContainer" unique_id=1526083542]
+layout_mode = 2
+text = "Copy Room Code"
+
+[node name="StatusLabel" type="Label" parent="PausePanel/VBoxContainer" unique_id=499316863]
+layout_mode = 2
+text = "Room code copy is host-only."
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="PausePanel/VBoxContainer" unique_id=1558793106]
+layout_mode = 2
+
+[node name="ColorRow" type="HBoxContainer" parent="PausePanel/VBoxContainer" unique_id=406676903]
+layout_mode = 2
+alignment = 1
+
+[node name="JointsColorLabel" type="Label" parent="PausePanel/VBoxContainer/ColorRow" unique_id=463620625]
+layout_mode = 2
+text = "Joints"
+
+[node name="JointsColorPicker" type="ColorPickerButton" parent="PausePanel/VBoxContainer/ColorRow" unique_id=473945120]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.612501, 0.38787553, 0.35089412, 1)
+
+[node name="SurfaceColorLabel" type="Label" parent="PausePanel/VBoxContainer/ColorRow" unique_id=385366724]
+layout_mode = 2
+text = "Surface"
+
+[node name="SurfaceColorPicker" type="ColorPickerButton" parent="PausePanel/VBoxContainer/ColorRow" unique_id=159410309]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.9246135, 0.58587474, 0.55036527, 1)
+
+[node name="HSeparator" type="HSeparator" parent="PausePanel/VBoxContainer" unique_id=93126665]
+layout_mode = 2
+
+[node name="OptionsRow" type="HBoxContainer" parent="PausePanel/VBoxContainer" unique_id=1801334505]
+layout_mode = 2
+alignment = 1
+
+[node name="OptionsButton" type="Button" parent="PausePanel/VBoxContainer/OptionsRow" unique_id=1680215717]
+layout_mode = 2
+text = "Options"
+
+[node name="DisconnectButton" type="Button" parent="PausePanel/VBoxContainer/OptionsRow" unique_id=304024483]
+layout_mode = 2
+text = "Disconnect"
+
+[node name="QuitGameButton" type="Button" parent="PausePanel/VBoxContainer/OptionsRow" unique_id=842272600]
+layout_mode = 2
+text = "Quit Game"

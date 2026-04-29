@@ -3,6 +3,7 @@ extends Node
 signal remote_profile_received(peer_id: int, player_name: String, icon_png_base64: String)
 signal session_created(room_code: String)
 signal session_joined(room_code: String)
+signal session_ended()
 signal error_raised(message: String)
 
 const PLAYER = preload("res://player.tscn")
@@ -257,6 +258,8 @@ func leave_session() -> void:
 	
 	active_room_code = ""
 	_local_peer_id = 0
+	
+	emit_signal("session_ended")
 
 func is_host() -> bool:
 	return _is_host

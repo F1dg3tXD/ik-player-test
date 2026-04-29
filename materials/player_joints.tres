@@ -3,6 +3,6 @@
 [resource]
 resource_name = "Beta_Joints_MAT1"
 cull_mode = 2
-albedo_color = Color(0.612501, 0.38787553, 0.35089412, 1)
+albedo_color = Color(0.99747735, 0.99777657, 0.99873096, 1)
 metallic = 0.5
 roughness = 0.5527864

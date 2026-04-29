@@ -61,10 +61,28 @@ var _remote_roll_angle := 0.0
 var _remote_walker_rot_x := 0.0
 var _remote_walker_scale := Vector3.ONE
 
-# Player color 
-@export var beta_joints_mat := StandardMaterial3D.new()
-@export var beta_surface_mat := StandardMaterial3D.new()
-@export var _player_color: Color = Color(0.612501, 0.38787553, 0.35089412)
+# Player colors 
+const JOINTS_MATERIAL := preload("res://materials/player_joints.tres")
+const SURFACE_MATERIAL := preload("res://materials/player_mesh.tres")
+
+var beta_joints_mat: StandardMaterial3D
+var beta_surface_mat: StandardMaterial3D
+var _joints_color: Color = Color(0.612501, 0.38787553, 0.35089412)
+var _surface_color: Color = Color(0.9246135, 0.58587474, 0.55036527)
+
+# UI elements
+@onready var pause_menu: CanvasLayer = $PauseMenu
+@onready var joints_color_picker: ColorPickerButton = $PauseMenu/PausePanel/VBoxContainer/ColorRow/JointsColorPicker
+@onready var surface_color_picker: ColorPickerButton = $PauseMenu/PausePanel/VBoxContainer/ColorRow/SurfaceColorPicker
+@onready var room_code_value: LineEdit = $PauseMenu/PausePanel/VBoxContainer/RoomCodeRow/RoomCodeValue
+@onready var copy_room_code_button: Button = $PauseMenu/PausePanel/VBoxContainer/CopyRoomCodeButton
+@onready var status_label: Label = $PauseMenu/PausePanel/VBoxContainer/StatusLabel
+@onready var disconnect_button: Button = $PauseMenu/PausePanel/VBoxContainer/OptionsRow/DisconnectButton
+@onready var quit_game_button: Button = $PauseMenu/PausePanel/VBoxContainer/OptionsRow/QuitGameButton
+
+var is_paused: bool = false
+
+@onready var lobby_node: Node = null
 
 # Interaction Ray
 @onready var ray_cast_interactor_3d: RayCastInteractor3D = $neck/head/Camera3D/RayCastInteractor3D
@@ -75,11 +93,12 @@ func _enter_tree() -> void:
 		set_multiplayer_authority(peer_id)
 
 func _ready() -> void:
-	beta_joints_mat.albedo_color = _player_color
-	beta_surface_mat.albedo_color = _player_color
+	beta_joints_mat = JOINTS_MATERIAL.duplicate()
+	beta_surface_mat = SURFACE_MATERIAL.duplicate()
+	beta_joints_mat.albedo_color = _joints_color
+	beta_surface_mat.albedo_color = _surface_color
 	beta_joints.set_surface_override_material(0, beta_joints_mat)
 	beta_surface.set_surface_override_material(0, beta_surface_mat)
-	_apply_player_color(_player_color)
 
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")
@@ -98,6 +117,27 @@ func _ready() -> void:
 		_remote_head_pitch_target = head.rotation.x
 
 	_try_sync_profile()
+
+	lobby_node = get_tree().root.get_node_or_null("Lobby")
+
+	if is_multiplayer_authority() and joints_color_picker and surface_color_picker:
+		joints_color_picker.color = _joints_color
+		surface_color_picker.color = _surface_color
+	
+	if is_multiplayer_authority():
+		if pause_menu:
+			pause_menu.visible = false
+		if copy_room_code_button:
+			copy_room_code_button.pressed.connect(_on_copy_room_code_button_pressed)
+			_update_pause_menu_for_role()
+		if disconnect_button:
+			disconnect_button.pressed.connect(_on_disconnect_pressed)
+		if quit_game_button:
+			quit_game_button.pressed.connect(_on_quit_game_pressed)
+		if lobby_node:
+			lobby_node.lobby_created.connect(_on_lobby_state_updated)
+			lobby_node.lobby_joined.connect(_on_lobby_state_updated)
+		NetworkManager.session_ended.connect(_on_session_ended)
 
 func _process(delta: float) -> void:
 	if is_multiplayer_authority():
@@ -121,6 +161,14 @@ func _try_sync_profile() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
 		return
+	
+	if event.is_action_pressed("pause"):
+		_toggle_pause_menu()
+		return
+	
+	if is_paused:
+		return
+		
 	if event is InputEventMouseMotion:
 		# Yaw rotates the body
 		rotation.y -= event.relative.x * mouse_sensitivity
@@ -290,18 +338,112 @@ func set_fly_mode(enabled: bool) -> void:
 
 	velocity = Vector3.ZERO
 
-func _on_color_changed(new_color: Color) -> void:
+func _on_color_changed(joints_color: Color, surface_color: Color) -> void:
 	if not is_multiplayer_authority():
 		return
-	_player_color = new_color
-	_apply_player_color(new_color)
-	replicate_color.rpc(new_color)
+	_joints_color = joints_color
+	_surface_color = surface_color
+	_apply_player_colors()
+	replicate_colors.rpc(joints_color, surface_color)
+
+func _on_joints_color_changed(color: Color) -> void:
+	if not is_multiplayer_authority():
+		return
+	_joints_color = color
+	_apply_player_colors()
+	replicate_colors.rpc(_joints_color, _surface_color)
+
+func _on_surface_color_changed(color: Color) -> void:
+	if not is_multiplayer_authority():
+		return
+	_surface_color = color
+	_apply_player_colors()
+	replicate_colors.rpc(_joints_color, _surface_color)
 
 @rpc("authority", "call_remote", "reliable")
-func replicate_color(color: Color) -> void:
-	_player_color = color
-	_apply_player_color(color)
+func replicate_colors(joints_color: Color, surface_color: Color) -> void:
+	_joints_color = joints_color
+	_surface_color = surface_color
+	_apply_player_colors()
 
-func _apply_player_color(color: Color) -> void:
-	beta_joints_mat.albedo_color = color
-	beta_surface_mat.albedo_color = color
+func get_joints_color() -> Color:
+	return _joints_color
+
+func get_surface_color() -> Color:
+	return _surface_color
+
+func _apply_player_colors() -> void:
+	beta_joints_mat.albedo_color = _joints_color
+	beta_surface_mat.albedo_color = _surface_color
+
+func _toggle_pause_menu() -> void:
+	if pause_menu == null:
+		return
+	is_paused = not is_paused
+	pause_menu.visible = is_paused
+	if is_paused:
+		_update_pause_menu_for_role()
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	else:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func _update_pause_menu_for_role() -> void:
+	if status_label == null:
+		return
+	
+	var room_code_val := ""
+	if lobby_node != null:
+		var ac = lobby_node.get("active_room_code")
+		if ac != null:
+			room_code_val = ac
+	
+	if room_code_val.is_empty():
+		room_code_val = "(No lobby room code available)"
+	if room_code_value:
+		room_code_value.text = room_code_val
+
+	var can_copy: bool = multiplayer.is_server()
+	if lobby_node != null and lobby_node.has_method("_is_dedicated_server_mode"):
+		var is_dedicated: bool = lobby_node.call("_is_dedicated_server_mode")
+		can_copy = can_copy and not is_dedicated
+	if copy_room_code_button:
+		copy_room_code_button.visible = can_copy
+	if room_code_value:
+		room_code_value.editable = false
+
+	if can_copy:
+		status_label.text = "Host room code available for sharing."
+	else:
+		status_label.text = "Room code copy is host-only."
+
+func _on_copy_room_code_button_pressed() -> void:
+	if lobby_node != null:
+		var ac = lobby_node.get("active_room_code")
+		if ac != null and ac != "":
+			DisplayServer.clipboard_set(ac)
+			status_label.text = "Room code copied to clipboard."
+			return
+	status_label.text = "No room code to copy yet."
+
+func _on_lobby_state_updated(_room_code: String) -> void:
+	_update_pause_menu_for_role()
+
+func _on_disconnect_pressed() -> void:
+	is_paused = false
+	if pause_menu:
+		pause_menu.visible = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	get_tree().root.get_node("Main/Menu").visible = true
+	NetworkManager.leave_session()
+
+func _on_quit_game_pressed() -> void:
+	NetworkManager.leave_session()
+	get_tree().quit()
+
+func _on_session_ended() -> void:
+	is_paused = false
+	if pause_menu:
+		pause_menu.visible = true
+		_update_pause_menu_for_role()
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	get_tree().root.get_node("Main/Menu").visible = true
