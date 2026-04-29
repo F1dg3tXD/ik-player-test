@@ -21,6 +21,8 @@ var _is_host := false
 
 var _pending_profile_sync: Dictionary = {}
 var _signals_connected := false
+var _host_username := ""
+var _host_icon_png: PackedByteArray = PackedByteArray()
 
 func _ready() -> void:
 	if tube_enabled:
@@ -110,9 +112,12 @@ func join_server() -> void:
 	_is_host = false
 
 func _on_session_created() -> void:
+	ProfileManager.load_profile()
 	active_room_code = str(tube_client.get("session_id"))
 	_local_peer_id = 1
 	_is_host = true
+	_host_username = ProfileManager.username
+	_host_icon_png = ProfileManager.get_icon_png_buffer()
 	print("Session created: ", active_room_code)
 	emit_signal("session_created", active_room_code)
 	add_local_player()
@@ -129,6 +134,7 @@ func _on_tube_error(code: int, message: String) -> void:
 func _on_peer_connected(id: int) -> void:
 	print("Peer connected: ", id)
 	_spawn_player(id)
+	send_local_profile_with_icon.rpc(_host_username, _host_icon_png)
 
 func _on_peer_disconnected(id: int) -> void:
 	print("Peer disconnected: ", id)
@@ -137,13 +143,15 @@ func _on_peer_disconnected(id: int) -> void:
 func _on_connected_to_server() -> void:
 	_local_peer_id = multiplayer.get_unique_id()
 	print("Connected to server as peer: ", _local_peer_id)
+	ProfileManager.load_profile()
 	_spawn_player(_local_peer_id)
-	send_local_profile.rpc(ProfileManager.username)
+	send_local_profile_with_icon.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
 
 func add_local_player() -> void:
 	_local_peer_id = 1
+	ProfileManager.load_profile()
 	_spawn_player(_local_peer_id)
-	send_local_profile.rpc(ProfileManager.username)
+	send_local_profile_with_icon.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
 
 func _spawn_player(peer_id: int) -> void:
 	var main = get_tree().root.get_node_or_null("Main")
@@ -191,18 +199,21 @@ func _despawn_player(peer_id: int) -> void:
 	if player_node:
 		player_node.queue_free()
 
+@rpc("authority", "call_local")
+func broadcast_profile(player_name: String) -> void:
+	send_local_profile_with_icon.rpc(player_name, _host_icon_png)
+
 @rpc("any_peer", "call_remote")
-func send_local_profile(player_name: String) -> void:
+func send_local_profile_with_icon(player_name: String, icon_png: PackedByteArray) -> void:
 	var sender_id = multiplayer.get_remote_sender_id()
 	var path = "Main/World/Players/" + str(sender_id)
 	var player_node = get_tree().root.get_node_or_null(path)
 	if player_node and player_node.has_method("apply_remote_profile"):
-		player_node.apply_remote_profile(player_name, "")
+		var icon_base64 := ""
+		if not icon_png.is_empty():
+			icon_base64 = Marshalls.raw_to_base64(icon_png)
+		player_node.apply_remote_profile(player_name, icon_base64)
 	_apply_remote_profile_for_pending(sender_id)
-
-@rpc("authority", "call_local")
-func broadcast_profile(player_name: String) -> void:
-	send_local_profile.rpc(player_name)
 
 func _apply_remote_profile_for_pending(peer_id: int) -> void:
 	if not _pending_profile_sync.has(peer_id):
@@ -258,6 +269,8 @@ func leave_session() -> void:
 	
 	active_room_code = ""
 	_local_peer_id = 0
+	_host_username = ""
+	_host_icon_png = PackedByteArray()
 	
 	emit_signal("session_ended")
 

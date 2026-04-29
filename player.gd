@@ -19,7 +19,7 @@ var roll_angle: float = 0.0
 @onready var beta_surface: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_Surface
 
 var horizontal_vel := Vector3.ZERO
-var _profile_synced := false
+var _profile_loaded_attempted := false
 
 @export var MOUSE_SENS := 0.002
 @export var TURN_SPEED := 8.0
@@ -60,6 +60,8 @@ var _remote_head_pitch_target := 0.0
 var _remote_roll_angle := 0.0
 var _remote_walker_rot_x := 0.0
 var _remote_walker_scale := Vector3.ONE
+var _remote_head_target_pos := Vector3.ZERO
+var _remote_spine_target_pos := Vector3.ZERO
 
 # Player colors 
 const JOINTS_MATERIAL := preload("res://materials/player_joints.tres")
@@ -86,6 +88,10 @@ var is_paused: bool = false
 
 # Interaction Ray
 @onready var ray_cast_interactor_3d: RayCastInteractor3D = $neck/head/Camera3D/RayCastInteractor3D
+@onready var head_target: Marker3D = $neck/head/LookTarget/HeadTarget
+@onready var spine_target: Marker3D = $neck/head/LookTarget/SpineTarget
+@onready var head_look: Node3D = $player_mdl/Armature/Skeleton3D/HeadLook
+@onready var chest_look: Node3D = $player_mdl/Armature/Skeleton3D/ChestLook
 
 func _enter_tree() -> void:
 	var peer_id := str(name).to_int()
@@ -110,6 +116,10 @@ func _ready() -> void:
 		name_plate.visible = false
 		beta_joints.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		beta_surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		if head_look and "enabled" in head_look:
+			head_look.set("enabled", true)
+		if chest_look and "enabled" in chest_look:
+			chest_look.set("enabled", true)
 	else:
 		camera_3d.current = false
 		_remote_position_target = global_position
@@ -148,14 +158,19 @@ func _process(delta: float) -> void:
 	roll_angle = lerp_angle(roll_angle, _remote_roll_angle, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
 	walker.rotation.x = lerp_angle(walker.rotation.x, _remote_walker_rot_x, clamp(delta * remote_rotation_lerp_speed, 0.0, 1.0))
 	walker.scale = walker.scale.lerp(_remote_walker_scale, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
+	if head_target and is_instance_valid(head_target):
+		head_target.global_position = head_target.global_position.lerp(_remote_head_target_pos, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
+	if spine_target and is_instance_valid(spine_target):
+		spine_target.global_position = spine_target.global_position.lerp(_remote_spine_target_pos, clamp(delta * remote_position_lerp_speed, 0.0, 1.0))
 
 func _on_multiplayer_authority_changed() -> void:
 	_try_sync_profile()
 
 func _try_sync_profile() -> void:
-	if _profile_synced or not is_multiplayer_authority():
+	if not is_multiplayer_authority():
 		return
-	_profile_synced = true
+	
+	ProfileManager.load_profile()
 	_sync_profile.rpc(ProfileManager.username, ProfileManager.get_icon_png_buffer())
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -260,7 +275,16 @@ func _broadcast_state(delta: float) -> void:
 	if _state_broadcast_timer < state_broadcast_interval:
 		return
 	_state_broadcast_timer = 0.0
-	_receive_state.rpc(global_position, rotation.y, head.rotation.x, roll_angle, walker.rotation.x, walker.scale)
+	_receive_state.rpc(
+		global_position, 
+		rotation.y, 
+		head.rotation.x, 
+		roll_angle, 
+		walker.rotation.x, 
+		walker.scale,
+		head_target.global_position,
+		spine_target.global_position
+	)
 
 func update_walker(delta: float) -> void:
 	var local_vel: Vector3 = player_mdl.global_transform.basis.inverse() * horizontal_vel
@@ -297,7 +321,7 @@ func update_walker(delta: float) -> void:
 	var target_yaw: float = deg_to_rad(0.0) * strafe_dir
 	walker.rotation.y = lerp(walker.rotation.y, target_yaw, delta * 8.0)
 
-@rpc("authority", "call_local", "reliable")
+@rpc("authority", "call_remote", "reliable")
 func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 	var safe_name := player_name.strip_edges()
 	if safe_name.is_empty():
@@ -312,7 +336,7 @@ func _sync_profile(player_name: String, icon_png: PackedByteArray) -> void:
 	avatar_sprite.texture = ImageTexture.create_from_image(avatar_image)
 
 @rpc("any_peer", "call_remote", "unreliable_ordered")
-func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float, w_roll: float, w_rot_x: float, w_scale: Vector3) -> void:
+func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float, w_roll: float, w_rot_x: float, w_scale: Vector3, head_target_pos: Vector3, spine_target_pos: Vector3) -> void:
 	if is_multiplayer_authority():
 		return
 	_remote_position_target = world_pos
@@ -321,6 +345,8 @@ func _receive_state(world_pos: Vector3, body_yaw: float, head_pitch: float, w_ro
 	_remote_roll_angle = w_roll
 	_remote_walker_rot_x = w_rot_x
 	_remote_walker_scale = w_scale
+	_remote_head_target_pos = head_target_pos
+	_remote_spine_target_pos = spine_target_pos
 
 func apply_remote_profile(player_name: String, icon_png_base64: String) -> void:
 	var png_buffer := PackedByteArray()

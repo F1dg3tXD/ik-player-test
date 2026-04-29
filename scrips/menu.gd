@@ -17,6 +17,8 @@ extends Node2D
 # Profile UI
 @onready var username_prompt: LineEdit = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/UsernameRow/UsernamePrompt
 @onready var icon_path_prompt: LineEdit = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow/IconPathPrompt
+@onready var icon_button: Button = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow/Button
+@onready var icon_file_dialog: FileDialog = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow/FileDialog
 
 # Graphics
 @onready var resolutions: OptionButton = $main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Graphics/Resolution/Resolutions
@@ -49,7 +51,14 @@ func _ready() -> void:
 	_load_profile_ui()
 	signaling_prompt.text = ""
 	_connect_lobby_signals()
+	_connect_file_dialog()
 	_show_main()
+
+func _connect_file_dialog() -> void:
+	if icon_file_dialog:
+		icon_file_dialog.file_selected.connect(_on_icon_file_selected)
+	if icon_button:
+		icon_button.pressed.connect(_on_icon_button_pressed)
 
 func _connect_lobby_signals() -> void:
 	if _lobby_signals_connected:
@@ -238,3 +247,10 @@ func _load_current_settings() -> void:
 func _load_profile_ui() -> void:
 	username_prompt.text = ProfileManager.username
 	icon_path_prompt.text = ProfileManager.icon_path
+
+func _on_icon_button_pressed() -> void:
+	if icon_file_dialog:
+		icon_file_dialog.popup_centered_ratio(0.5)
+
+func _on_icon_file_selected(path: String) -> void:
+	icon_path_prompt.text = path

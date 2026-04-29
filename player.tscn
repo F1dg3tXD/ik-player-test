@@ -1,9 +1,7 @@
 [gd_scene format=4 uid="uid://b5h3gn2xc5hv7"]
 
 [ext_resource type="Script" uid="uid://bkhcmto3sxbkw" path="res://player.gd" id="1_onrkg"]
-[ext_resource type="Material" uid="uid://usec1q8m8m5i" path="res://materials/player_joints.tres" id="2_i3pqv"]
 [ext_resource type="Script" uid="uid://b13ku4ha6ywfi" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/raycast_interactor_3d.gd" id="2_onrkg"]
-[ext_resource type="Material" uid="uid://t02mc5idqc57" path="res://materials/player_mesh.tres" id="3_hqtel"]
 [ext_resource type="PackedScene" uid="uid://cxppw8ewlh284" path="res://UI/pause_menu.tscn" id="4_b26j0"]
 [ext_resource type="Script" uid="uid://cjv0cckxt2gv4" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/grabbable_raycast_interactor_3d.gd" id="5_sweqy"]
 [ext_resource type="Script" uid="uid://bu76uqckoi0qr" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/grabber_3d.gd" id="6_1jxqw"]
@@ -696,6 +694,20 @@ viewport_path = NodePath("SteamName")
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_b26j0"]
 radius = 0.8901367
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_2hs0m"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("neck/head/LookTarget/HeadTarget:position")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("player_mdl/roller/walker:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+
 [node name="player" type="CharacterBody3D" unique_id=931792228 groups=["Player"]]
 collision_layer = 2
 collision_mask = 3
@@ -1293,6 +1305,9 @@ transform = Transform3D(1, -7.381198e-08, -2.8810774e-08, -2.9772934e-08, -0.013
 
 [node name="PauseMenu" parent="." unique_id=1935236065 instance=ExtResource("4_b26j0")]
 visible = false
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=506749236]
+replication_config = SubResource("SceneReplicationConfig_2hs0m")
 
 [connection signal="color_changed" from="PauseMenu/PausePanel/VBoxContainer/ColorRow/JointsColorPicker" to="." method="_on_joints_color_changed"]
 [connection signal="color_changed" from="PauseMenu/PausePanel/VBoxContainer/ColorRow/SurfaceColorPicker" to="." method="_on_surface_color_changed"]

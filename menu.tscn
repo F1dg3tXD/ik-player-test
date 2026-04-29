@@ -123,7 +123,6 @@ layout_mode = 2
 text = "Back"
 
 [node name="OptionsMenuHead" type="Control" parent="main/Menu" unique_id=854969838]
-visible = false
 anchors_preset = 0
 offset_top = -50.0
 offset_right = 40.0
@@ -138,9 +137,10 @@ offset_bottom = 40.0
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme = ExtResource("2_4hy44")
-current_tab = 0
+current_tab = 2
 
 [node name="Graphics" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu" unique_id=588385908]
+visible = false
 custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
 metadata/_tab_index = 0
@@ -337,7 +337,6 @@ ticks_on_borders = true
 ticks_position = 3
 
 [node name="Profile" type="VBoxContainer" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu" unique_id=1747928007]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -360,12 +359,25 @@ layout_mode = 2
 [node name="Label" type="Label" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=1375343267]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "Icon Path"
+text = "Select Icon"
 
 [node name="IconPathPrompt" type="LineEdit" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=221013873]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "C:/Users/.../avatar.png"
+
+[node name="Button" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=515379946]
+layout_mode = 2
+text = "Open Image Selector"
+
+[node name="FileDialog" type="FileDialog" parent="main/Menu/OptionsMenuHead/VBoxContainer/OptionsMenu/Profile/IconRow" unique_id=1284635170]
+oversampling_override = 1.0
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray(".png", ".jpg", ".gif", ".jpeg")
+use_native_dialog = true
 
 [node name="Back" type="Button" parent="main/Menu/OptionsMenuHead/VBoxContainer" unique_id=548933785]
 layout_mode = 2
