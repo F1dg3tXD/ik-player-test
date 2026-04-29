@@ -275,6 +275,10 @@ func _broadcast_state(delta: float) -> void:
 	if _state_broadcast_timer < state_broadcast_interval:
 		return
 	_state_broadcast_timer = 0.0
+	
+	if not multiplayer.has_multiplayer_peer() or multiplayer.get_multiplayer_peer().get_connection_status() != multiplayer.get_multiplayer_peer().CONNECTION_CONNECTED:
+		return
+	
 	_receive_state.rpc(
 		global_position, 
 		rotation.y, 
