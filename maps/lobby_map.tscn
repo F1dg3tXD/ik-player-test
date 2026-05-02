@@ -71,13 +71,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
 transform = Transform3D(-1, 0, -8.940697e-08, 0, 1, 0, 8.940697e-08, 0, -1, 0, 2.0429358, 7)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Mirror" unique_id=255951234]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.528941e-08, 0, 0.2828579)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8086786e-07, 0, -2.022972)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Mirror/StaticBody3D" unique_id=22455909]
-transform = Transform3D(1, 8.940697e-08, 8.9406974e-08, -8.940697e-08, -4.371139e-08, 1.0000001, 8.9406996e-08, -1, -4.3711378e-08, 2.1585038e-08, 0, -0.24142456)
+transform = Transform3D(1, 8.940697e-08, 8.9406974e-08, -8.940697e-08, -4.371139e-08, 1.0000001, 8.9406996e-08, -1, -4.3711378e-08, 3.7475274e-08, 0, -0.41915417)
 shape = SubResource("BoxShape3D_jwr0y")
 
 [node name="Mirror3D" parent="Mirror" unique_id=916837440 instance=ExtResource("3_rtbyf")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2.1213708e-07, 0, -2.372713)
 size = Vector2(10, 4)
+cull_far = 20.0
+freeze_distance = 23.0
+max_fps = 60.0
 
 [editable path="spawnPoints"]
