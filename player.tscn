@@ -1,11 +1,7 @@
 [gd_scene format=4 uid="uid://b5h3gn2xc5hv7"]
 
 [ext_resource type="Script" uid="uid://bkhcmto3sxbkw" path="res://player.gd" id="1_onrkg"]
-[ext_resource type="Script" uid="uid://b13ku4ha6ywfi" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/raycast_interactor_3d.gd" id="2_onrkg"]
 [ext_resource type="PackedScene" uid="uid://cxppw8ewlh284" path="res://UI/pause_menu.tscn" id="4_b26j0"]
-[ext_resource type="Script" uid="uid://cjv0cckxt2gv4" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/interactors/grabbable_raycast_interactor_3d.gd" id="5_sweqy"]
-[ext_resource type="Script" uid="uid://bu76uqckoi0qr" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/grabber_3d.gd" id="6_1jxqw"]
-[ext_resource type="Script" uid="uid://ck3fmuiux0uf1" path="res://addons/ninetailsrabbit.interaction_kit_3d/src/pickup/grabbable_area_detector_3d.gd" id="7_dw050"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mjshs"]
 resource_name = "Beta_Joints_MAT1"
@@ -691,9 +687,6 @@ albedo_color = Color(0, 0.4627451, 1, 0.12156863)
 [sub_resource type="ViewportTexture" id="ViewportTexture_onrkg"]
 viewport_path = NodePath("SteamName")
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_b26j0"]
-radius = 0.8901367
-
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_2hs0m"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -1085,11 +1078,25 @@ bones/51/rotation = Quaternion(0.3352415, 2.6340924e-08, -1.3343895e-07, 0.94213
 bones/51/scale = Vector3(1, 0.99999994, 1)
 
 [node name="Beta_Joints" type="MeshInstance3D" parent="player_mdl/Armature/Skeleton3D" unique_id=154316393]
+layers = 5
+mesh = SubResource("ArrayMesh_0lnck")
+skin = SubResource("Skin_6cf3j")
+skeleton = NodePath("..")
+
+[node name="Beta_JointsRender" type="MeshInstance3D" parent="player_mdl/Armature/Skeleton3D" unique_id=257129390]
+layers = 4
 mesh = SubResource("ArrayMesh_0lnck")
 skin = SubResource("Skin_6cf3j")
 skeleton = NodePath("..")
 
 [node name="Beta_Surface" type="MeshInstance3D" parent="player_mdl/Armature/Skeleton3D" unique_id=21816873]
+layers = 5
+mesh = SubResource("ArrayMesh_iqboh")
+skin = SubResource("Skin_6cf3j")
+skeleton = NodePath("..")
+
+[node name="Beta_SurfaceRender" type="MeshInstance3D" parent="player_mdl/Armature/Skeleton3D" unique_id=1527090463]
+layers = 4
 mesh = SubResource("ArrayMesh_iqboh")
 skin = SubResource("Skin_6cf3j")
 skeleton = NodePath("..")
@@ -1262,37 +1269,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17386842, 0)
 [node name="Camera3D" type="Camera3D" parent="neck/head" unique_id=2053508083]
 unique_name_in_owner = true
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
-
-[node name="RayCastInteractor3D" type="RayCast3D" parent="neck/head/Camera3D" unique_id=1205803866]
-transform = Transform3D(1, 8.742278e-08, -8.742278e-08, -8.742278e-08, -4.371139e-08, -1, -8.742278e-08, 1, -4.371138e-08, 0, 0, 0)
-target_position = Vector3(0, -2, 0)
-script = ExtResource("2_onrkg")
-metadata/_custom_type_script = "uid://b13ku4ha6ywfi"
-
-[node name="GrabbableRayCastInteractor3D" type="RayCast3D" parent="neck/head/Camera3D" unique_id=231665851]
-transform = Transform3D(1, 8.742278e-08, -8.742278e-08, -8.742278e-08, -4.371139e-08, -1, -8.742278e-08, 1, -4.371138e-08, 0, 0, 0)
-target_position = Vector3(0, -2, 0)
-script = ExtResource("5_sweqy")
-metadata/_custom_type_script = "uid://cjv0cckxt2gv4"
-
-[node name="Grabber3D" type="Node3D" parent="neck/head/Camera3D" unique_id=1894205752 node_paths=PackedStringArray("available_slots")]
-script = ExtResource("6_1jxqw")
-available_slots = [NodePath("Marker3D"), NodePath("Marker3D2")]
-metadata/_custom_type_script = "uid://bu76uqckoi0qr"
-
-[node name="Marker3D" type="Marker3D" parent="neck/head/Camera3D/Grabber3D" unique_id=1264779110]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1.5)
-
-[node name="Marker3D2" type="Marker3D" parent="neck/head/Camera3D/Grabber3D" unique_id=1962049726]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -1.5)
-
-[node name="GrabbableAreaDetector3D" type="Area3D" parent="neck/head/Camera3D" unique_id=1559730142]
-script = ExtResource("7_dw050")
-metadata/_custom_type_script = "uid://ck3fmuiux0uf1"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="neck/head/Camera3D/GrabbableAreaDetector3D" unique_id=900431685]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04410184e-07, -0.11902475, -1.1943133)
-shape = SubResource("CapsuleShape3D_b26j0")
+cull_mask = 1048571
 
 [node name="LookTarget" type="Node3D" parent="neck/head" unique_id=2077054665]
 transform = Transform3D(1, -9.334053e-08, 7.259832e-08, -7.3812124e-08, -0.013068594, 0.9999141, -9.2383814e-08, -0.99991465, -0.013068514, 4.0819735e-08, -0.018010497, 0.015722938)

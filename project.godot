@@ -37,8 +37,6 @@ NetworkManager="*uid://bbayd6bi5w5tt"
 ProfileManager="*res://globals/ProfileManager.gd"
 Lobby="*uid://2yvjfoighqbo"
 TileRunInstancesGlobal="*uid://b6fg6pu2bfi14"
-GlobalInteractionEvents="*uid://xca2kvqtvbts"
-ScanInteractableLayer="*uid://bcseri36yyy3n"
 
 [console]
 
@@ -56,7 +54,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SimpleDungeons/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/ninetailsrabbit.interaction_kit_3d/plugin.cfg", "res://addons/tile-run-instances/plugin.cfg", "res://addons/tube/plugin.cfg", "res://addons/virtual_joystick_plus/plugin.cfg")
+enabled=PackedStringArray("res://addons/SimpleDungeons/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/tile-run-instances/plugin.cfg", "res://addons/tube/plugin.cfg", "res://addons/virtual_joystick_plus/plugin.cfg")
 
 [global_group]
 

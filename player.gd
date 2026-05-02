@@ -87,7 +87,6 @@ var is_paused: bool = false
 @onready var lobby_node: Node = null
 
 # Interaction Ray
-@onready var ray_cast_interactor_3d: RayCastInteractor3D = $neck/head/Camera3D/RayCastInteractor3D
 @onready var head_target: Marker3D = $neck/head/LookTarget/HeadTarget
 @onready var spine_target: Marker3D = $neck/head/LookTarget/SpineTarget
 @onready var head_look: Node3D = $player_mdl/Armature/Skeleton3D/HeadLook
@@ -97,6 +96,10 @@ func _enter_tree() -> void:
 	var peer_id := str(name).to_int()
 	if peer_id > 0:
 		set_multiplayer_authority(peer_id)
+		
+# Render Meshes
+@onready var beta_joints_render: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_JointsRender
+@onready var beta_surface_render: MeshInstance3D = $player_mdl/Armature/Skeleton3D/Beta_SurfaceRender
 
 func _ready() -> void:
 	beta_joints_mat = JOINTS_MATERIAL.duplicate()
@@ -105,6 +108,8 @@ func _ready() -> void:
 	beta_surface_mat.albedo_color = _surface_color
 	beta_joints.set_surface_override_material(0, beta_joints_mat)
 	beta_surface.set_surface_override_material(0, beta_surface_mat)
+	beta_joints_render.set_surface_override_material(0, beta_joints_mat)
+	beta_surface_render.set_surface_override_material(0, beta_surface_mat)
 
 	if is_multiplayer_authority():
 		print("Local player ready -> enabling camera")

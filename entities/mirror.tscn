@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://co3tehr2olol6"]
+
+[ext_resource type="Script" uid="uid://dknrhsg5plgqs" path="res://entities/camera_projection.gd" id="2_syy3b"]
+
+[sub_resource type="GDScript" id="GDScript_0080g"]
+script/source = "extends Node3D
+
+@onready var camera_3d: Camera3D = $MeshInstance3D/SubViewport/Camera3D
+@onready var mirror_plane: MeshInstance3D = $MeshInstance3D
+@onready var dummy_cam_pos: Node3D = $MeshInstance3D/DummyCamPos
+
+func _process(delta: float) -> void:
+	var player_camera = _get_local_player_camera()
+	if not player_camera:
+		return
+
+	_update_mirror_transform(player_camera)
+
+func _get_local_player_camera() -> Camera3D:
+	var player = get_tree().get_first_node_in_group(\"Player\")
+	if player and player.has_node(\"%Camera3D\"):
+		return player.get_node(\"%Camera3D\")
+	return null
+
+func _update_mirror_transform(player_camera: Camera3D) -> void:
+	var plane_point = mirror_plane.global_position
+	var player_pos = player_camera.global_position
+
+	var to_player = player_pos - plane_point
+	var mirror_cam_pos = plane_point + to_player
+	
+	camera_3d.global_position = mirror_cam_pos
+	
+	var look_target = Vector3(player_pos.x, camera_3d.global_position.y, player_pos.z)
+	camera_3d.look_at(look_target, Vector3.UP)
+
+func _get_mirror_normal() -> Vector3:
+	var global_transform = mirror_plane.global_transform
+	return -global_transform.basis.z.normalized()
+
+func _reflect_point_across_plane(point: Vector3, plane_point: Vector3, plane_normal: Vector3) -> Vector3:
+	var to_point = point - plane_point
+	var distance = to_point.dot(plane_normal)
+	return point - plane_normal * (2.0 * distance)
+
+func _reflect_vector_across_plane(vector: Vector3, plane_normal: Vector3) -> Vector3:
+	var distance = vector.dot(plane_normal)
+	return vector - plane_normal * (2.0 * distance)
+"
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_0080g"]
+viewport_path = NodePath("Mirror/SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kfgvg"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_0080g")
+uv1_triplanar = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0080g"]
+material = SubResource("StandardMaterial3D_kfgvg")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_syy3b"]
+viewport_path = NodePath("MeshInstance3D/SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_syy3b"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_syy3b")
+uv1_triplanar = true
+
+[node name="Mirror" type="Node3D" unique_id=1829580408]
+script = SubResource("GDScript_0080g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=514906702]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_0080g")
+surface_material_override/0 = SubResource("StandardMaterial3D_syy3b")
+
+[node name="mirrorDirection" type="RayCast3D" parent="MeshInstance3D" unique_id=650033459]
+target_position = Vector3(0, 1, 0)
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 1, 0, 1)
+
+[node name="SubViewport" type="SubViewport" parent="MeshInstance3D" unique_id=383594569]
+transparent_bg = true
+gui_disable_input = true
+size = Vector2i(1280, 720)
+script = ExtResource("2_syy3b")
+
+[node name="Camera3D" type="Camera3D" parent="MeshInstance3D/SubViewport" unique_id=985786740]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+fov = 71.9961
+
+[node name="DummyCamPos" type="Node3D" parent="MeshInstance3D" unique_id=127276167]

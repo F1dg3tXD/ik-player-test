@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://mmbsrlbuktv1"]
+
+[ext_resource type="Script" uid="uid://dknrhsg5plgqs" path="res://entities/camera_projection.gd" id="1_w1fke"]
+
+[node name="SubViewport" type="SubViewport" unique_id=383594569]
+transparent_bg = true
+gui_disable_input = true
+size = Vector2i(1280, 720)
+script = ExtResource("1_w1fke")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=985786740]
+transform = Transform3D(-1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0, 1, 0, 2.05576, 7.4614286)
+fov = 71.9961
