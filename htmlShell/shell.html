@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>$GODOT_PROJECT_NAME</title>
+		<style>
+:root {
+	--accent: #e02121;
+	--bg: #0a0a0a;
+	--fg: #ffffff;
+	--muted: #6a6a6a;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	overflow: hidden;
+	touch-action: none;
+}
+
+@keyframes bounce {
+	0%, 100% { transform: translate(0, 0) rotate(0deg); }
+	25% { transform: translate(80px, -20px) rotate(90deg); }
+	50% { transform: translate(160px, 0) rotate(180deg); }
+	75% { transform: translate(80px, -20px) rotate(270deg); }
+}
+
+#canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status {
+	position: fixed;
+	inset: 0;
+	background-color: $GODOT_SPLASH_COLOR;
+	display: none;
+}
+
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
+
+#status-splash.show-image--false {
+	display: none;
+}
+
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
+
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
+
+#status-progress,
+#status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #2b2b2b;
+	border-radius: 8px;
+	border: 1px solid var(--accent);
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.4;
+	margin: 0 2rem;
+	padding: 1rem;
+	text-align: center;
+	z-index: 11;
+}
+
+#loader {
+	position: fixed;
+	inset: 0;
+	background: radial-gradient(ellipse at center, #151515 0%, #000000 100%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	padding-bottom: 15vh;
+	z-index: 10000;
+}
+
+#loader.hidden {
+	display: none;
+}
+
+#loader-icon {
+	width: 80px;
+	height: 80px;
+	object-fit: contain;
+	filter: drop-shadow(0 4px 12px rgba(224, 33, 33, 0.5));
+	animation: bounce 2s ease-in-out infinite;
+}
+
+#loader-bar {
+	width: min(280px, 80vw);
+	height: 6px;
+	background: #1a1a1a;
+	border-radius: 3px;
+	overflow: hidden;
+	margin-top: 24px;
+	box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+#loader-bar-fill {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, #6a0000, var(--accent), #ff4a4a);
+	border-radius: 3px;
+	transition: width 0.15s ease-out;
+	box-shadow: 0 0 10px rgba(224, 33, 33, 0.6);
+}
+
+#loader-percent {
+	font-size: 0.85rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--muted);
+	margin-top: 12px;
+	font-weight: 500;
+}
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<div id="loader">
+			<img id="loader-icon" src="icon.png" alt="Loading">
+			<div id="loader-bar">
+				<div id="loader-bar-fill"></div>
+			</div>
+			<div id="loader-percent">0%</div>
+		</div>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="$GODOT_SPLASH_CLASSES" src="$GODOT_SPLASH" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+	const loader = document.getElementById('loader');
+	const barFill = document.getElementById('loader-bar-fill');
+	const percentLabel = document.getElementById('loader-percent');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach(function(line) {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	function hideLoader() {
+		loader.style.opacity = '0';
+		loader.style.pointerEvents = 'none';
+		loader.style.transition = 'opacity 0.4s ease-out';
+		setTimeout(function() {
+			loader.classList.add('hidden');
+		}, 450);
+	}
+
+	function updateProgress(current, total) {
+		if (total > 0) {
+			var pct = (current / total) * 1;
+			barFill.style.width = (pct * 100) + '%';
+			percentLabel.textContent = Math.round(pct * 100) + '%';
+		}
+	}
+
+	var missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			var serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			Promise.race([
+				serviceWorkerRegistrationPromise.then(function(registration) {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(function() { return engine.installServiceWorker(); }),
+				new Promise(function(resolve) {
+					setTimeout(function() { resolve(); }, 2000);
+				}),
+			]).then(function() {
+				window.location.reload();
+			}).catch(function(err) {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			var missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function(current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+					updateProgress(current, total);
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(function() {
+			setStatusMode('hidden');
+			setTimeout(hideLoader, 800);
+		}, displayFailureNotice);
+	}
+})();
+		</script>
+	</body>
+</html>
