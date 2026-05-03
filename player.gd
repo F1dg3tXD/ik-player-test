@@ -467,6 +467,8 @@ func _on_disconnect_pressed() -> void:
 	is_paused = false
 	if pause_menu:
 		pause_menu.visible = false
+		await get_tree().process_frame
+		get_tree().root.get_node("Main/Menu").visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	get_tree().root.get_node("Main/Menu").visible = true
 	NetworkManager.leave_session()

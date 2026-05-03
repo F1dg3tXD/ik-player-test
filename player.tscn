@@ -1233,6 +1233,7 @@ material = SubResource("StandardMaterial3D_hqtel")
 [node name="SteamName" type="SubViewport" parent="." unique_id=1236479918]
 transparent_bg = true
 gui_disable_input = true
+canvas_cull_mask = 4293918729
 size = Vector2i(500, 50)
 
 [node name="displayName" type="Label" parent="SteamName" unique_id=624669869]

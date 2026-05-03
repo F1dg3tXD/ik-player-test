@@ -32,15 +32,15 @@ script = ExtResource("1_mtvun")
 distortion_texture = SubResource("NoiseTexture2D_707dm")
 
 [node name="Viewport" type="SubViewport" parent="." unique_id=492097338]
-size = Vector2i(1280, 720)
+size = Vector2i(200, 200)
 
 [node name="Camera" type="Camera3D" parent="Viewport" unique_id=1129476143]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21393466, 1.6621454, 3.295871)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.8235589, 0.42368513, -0.47446895)
 keep_aspect = 0
 projection = 2
-frustum_offset = Vector2(0.21393466, -1.6621454)
-near = 3.345871
-far = 53.697468
+frustum_offset = Vector2(-0.8235589, -0.42368513)
+near = 0.52446896
+far = 51.040615
 
 [node name="Quad" type="MeshInstance3D" parent="." unique_id=2061898132]
 mesh = SubResource("QuadMesh_5i7m6")
